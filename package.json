@@ -1,8 +1,12 @@
 {
   "name": "payload-better-auth",
-  "version": "1.0.0",
-  "description": "A blank template to get started with Payload 3.0",
-  "license": "MIT",
+  "version": "0.0.1",
+  "description": "A Payload CMS 3 plugin for Better Auth",
+  "author": {
+    "name": "Benedetto Abbenanti",
+    "url": "https://ben.abbenanti.com"
+  },
+  "license": "AGPL-3.0-only",
   "type": "module",
   "exports": {
     ".": {
@@ -32,16 +36,19 @@
     "build:types": "tsc --outDir dist --rootDir ./src",
     "clean": "rimraf {dist,*.tsbuildinfo}",
     "copyfiles": "copyfiles -u 1 \"src/**/*.{html,css,scss,ttf,woff,woff2,eot,svg,jpg,png,json}\" dist/",
-    "dev": "payload run ./dev/server.ts",
+    "dev": "pnpm local:up -d && payload run ./dev/server.ts",
+    "dev:sync": "pnpm dev:generate-importmap && pnpm dev:generate-types",
     "dev:generate-importmap": "pnpm dev:payload generate:importmap",
     "dev:generate-types": "pnpm dev:payload generate:types",
     "dev:payload": "cross-env PAYLOAD_CONFIG_PATH=./dev/payload.config.ts payload",
+    "local:up": "docker-compose -f ./compose.local.yml up",
     "lint": "eslint",
     "lint:fix": "eslint ./src --fix",
     "prepublishOnly": "pnpm clean && pnpm build",
     "test": "jest"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
     "@eslint/eslintrc": "^3.2.0",
     "@payloadcms/db-mongodb": "3.17.1",
     "@payloadcms/db-postgres": "3.17.1",
@@ -109,5 +116,9 @@
       "sharp"
     ]
   },
-  "registry": "https://registry.npmjs.org/"
+  "registry": "https://registry.npmjs.org/",
+  "dependencies": {
+    "better-auth": "^1.1.17",
+    "mongodb": "^6.13.0"
+  }
 }
