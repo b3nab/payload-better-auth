@@ -1,9 +1,7 @@
-import { BeforeDashboardClient as BeforeDashboardClient_fc6e7dd366b9e2c8ce77d31252122343 } from 'plugin-package-name-placeholder/client'
-import { BeforeDashboardServer as BeforeDashboardServer_c4406fcca100b2553312c5a3d7520a3f } from 'plugin-package-name-placeholder/rsc'
+import { BeforeDashboardClient as BeforeDashboardClient_4bd30199dc2f6ea9b837964c640b84ab } from 'payload-better-auth/client'
+import { BeforeDashboardServer as BeforeDashboardServer_0814f4521f2b1f0fcc391051cb30e62b } from 'payload-better-auth/rsc'
 
 export const importMap = {
-  'plugin-package-name-placeholder/client#BeforeDashboardClient':
-    BeforeDashboardClient_fc6e7dd366b9e2c8ce77d31252122343,
-  'plugin-package-name-placeholder/rsc#BeforeDashboardServer':
-    BeforeDashboardServer_c4406fcca100b2553312c5a3d7520a3f,
+  "payload-better-auth/client#BeforeDashboardClient": BeforeDashboardClient_4bd30199dc2f6ea9b837964c640b84ab,
+  "payload-better-auth/rsc#BeforeDashboardServer": BeforeDashboardServer_0814f4521f2b1f0fcc391051cb30e62b
 }

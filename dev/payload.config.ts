@@ -1,10 +1,10 @@
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+import sharp from 'sharp'
+import { buildConfig } from 'payload'
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
-import path from 'path'
-import { buildConfig } from 'payload'
-import { payloadBetterAuth } from 'payload-better-auth'
-import sharp from 'sharp'
-import { fileURLToPath } from 'url'
+import { betterAuthPlugin } from 'payload-better-auth'
 
 import { devUser } from './helpers/credentials.js'
 import { testEmailAdapter } from './helpers/testEmailAdapter.js'
@@ -19,7 +19,7 @@ if (!process.env.ROOT_DIR) {
 
 export default buildConfig({
   admin: {
-    autoLogin: devUser,
+    // autoLogin: devUser,
     importMap: {
       baseDir: path.resolve(dirname),
     },
@@ -42,14 +42,16 @@ export default buildConfig({
   }),
   editor: lexicalEditor(),
   email: testEmailAdapter,
-  onInit: async (payload) => {
-    await seed(payload)
-  },
+  // onInit: async (payload) => {
+  //   await seed(payload)
+  // },
   plugins: [
-    payloadBetterAuth({
+    betterAuthPlugin({
+      betterAuth: {},
       collections: {
         posts: true,
       },
+      collectionUser: 'user',
     }),
   ],
   secret: process.env.PAYLOAD_SECRET || 'test-secret_key',
