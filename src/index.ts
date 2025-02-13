@@ -30,6 +30,8 @@ import {
   verificationCollection,
 } from './core-schema/index.js'
 import { EndpointFactory } from './factory.endpoint.js'
+import { getPayload, payloadSingleton } from './singleton.payload.js'
+import { payloadAdapter } from './better-auth/payload-adapter.js'
 
 export type BetterAuthPluginOptions = {
   /**
@@ -53,10 +55,13 @@ export const betterAuthPlugin =
   (incomingConfig: Config): Config => {
     const config = { ...incomingConfig }
 
+    console.log(`\n- betterAuthPlugin`)
+
     ///////////////////////////////////
     // Add Better Auth - Core Schema
     ///////////////////////////////////
 
+    // Default collections
     config.collections = [
       ...(config.collections || []),
       userCollection,
@@ -65,33 +70,35 @@ export const betterAuthPlugin =
       verificationCollection,
     ]
 
-    config.collections.push({
-      slug: 'plugin-collection',
-      fields: [
-        {
-          name: 'id',
-          type: 'text',
-        },
-      ],
-    })
+    // Dynamic collections
+    // config.collections.push({
+    //   slug: 'plugin-collection',
+    //   fields: [
+    //     {
+    //       name: 'id',
+    //       type: 'text',
+    //     },
+    //   ],
+    // })
 
-    if (pluginOptions.collections) {
-      for (const collectionSlug in pluginOptions.collections) {
-        const collection = config.collections.find(
-          (collection) => collection.slug === collectionSlug,
-        )
+    // Configure collections auth
+    // if (pluginOptions.collections) {
+    //   for (const collectionSlug in pluginOptions.collections) {
+    //     const collection = config.collections.find(
+    //       (collection) => collection.slug === collectionSlug,
+    //     )
 
-        if (collection) {
-          collection.fields.push({
-            name: 'addedByPlugin',
-            type: 'text',
-            admin: {
-              position: 'sidebar',
-            },
-          })
-        }
-      }
-    }
+    //     if (collection) {
+    //       collection.fields.push({
+    //         name: 'addedByPlugin',
+    //         type: 'text',
+    //         admin: {
+    //           position: 'sidebar',
+    //         },
+    //       })
+    //     }
+    //   }
+    // }
 
     if (pluginOptions.disabled) {
       /**
@@ -104,12 +111,15 @@ export const betterAuthPlugin =
     // Better Auth - INSTANCE
     ///////////////////////////////////
     const betterAuthOptions: BetterAuthOptions = {
-      database: mongodbAdapter(
-        new MongoClient(
-          process.env.DATABASE_URI ||
-            'mongodb://127.0.0.1:37001/payload-plugin-better-auth',
-        ).db(),
-      ),
+      // database: mongodbAdapter(
+      //   new MongoClient(
+      //     process.env.DATABASE_URI ||
+      //       'mongodb://127.0.0.1:37001/payload-plugin-better-auth',
+      //   ).db(),
+      // ),
+      database: payloadAdapter({
+        payload: getPayload(),
+      }),
       emailAndPassword: {
         enabled: true,
       },
@@ -177,10 +187,14 @@ export const betterAuthPlugin =
     const incomingOnInit = config.onInit
 
     config.onInit = async (payload) => {
+      console.log(`\n- betterAuthPlugin onInit`)
       // Ensure we are executing any existing onInit functions before running our own.
       if (incomingOnInit) {
         await incomingOnInit(payload)
       }
+
+      // attach payload instance to better-auth's payload adapter
+      payloadSingleton(payload)
 
       // const { totalDocs } = await payload.count({
       //   collection: 'plugin-collection',
