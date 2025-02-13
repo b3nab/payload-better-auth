@@ -29,12 +29,12 @@ const customJestConfig = {
     `/node_modules/(?!.pnpm)(?!(${esModules})/)`,
     `/node_modules/.pnpm/(?!(${esModules.replace(/\//g, '\\+')})@)`,
   ],
-  moduleNameMapper: {
-    '\\.(css|scss)$': '<rootDir>/test/helpers/mocks/emptyModule.js',
-    '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$':
-      '<rootDir>/test/helpers/mocks/fileMock.js',
-    '^(\\.{1,2}/.*)\\.js$': '$1',
-  },
+  // moduleNameMapper: {
+  //   '\\.(css|scss)$': '<rootDir>/test/helpers/mocks/emptyModule.js',
+  //   '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$':
+  //     '<rootDir>/test/helpers/mocks/fileMock.js',
+  //   '^(\\.{1,2}/.*)\\.js$': '$1',
+  // },
   testEnvironment: 'node',
   testTimeout: 90000,
   transform: {
