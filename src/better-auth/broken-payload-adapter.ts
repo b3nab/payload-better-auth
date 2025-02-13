@@ -163,9 +163,12 @@ export const payloadAdapter: (config: PayloadAdapterConfig) => AdapterInstance =
 
     return {
       id: 'payloadcms',
-
       // Crea un nuovo record
-      async create(data) {
+      async create<T extends Record<string, any>, R = T>(data: {
+        model: string
+        data: T
+        select?: string[]
+      }): Promise<R> {
         const { model, data: values, select } = data
         const transformed = transformInput(values, model, 'create')
 
@@ -175,7 +178,11 @@ export const payloadAdapter: (config: PayloadAdapterConfig) => AdapterInstance =
             data: transformed,
           })
 
-          return transformOutput(result, model, select)
+          const transformed_result = transformOutput<T>(result, model, select)
+          if (!transformed_result) {
+            throw new BetterAuthError('Failed to transform created record')
+          }
+          return transformed_result
         } catch (error) {
           throw new BetterAuthError(
             `Failed to create record in ${model}: ${(error as Error).message}`,
@@ -184,19 +191,23 @@ export const payloadAdapter: (config: PayloadAdapterConfig) => AdapterInstance =
       },
 
       // Trova un singolo record
-      async findOne(data) {
+      async findOne<T extends Record<string, any>>(data: {
+        model: string
+        where?: Where[]
+        select?: string[]
+      }): Promise<T | null> {
         const { model, where, select } = data
         const whereClause = convertWhereClause(model, where)
 
         try {
-          const result = await payload.find({
+          const { docs } = await payload.find({
             collection: getModelName(model),
             where: whereClause,
             limit: 1,
           })
 
-          if (!result.docs.length) return null
-          return transformOutput(result.docs[0], model, select)
+          if (!docs.length) return null
+          return transformOutput<T>(docs[0], model, select)
         } catch (error) {
           throw new BetterAuthError(
             `Failed to find record in ${model}: ${(error as Error).message}`,
@@ -205,24 +216,28 @@ export const payloadAdapter: (config: PayloadAdapterConfig) => AdapterInstance =
       },
 
       // Trova più record
-      async findMany(data) {
+      async findMany<T extends Record<string, any>>(data: {
+        model: string
+        where?: Where[]
+        limit?: number
+        offset?: number
+        sortBy?: { field: string; direction: 'asc' | 'desc' }
+      }): Promise<T[]> {
         const { model, where, limit, offset, sortBy } = data
         const whereClause = convertWhereClause(model, where)
 
         try {
-          const result = await payload.find({
+          const { docs } = await payload.find({
             collection: getModelName(model),
             where: whereClause,
             limit: limit || 100,
             skip: offset || 0,
             sort: sortBy
-              ? {
-                  [sortBy.field]: sortBy.direction === 'desc' ? -1 : 1,
-                }
+              ? { [sortBy.field]: sortBy.direction === 'desc' ? -1 : 1 }
               : undefined,
           })
 
-          return result.docs.map((doc) => transformOutput(doc, model))
+          return docs.map((doc) => transformOutput<T>(doc, model))
         } catch (error) {
           throw new BetterAuthError(
             `Failed to find records in ${model}: ${(error as Error).message}`,
@@ -231,29 +246,37 @@ export const payloadAdapter: (config: PayloadAdapterConfig) => AdapterInstance =
       },
 
       // Aggiorna un record
-      async update(data) {
+      async update<T extends Record<string, any>>(data: {
+        model: string
+        where?: Where[]
+        update: Partial<T>
+      }): Promise<T> {
         const { model, where, update: values } = data
         const whereClause = convertWhereClause(model, where)
         const transformed = transformInput(values, model, 'update')
 
         try {
-          const existing = await payload.find({
+          const { docs } = await payload.find({
             collection: getModelName(model),
             where: whereClause,
             limit: 1,
           })
 
-          if (!existing.docs.length) {
+          if (!docs.length) {
             throw new BetterAuthError(`Record not found in ${model}`)
           }
 
           const result = await payload.update({
             collection: getModelName(model),
-            id: existing.docs[0].id,
+            id: docs[0].id,
             data: transformed,
           })
 
-          return transformOutput(result, model)
+          const transformed_result = transformOutput<T>(result, model)
+          if (!transformed_result) {
+            throw new BetterAuthError('Failed to transform updated record')
+          }
+          return transformed_result
         } catch (error) {
           throw new BetterAuthError(
             `Failed to update record in ${model}: ${(error as Error).message}`,
