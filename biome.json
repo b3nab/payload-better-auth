@@ -22,7 +22,8 @@
       "recommended": true,
       "style": {
         "noUnusedTemplateLiteral": "off",
-        "noNonNullAssertion": "warn"
+        "noNonNullAssertion": "warn",
+        "noUselessElse": "off"
       },
       "suspicious": {
         "noArrayIndexKey": "info",
