@@ -15,11 +15,41 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { CollectionSlug, Config, Endpoint, PayloadHandler } from 'payload'
+import type {
+  AuthStrategyFunction,
+  CollectionSlug,
+  Config,
+  Endpoint,
+  PayloadHandler,
+} from 'payload'
 import { betterAuth, type BetterAuthOptions } from 'better-auth'
 import { getEndpoints } from 'better-auth/api'
-import { twoFactor } from 'better-auth/plugins'
+import {
+  // core authentication
+  twoFactor,
+  username,
+  anonymous,
+  phoneNumber,
+  magicLink,
+  emailOTP,
+  // passkey,
+  genericOAuth,
+  oneTap,
+  // core authorization
+  admin,
+  organization,
+  // core enterprise
+  oidcProvider,
+  // sso,
+  // core utility
+  bearer,
+  multiSession,
+  oAuthProxy,
+  openAPI,
+  jwt,
+} from 'better-auth/plugins'
 import { passkey } from 'better-auth/plugins/passkey'
+import { sso } from 'better-auth/plugins/sso'
 import { MongoClient } from 'mongodb'
 import { mongodbAdapter } from 'better-auth/adapters/mongodb'
 
@@ -32,6 +62,8 @@ import {
 import { EndpointFactory } from './factory.endpoint.js'
 import { getPayload, payloadSingleton } from './singleton.payload.js'
 import { payloadAdapter } from './better-auth/payload-adapter.js'
+import { createAuthStrategies } from './factory.strategy.js'
+import { getAuthTables } from 'better-auth/db'
 
 export type BetterAuthPluginOptions = {
   /**
@@ -47,6 +79,36 @@ export type BetterAuthPluginOptions = {
    * Better Auth Config. https://www.better-auth.com/docs/reference/options
    */
   betterAuth?: Omit<BetterAuthOptions, 'database'>
+  betterAuthPlugins?: {
+    /**
+     * List of plugins to add to better-auth
+     */
+    // core authentication
+    twoFactor?: boolean
+    username?: boolean
+    anonymous?: boolean
+    phoneNumber?: boolean
+    magicLink?: boolean
+    emailOTP?: boolean
+    passkey?: boolean
+    genericOAuth?: boolean
+    oneTap?: boolean
+    // core authorization
+    admin?: boolean
+    organization?: boolean
+    // core enterprise
+    oidcProvider?: boolean
+    sso?: boolean
+    // core utility
+    bearer?: boolean
+    multiSession?: boolean
+    oAuthProxy?: boolean
+    openAPI?: boolean
+    jwt?: boolean
+    // third-party
+    harmony?: boolean
+    validator?: boolean
+  }
 }
 
 // Plugin PayloadCMS che utilizza l'adapter
@@ -55,12 +117,12 @@ export const betterAuthPlugin =
   (incomingConfig: Config): Config => {
     const config = { ...incomingConfig }
 
-    console.log(`\n- betterAuthPlugin`)
+    // console.log(`\n- betterAuthPlugin`)
 
     ///////////////////////////////////
     // Add Better Auth - Core Schema
     ///////////////////////////////////
-
+    // TODO: add core schema dynamically from authTables
     // Default collections
     config.collections = [
       ...(config.collections || []),
@@ -111,25 +173,38 @@ export const betterAuthPlugin =
     // Better Auth - INSTANCE
     ///////////////////////////////////
     const betterAuthOptions: BetterAuthOptions = {
-      // database: mongodbAdapter(
-      //   new MongoClient(
-      //     process.env.DATABASE_URI ||
-      //       'mongodb://127.0.0.1:37001/payload-plugin-better-auth',
-      //   ).db(),
-      // ),
+      // defaults
       database: payloadAdapter({
         payload: getPayload(),
-      }),
+      }) as any, // TODO: fix type
       emailAndPassword: {
         enabled: true,
       },
-      plugins: [twoFactor(), passkey()],
+      plugins: [twoFactor(), passkey(), openAPI()],
+      // options from plugin
+      ...(pluginOptions.betterAuth || {}),
+      // merge options
+      trustedOrigins: [
+        // url for hoppscotch extension proxy
+        'chrome-extension://amknoiejhlmhancpahfcfcfhllgkpbld',
+        ...(pluginOptions.betterAuth?.trustedOrigins || []),
+      ],
+      // user: {
+      //   additionalFields: {
+      //     name: {
+      //       type: 'string',
+      //     },
+      //   },
+      // },
     }
     // extract api endpoints the same way as better-auth do.
     const auth = betterAuth(betterAuthOptions)
     // console.log('keys:', Object.keys(auth.api))
     // console.log(`[better-auth] auth.api: ${JSON.stringify(auth.api, null, 2)}`)
     const authEndpoints = getEndpoints(auth.$context, betterAuthOptions)
+    const authTables = getAuthTables(betterAuthOptions)
+
+    console.log('authTables', JSON.stringify(authTables, null, 2))
 
     // console.log('keys authEndpoints:', Object.keys(authEndpoints.api))
     // console.log(
@@ -165,13 +240,94 @@ export const betterAuthPlugin =
 
     config.endpoints = [...(config.endpoints || []), ...betterAuthEndpoints]
 
-    // if (!config.admin) {
-    //   config.admin = {}
-    // }
+    ///////////////////////////////////
+    // Add Better Auth - Strategies
+    ///////////////////////////////////
 
-    // if (!config.admin.components) {
-    //   config.admin.components = {}
-    // }
+    const betterAuthStrategies = createAuthStrategies({
+      betterAuthOptions,
+    })
+
+    const authCollection = config.collections.find(
+      (collection) => collection.auth === true,
+    )
+
+    if (authCollection) {
+      authCollection.auth = {
+        disableLocalStrategy: true,
+        strategies: [...betterAuthStrategies],
+      }
+    }
+
+    // console.log('authCollection', authCollection)
+
+    ///////////////////////////////////////////
+    // Add Better Auth - Admin Customization
+    ///////////////////////////////////////////
+
+    if (!config.admin) {
+      config.admin = {}
+    }
+
+    config.admin.routes = {
+      ...config.admin.routes,
+      // account: '/auth/account'
+      createFirstUser: '/admin/auth/create-first-user',
+      // forgot: '/auth/forgot'
+      // inactivity: '/auth/inactivity'
+      // login: '/auth/login'
+      // logout: '/auth/logout'
+      // reset: '/auth/reset'
+      // unauthorized: '/auth/unauthorized'
+    }
+
+    if (!config.admin.components) {
+      config.admin.components = {}
+    }
+
+    config.admin.components = {
+      ...config.admin.components,
+      // beforeLogin: [
+      //   // `payload-better-auth/client#BeforeLoginClient`,
+      //   `payload-better-auth/rsc#BeforeLoginServer`,
+      // ],
+
+      // Better Auth Custom Views
+      views: {
+        // account: {
+        //   path: '/admin/auth/account',
+        //   Component: 'payload-better-auth/rsc#AccountServer',
+        // },
+        login: {
+          path: '/auth/login',
+          Component: 'payload-better-auth/rsc#LoginServer',
+        },
+        // forgot: {
+        //   path: '/admin/auth/forgot',
+        //   Component: 'payload-better-auth/rsc#ForgotServer',
+        // },
+        // inactivity: {
+        //   path: '/admin/auth/inactivity',
+        //   Component: 'payload-better-auth/rsc#InactivityServer',
+        // },
+        // login: {
+        //   path: '/admin/auth/login',
+        //   Component: 'payload-better-auth/rsc#LoginServer',
+        // },
+        // logout: {
+        //   path: '/admin/auth/logout',
+        //   Component: 'payload-better-auth/rsc#LogoutServer',
+        // },
+        // reset: {
+        //   path: '/admin/auth/reset',
+        //   Component: 'payload-better-auth/rsc#ResetServer',
+        // },
+        // unauthorized: {
+        //   path: '/admin/auth/unauthorized',
+        //   Component: 'payload-better-auth/rsc#UnauthorizedServer',
+        // },
+      },
+    }
 
     // if (!config.admin.components.beforeDashboard) {
     //   config.admin.components.beforeDashboard = []
@@ -187,7 +343,7 @@ export const betterAuthPlugin =
     const incomingOnInit = config.onInit
 
     config.onInit = async (payload) => {
-      console.log(`\n- betterAuthPlugin onInit`)
+      // console.log(`\n- betterAuthPlugin onInit`)
       // Ensure we are executing any existing onInit functions before running our own.
       if (incomingOnInit) {
         await incomingOnInit(payload)
