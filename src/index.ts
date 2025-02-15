@@ -22,7 +22,11 @@ import type {
   Endpoint,
   PayloadHandler,
 } from 'payload'
-import { betterAuth, type BetterAuthOptions } from 'better-auth'
+import {
+  betterAuth,
+  type BetterAuthOptions,
+  type BetterAuthPlugin,
+} from 'better-auth'
 import { getEndpoints } from 'better-auth/api'
 import {
   // core authentication
@@ -109,6 +113,8 @@ export type BetterAuthPluginOptions = {
     // third-party
     harmony?: boolean
     validator?: boolean
+  } & {
+    [key: string]: BetterAuthPlugin | undefined
   }
 }
 
@@ -243,7 +249,7 @@ export const betterAuthPlugin =
     config.admin.routes = {
       ...config.admin.routes,
       // account: '/auth/account'
-      createFirstUser: '/admin/auth/create-first-user',
+      // createFirstUser: '/admin/auth/create-first-user',
       // forgot: '/auth/forgot'
       // inactivity: '/auth/inactivity'
       // login: '/auth/login'
@@ -269,10 +275,10 @@ export const betterAuthPlugin =
         //   path: '/admin/auth/account',
         //   Component: 'payload-better-auth/rsc#AccountServer',
         // },
-        login: {
-          path: '/auth/login',
-          Component: 'payload-better-auth/rsc#LoginServer',
-        },
+        // login: {
+        //   path: '/auth/login',
+        //   Component: 'payload-better-auth/rsc#LoginServer',
+        // },
         // forgot: {
         //   path: '/admin/auth/forgot',
         //   Component: 'payload-better-auth/rsc#ForgotServer',
