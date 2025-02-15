@@ -37,13 +37,22 @@ const convertToPayloadFields = (
       ({
         name: fieldKey,
         type: convertToPayloadType(fieldValue.type),
+        required: fieldValue.required,
+        // TODO: better-auth FieldAttributeConfig . returned has the same "reason to exists" as the payload FieldBase . hidden ??
+        hidden: fieldValue.returned,
+        // TODO: how to map better-auth FieldAttributeConfig . input ??
+        defaultValue: fieldValue.defaultValue,
+        // TODO: how to map better-auth FieldAttributeConfig . references ??
+        unique: fieldValue.unique,
+        // TODO: better-auth FieldAttributeConfig . sortable has the same "reason to exists" as the payload FieldBase . index ??
+        index: fieldValue.sortable,
       }) as PayloadField,
   )
 }
 
-// BETTER AUTH TYPES
+// BETTER AUTH FieldType
 // "string" | "number" | "boolean" | "date" | `${"string" | "number"}[]`
-// PAYLOAD TYPES
+// PAYLOAD FieldTypes
 // "text" | "number" | "checkbox" | "date" | "array"
 function convertToPayloadType(fieldType: FieldType): PayloadFieldTypes {
   return ({
