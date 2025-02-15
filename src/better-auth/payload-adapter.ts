@@ -25,7 +25,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
     },
   )
 
-  return async (options: BetterAuthOptions) => {
+  return (options: BetterAuthOptions): Adapter => {
     // console.log(`\n- - payloadAdapter CLOSURE`)
     const schema = getAuthTables(options)
 

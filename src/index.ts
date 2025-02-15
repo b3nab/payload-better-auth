@@ -54,8 +54,6 @@ import {
 } from 'better-auth/plugins'
 import { passkey } from 'better-auth/plugins/passkey'
 import { sso } from 'better-auth/plugins/sso'
-import { MongoClient } from 'mongodb'
-import { mongodbAdapter } from 'better-auth/adapters/mongodb'
 
 import {
   accountCollection,
@@ -179,12 +177,11 @@ export const betterAuthPlugin =
       //////////////////////////////
       database: payloadAdapter({
         payload: getPayload(),
-      }) as any, // TODO: fix type
+      }),
       emailAndPassword: {
         enabled: true,
       },
       plugins: pluginsToLoad,
-      // [twoFactor(), passkey(), openAPI()],
 
       ////////////////////////////
       // options from plugin
