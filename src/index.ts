@@ -114,7 +114,7 @@ export type BetterAuthPluginOptions = {
     harmony?: boolean
     validator?: boolean
   } & {
-    [key: string]: BetterAuthPlugin | undefined
+    [key: string]: () => BetterAuthPlugin
   }
 }
 
@@ -129,6 +129,50 @@ export const betterAuthPlugin =
     ///////////////////////////////////
     // Better Auth - INSTANCE
     ///////////////////////////////////
+    const defaultPlugins = [twoFactor(), passkey(), openAPI()]
+    const pluginsToLoad = pluginOptions.betterAuthPlugins
+      ? Object.entries(pluginOptions.betterAuthPlugins)
+          .map(([key, plugin]) => {
+            if (typeof plugin === 'boolean') {
+              return {
+                // core authentication
+                twoFactor: twoFactor(),
+                username: username(),
+                anonymous: anonymous(),
+                phoneNumber: phoneNumber(),
+                // TODO: need to pass options for plugin
+                // magicLink: magicLink(),
+                // TODO: need to pass options for plugin
+                // emailOTP: emailOTP(),
+                passkey: passkey(),
+                // TODO: need to pass options for plugin
+                // genericOAuth: genericOAuth(),
+                oneTap: oneTap(),
+                // core authorization
+                admin: admin(),
+                organization: organization(),
+                // core enterprise
+                // TODO: need to pass options for plugin
+                // oidcProvider: oidcProvider(),
+                sso: sso(),
+                // core utility
+                bearer: bearer(),
+                multiSession: multiSession(),
+                oAuthProxy: oAuthProxy(),
+                openAPI: openAPI(),
+                jwt: jwt(),
+                // third-party
+                // TODO: need to pass options for plugin
+                // harmony: harmony(),
+                // TODO: need to pass options for plugin
+                // validator: validator(),
+              }[key]
+            }
+            return plugin()
+          })
+          // need to filter out undefined plugins
+          .filter((plugin) => !!plugin)
+      : defaultPlugins
     const betterAuthOptions: BetterAuthOptions = {
       //////////////////////////////
       // defaults (sane defaults)
@@ -139,7 +183,8 @@ export const betterAuthPlugin =
       emailAndPassword: {
         enabled: true,
       },
-      plugins: [twoFactor(), passkey(), openAPI()],
+      plugins: pluginsToLoad,
+      // [twoFactor(), passkey(), openAPI()],
 
       ////////////////////////////
       // options from plugin
