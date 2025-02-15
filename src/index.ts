@@ -55,6 +55,7 @@ import { mongodbAdapter } from 'better-auth/adapters/mongodb'
 
 import {
   accountCollection,
+  generatePayloadCollections,
   sessionCollection,
   userCollection,
   verificationCollection,
@@ -120,60 +121,12 @@ export const betterAuthPlugin =
     // console.log(`\n- betterAuthPlugin`)
 
     ///////////////////////////////////
-    // Add Better Auth - Core Schema
-    ///////////////////////////////////
-    // TODO: add core schema dynamically from authTables
-    // Default collections
-    config.collections = [
-      ...(config.collections || []),
-      userCollection,
-      sessionCollection,
-      accountCollection,
-      verificationCollection,
-    ]
-
-    // Dynamic collections
-    // config.collections.push({
-    //   slug: 'plugin-collection',
-    //   fields: [
-    //     {
-    //       name: 'id',
-    //       type: 'text',
-    //     },
-    //   ],
-    // })
-
-    // Configure collections auth
-    // if (pluginOptions.collections) {
-    //   for (const collectionSlug in pluginOptions.collections) {
-    //     const collection = config.collections.find(
-    //       (collection) => collection.slug === collectionSlug,
-    //     )
-
-    //     if (collection) {
-    //       collection.fields.push({
-    //         name: 'addedByPlugin',
-    //         type: 'text',
-    //         admin: {
-    //           position: 'sidebar',
-    //         },
-    //       })
-    //     }
-    //   }
-    // }
-
-    if (pluginOptions.disabled) {
-      /**
-       * If the plugin is disabled, we still want to keep added collections/fields so the database schema is consistent which is important for migrations.
-       * If your plugin heavily modifies the database schema, you may want to remove this property.
-       */
-      return config
-    }
-    ///////////////////////////////////
     // Better Auth - INSTANCE
     ///////////////////////////////////
     const betterAuthOptions: BetterAuthOptions = {
-      // defaults
+      //////////////////////////////
+      // defaults (sane defaults)
+      //////////////////////////////
       database: payloadAdapter({
         payload: getPayload(),
       }) as any, // TODO: fix type
@@ -181,9 +134,15 @@ export const betterAuthPlugin =
         enabled: true,
       },
       plugins: [twoFactor(), passkey(), openAPI()],
+
+      ////////////////////////////
       // options from plugin
+      ////////////////////////////
       ...(pluginOptions.betterAuth || {}),
-      // merge options
+
+      //////////////////////////////////
+      // merge options (nested ones)
+      //////////////////////////////////
       trustedOrigins: [
         // url for hoppscotch extension proxy
         'chrome-extension://amknoiejhlmhancpahfcfcfhllgkpbld',
@@ -211,12 +170,24 @@ export const betterAuthPlugin =
     //   `[better-auth] authEndpoints.api: ${JSON.stringify(authEndpoints.api, null, 2)}`,
     // )
 
-    // const authContext = init(betterAuthOptions)
-    // const authEndpoints = getEndpoints(authContext, betterAuthOptions)
+    ///////////////////////////////////
+    // Add Better Auth - Core Schema
+    ///////////////////////////////////
+    // TODO: add core schema dynamically from authTables
+    const betterAuthCollections = generatePayloadCollections(authTables)
+    // Default collections
+    config.collections = [
+      ...(config.collections || []),
+      ...betterAuthCollections,
+    ]
 
-    // console.log(
-    //   `[better-auth] getEndpoints: ${JSON.stringify(authEndpoints.api, null, 2)}`,
-    // )
+    if (pluginOptions.disabled) {
+      /**
+       * If the plugin is disabled, we still want to keep added collections/fields so the database schema is consistent which is important for migrations.
+       * If your plugin heavily modifies the database schema, you may want to remove this property.
+       */
+      return config
+    }
 
     ///////////////////////////////////
     // Add Better Auth - Endpoints
