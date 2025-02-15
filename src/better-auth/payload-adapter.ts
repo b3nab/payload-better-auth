@@ -14,7 +14,7 @@ export interface PayloadAdapterConfig {
 }
 
 export const payloadAdapter = (config: PayloadAdapterConfig) => {
-  console.log(`\n- payloadAdapter WRAPPER`)
+  // console.log(`\n- payloadAdapter WRAPPER`)
   const payloadPromise: Promise<Payload | undefined> = new Promise(
     (resolve) => {
       if (config.payload) {
@@ -26,10 +26,10 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
   )
 
   return async (options: BetterAuthOptions) => {
-    console.log(`\n- - payloadAdapter CLOSURE`)
+    // console.log(`\n- - payloadAdapter CLOSURE`)
     const schema = getAuthTables(options)
 
-    const initializePayload = async () => {
+    const resolvePayload = async () => {
       const payload = await payloadPromise
       if (!payload) {
         throw new Error('Payload is not initialized')
@@ -50,7 +50,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
         select?: string[]
       }): Promise<any> {
         console.log(`\n- - payloadAdapter - create`)
-        const payload = await initializePayload()
+        const payload = await resolvePayload()
         const { model, data: values } = data
 
         try {
@@ -73,7 +73,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
         select?: string[]
       }): Promise<any | null> {
         console.log(`\n- - payloadAdapter - findOne`)
-        const payload = await initializePayload()
+        const payload = await resolvePayload()
         const { model, where } = data
 
         try {
@@ -99,7 +99,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
         sortBy?: { field: string; direction: 'asc' | 'desc' }
       }): Promise<any[]> {
         console.log(`\n- - payloadAdapter - findMany`)
-        const payload = await initializePayload()
+        const payload = await resolvePayload()
         const { model, where, limit, offset, sortBy } = data
 
         try {
@@ -128,7 +128,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
         update: any
       }): Promise<any> {
         console.log(`\n- - payloadAdapter - update`)
-        const payload = await initializePayload()
+        const payload = await resolvePayload()
         const { model, where, update: values } = data
 
         try {
@@ -162,7 +162,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
         update: any
       }): Promise<number> {
         console.log(`\n- - payloadAdapter - updateMany`)
-        const payload = await initializePayload()
+        const payload = await resolvePayload()
         const { model, where, update: values } = data
 
         try {
@@ -191,7 +191,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
 
       async delete(data: { model: string; where?: Where[] }): Promise<void> {
         console.log(`\n- - payloadAdapter - delete`)
-        const payload = await initializePayload()
+        const payload = await resolvePayload()
         const { model, where } = data
 
         try {
@@ -219,7 +219,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
         where?: Where[]
       }): Promise<number> {
         console.log(`\n- - payloadAdapter - deleteMany`)
-        const payload = await initializePayload()
+        const payload = await resolvePayload()
         const { model, where } = data
 
         try {
