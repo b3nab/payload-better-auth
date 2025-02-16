@@ -15,10 +15,14 @@ export const generatePayloadCollections = (
   const collections: CollectionConfig[] = []
 
   for (const [key, value] of Object.entries(authTables)) {
-    collections.push({
+    const newCollection: CollectionConfig = {
       slug: key,
       fields: convertToPayloadFields(value.fields),
-    })
+    }
+    if (key === 'user') {
+      newCollection.auth = true
+    }
+    collections.push(newCollection)
   }
 
   return collections
@@ -32,22 +36,24 @@ export const generatePayloadCollections = (
 const convertToPayloadFields = (
   fields: Record<string, FieldAttribute<FieldType>>,
 ): PayloadField[] => {
-  return Object.entries(fields).map(
-    ([fieldKey, fieldValue]) =>
-      ({
-        name: fieldKey,
-        type: convertToPayloadType(fieldValue.type),
-        required: fieldValue.required,
-        // TODO: better-auth FieldAttributeConfig . returned has the same "reason to exists" as the payload FieldBase . hidden ??
-        hidden: fieldValue.returned,
-        // TODO: how to map better-auth FieldAttributeConfig . input ??
-        defaultValue: fieldValue.defaultValue,
-        // TODO: how to map better-auth FieldAttributeConfig . references ??
-        unique: fieldValue.unique,
-        // TODO: better-auth FieldAttributeConfig . sortable has the same "reason to exists" as the payload FieldBase . index ??
-        index: fieldValue.sortable,
-      }) as PayloadField,
-  )
+  return Object.entries(fields)
+    .filter(
+      ([fieldKey]) => !['email', 'createdAt', 'updatedAt'].includes(fieldKey),
+    )
+    .map(
+      ([fieldKey, fieldValue]) =>
+        ({
+          name: fieldKey,
+          type: convertToPayloadType(fieldValue.type),
+          required: fieldValue.required,
+          // TODO: better-auth FieldAttributeConfig . returned has the same "reason to exists" as the payload FieldBase . hidden ??
+          hidden: fieldValue.returned,
+          // TODO: how to map better-auth FieldAttributeConfig . input ??
+          defaultValue: fieldValue.defaultValue,
+          // TODO: how to map better-auth FieldAttributeConfig . references ??
+          unique: fieldValue.unique, // TODO: better-auth FieldAttributeConfig . sortable has the same "reason to exists" as the payload FieldBase . index ??  index: fieldValue.sortable,
+        }) as PayloadField,
+    )
 }
 
 // BETTER AUTH FieldType
@@ -56,6 +62,7 @@ const convertToPayloadFields = (
 // "text" | "number" | "checkbox" | "date" | "array"
 function convertToPayloadType(fieldType: FieldType): PayloadFieldTypes {
   return ({
+    // TODO: better-auth FieldType "number[]" or "string[]" are not mapped strictly to payload FieldTypes "array"
     'number[]': 'array',
     'string[]': 'array',
     string: 'text',
