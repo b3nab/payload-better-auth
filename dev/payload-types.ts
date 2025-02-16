@@ -6,15 +6,73 @@
  * and re-run `payload generate:types` to regenerate this file.
  */
 
+/**
+ * Supported timezones in IANA format.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "supportedTimezones".
+ */
+export type SupportedTimezones =
+  | 'Pacific/Midway'
+  | 'Pacific/Niue'
+  | 'Pacific/Honolulu'
+  | 'Pacific/Rarotonga'
+  | 'America/Anchorage'
+  | 'Pacific/Gambier'
+  | 'America/Los_Angeles'
+  | 'America/Tijuana'
+  | 'America/Denver'
+  | 'America/Phoenix'
+  | 'America/Chicago'
+  | 'America/Guatemala'
+  | 'America/New_York'
+  | 'America/Bogota'
+  | 'America/Caracas'
+  | 'America/Santiago'
+  | 'America/Buenos_Aires'
+  | 'America/Sao_Paulo'
+  | 'Atlantic/South_Georgia'
+  | 'Atlantic/Azores'
+  | 'Atlantic/Cape_Verde'
+  | 'Europe/London'
+  | 'Europe/Berlin'
+  | 'Africa/Lagos'
+  | 'Europe/Athens'
+  | 'Africa/Cairo'
+  | 'Europe/Moscow'
+  | 'Asia/Riyadh'
+  | 'Asia/Dubai'
+  | 'Asia/Baku'
+  | 'Asia/Karachi'
+  | 'Asia/Tashkent'
+  | 'Asia/Calcutta'
+  | 'Asia/Dhaka'
+  | 'Asia/Almaty'
+  | 'Asia/Jakarta'
+  | 'Asia/Bangkok'
+  | 'Asia/Shanghai'
+  | 'Asia/Singapore'
+  | 'Asia/Tokyo'
+  | 'Asia/Seoul'
+  | 'Australia/Sydney'
+  | 'Pacific/Guam'
+  | 'Pacific/Noumea'
+  | 'Pacific/Auckland'
+  | 'Pacific/Fiji';
+
 export interface Config {
   auth: {
-    users: UserAuthOperations;
+    user: UserAuthOperations;
   };
   collections: {
     posts: Post;
     media: Media;
-    'plugin-collection': PluginCollection;
-    users: User;
+    user: User;
+    session: Session;
+    account: Account;
+    verification: Verification;
+    twoFactor: TwoFactor;
+    passkey: Passkey;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -23,8 +81,12 @@ export interface Config {
   collectionsSelect: {
     posts: PostsSelect<false> | PostsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
-    'plugin-collection': PluginCollectionSelect<false> | PluginCollectionSelect<true>;
-    users: UsersSelect<false> | UsersSelect<true>;
+    user: UserSelect<false> | UserSelect<true>;
+    session: SessionSelect<false> | SessionSelect<true>;
+    account: AccountSelect<false> | AccountSelect<true>;
+    verification: VerificationSelect<false> | VerificationSelect<true>;
+    twoFactor: TwoFactorSelect<false> | TwoFactorSelect<true>;
+    passkey: PasskeySelect<false> | PasskeySelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -36,7 +98,7 @@ export interface Config {
   globalsSelect: {};
   locale: null;
   user: User & {
-    collection: 'users';
+    collection: 'user';
   };
   jobs: {
     tasks: unknown;
@@ -67,7 +129,6 @@ export interface UserAuthOperations {
  */
 export interface Post {
   id: string;
-  addedByPlugin?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -91,19 +152,14 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "plugin-collection".
- */
-export interface PluginCollection {
-  id: string;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users".
+ * via the `definition` "user".
  */
 export interface User {
   id: string;
+  name: string;
+  emailVerified: boolean;
+  image?: string | null;
+  twoFactorEnabled?: boolean | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -114,6 +170,80 @@ export interface User {
   loginAttempts?: number | null;
   lockUntil?: string | null;
   password?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "session".
+ */
+export interface Session {
+  id: string;
+  expiresAt: string;
+  token: string;
+  ipAddress?: string | null;
+  userAgent?: string | null;
+  userId: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "account".
+ */
+export interface Account {
+  id: string;
+  accountId: string;
+  providerId: string;
+  userId: string;
+  accessToken?: string | null;
+  refreshToken?: string | null;
+  idToken?: string | null;
+  accessTokenExpiresAt?: string | null;
+  refreshTokenExpiresAt?: string | null;
+  scope?: string | null;
+  password?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "verification".
+ */
+export interface Verification {
+  id: string;
+  identifier: string;
+  value: string;
+  expiresAt: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "twoFactor".
+ */
+export interface TwoFactor {
+  id: string;
+  secret: string;
+  backupCodes: string;
+  userId: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "passkey".
+ */
+export interface Passkey {
+  id: string;
+  name?: string | null;
+  publicKey: string;
+  userId: string;
+  credentialID: string;
+  counter: number;
+  deviceType: string;
+  backedUp: boolean;
+  transports?: string | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -131,16 +261,32 @@ export interface PayloadLockedDocument {
         value: string | Media;
       } | null)
     | ({
-        relationTo: 'plugin-collection';
-        value: string | PluginCollection;
+        relationTo: 'user';
+        value: string | User;
       } | null)
     | ({
-        relationTo: 'users';
-        value: string | User;
+        relationTo: 'session';
+        value: string | Session;
+      } | null)
+    | ({
+        relationTo: 'account';
+        value: string | Account;
+      } | null)
+    | ({
+        relationTo: 'verification';
+        value: string | Verification;
+      } | null)
+    | ({
+        relationTo: 'twoFactor';
+        value: string | TwoFactor;
+      } | null)
+    | ({
+        relationTo: 'passkey';
+        value: string | Passkey;
       } | null);
   globalSlug?: string | null;
   user: {
-    relationTo: 'users';
+    relationTo: 'user';
     value: string | User;
   };
   updatedAt: string;
@@ -153,7 +299,7 @@ export interface PayloadLockedDocument {
 export interface PayloadPreference {
   id: string;
   user: {
-    relationTo: 'users';
+    relationTo: 'user';
     value: string | User;
   };
   key?: string | null;
@@ -185,7 +331,6 @@ export interface PayloadMigration {
  * via the `definition` "posts_select".
  */
 export interface PostsSelect<T extends boolean = true> {
-  addedByPlugin?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -208,18 +353,13 @@ export interface MediaSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "plugin-collection_select".
+ * via the `definition` "user_select".
  */
-export interface PluginCollectionSelect<T extends boolean = true> {
-  id?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users_select".
- */
-export interface UsersSelect<T extends boolean = true> {
+export interface UserSelect<T extends boolean = true> {
+  name?: T;
+  emailVerified?: T;
+  image?: T;
+  twoFactorEnabled?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -229,6 +369,75 @@ export interface UsersSelect<T extends boolean = true> {
   hash?: T;
   loginAttempts?: T;
   lockUntil?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "session_select".
+ */
+export interface SessionSelect<T extends boolean = true> {
+  expiresAt?: T;
+  token?: T;
+  ipAddress?: T;
+  userAgent?: T;
+  userId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "account_select".
+ */
+export interface AccountSelect<T extends boolean = true> {
+  accountId?: T;
+  providerId?: T;
+  userId?: T;
+  accessToken?: T;
+  refreshToken?: T;
+  idToken?: T;
+  accessTokenExpiresAt?: T;
+  refreshTokenExpiresAt?: T;
+  scope?: T;
+  password?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "verification_select".
+ */
+export interface VerificationSelect<T extends boolean = true> {
+  identifier?: T;
+  value?: T;
+  expiresAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "twoFactor_select".
+ */
+export interface TwoFactorSelect<T extends boolean = true> {
+  secret?: T;
+  backupCodes?: T;
+  userId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "passkey_select".
+ */
+export interface PasskeySelect<T extends boolean = true> {
+  name?: T;
+  publicKey?: T;
+  userId?: T;
+  credentialID?: T;
+  counter?: T;
+  deviceType?: T;
+  backedUp?: T;
+  transports?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
