@@ -119,7 +119,10 @@
   "registry": "https://registry.npmjs.org/",
   "dependencies": {
     "better-auth": "^1.1.17",
+    "busboy": "^1.6.0",
+    "http-status": "^2.1.0",
     "mongodb": "^6.13.0",
-    "pnpm": "9"
+    "pnpm": "9",
+    "tiny-invariant": "^1.3.3"
   }
 }
