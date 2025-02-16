@@ -28,32 +28,6 @@ import {
   type BetterAuthPlugin,
 } from 'better-auth'
 import { getEndpoints } from 'better-auth/api'
-import {
-  // core authentication
-  twoFactor,
-  username,
-  anonymous,
-  phoneNumber,
-  magicLink,
-  emailOTP,
-  // passkey,
-  genericOAuth,
-  oneTap,
-  // core authorization
-  admin,
-  organization,
-  // core enterprise
-  oidcProvider,
-  // sso,
-  // core utility
-  bearer,
-  multiSession,
-  oAuthProxy,
-  openAPI,
-  jwt,
-} from 'better-auth/plugins'
-import { passkey } from 'better-auth/plugins/passkey'
-import { sso } from 'better-auth/plugins/sso'
 
 import {
   accountCollection,
@@ -63,10 +37,15 @@ import {
   verificationCollection,
 } from './core-schema/index.js'
 import { EndpointFactory } from './factory.endpoint.js'
+import { createAuthStrategies } from './factory.strategy.js'
+import { betterAuthSingleton } from './singleton.better-auth.js'
 import { getPayload, payloadSingleton } from './singleton.payload.js'
 import { payloadAdapter } from './better-auth/payload-adapter.js'
-import { createAuthStrategies } from './factory.strategy.js'
 import { getAuthTables } from 'better-auth/db'
+import { payloadBetterAuthEndpoints } from './endpoints/endpoints.payload-better-auth.js'
+// import { createAuthClient } from 'better-auth/react'
+import { pluginsToLoad } from './better-auth/plugins.server.js'
+import { nextCookies } from 'better-auth/next-js'
 
 export type BetterAuthPluginOptions = {
   /**
@@ -127,50 +106,7 @@ export const betterAuthPlugin =
     ///////////////////////////////////
     // Better Auth - INSTANCE
     ///////////////////////////////////
-    const defaultPlugins = [twoFactor(), passkey(), openAPI()]
-    const pluginsToLoad = pluginOptions.betterAuthPlugins
-      ? Object.entries(pluginOptions.betterAuthPlugins)
-          .map(([key, plugin]) => {
-            if (typeof plugin === 'boolean') {
-              return {
-                // core authentication
-                twoFactor: twoFactor(),
-                username: username(),
-                anonymous: anonymous(),
-                phoneNumber: phoneNumber(),
-                // TODO: need to pass options for plugin
-                // magicLink: magicLink(),
-                // TODO: need to pass options for plugin
-                // emailOTP: emailOTP(),
-                passkey: passkey(),
-                // TODO: need to pass options for plugin
-                // genericOAuth: genericOAuth(),
-                oneTap: oneTap(),
-                // core authorization
-                admin: admin(),
-                organization: organization(),
-                // core enterprise
-                // TODO: need to pass options for plugin
-                // oidcProvider: oidcProvider(),
-                sso: sso(),
-                // core utility
-                bearer: bearer(),
-                multiSession: multiSession(),
-                oAuthProxy: oAuthProxy(),
-                openAPI: openAPI(),
-                jwt: jwt(),
-                // third-party
-                // TODO: need to pass options for plugin
-                // harmony: harmony(),
-                // TODO: need to pass options for plugin
-                // validator: validator(),
-              }[key]
-            }
-            return plugin()
-          })
-          // need to filter out undefined plugins
-          .filter((plugin) => !!plugin)
-      : defaultPlugins
+
     const betterAuthOptions: BetterAuthOptions = {
       //////////////////////////////
       // defaults (sane defaults)
@@ -181,7 +117,7 @@ export const betterAuthPlugin =
       emailAndPassword: {
         enabled: true,
       },
-      plugins: pluginsToLoad,
+      plugins: [...pluginsToLoad(pluginOptions), nextCookies()],
 
       ////////////////////////////
       // options from plugin
@@ -206,12 +142,15 @@ export const betterAuthPlugin =
     }
     // extract api endpoints the same way as better-auth do.
     const auth = betterAuth(betterAuthOptions)
+    betterAuthSingleton(auth)
+    // const authClient = createAuthClient(betterAuthOptions)
     // console.log('keys:', Object.keys(auth.api))
     // console.log(`[better-auth] auth.api: ${JSON.stringify(auth.api, null, 2)}`)
     const authEndpoints = getEndpoints(auth.$context, betterAuthOptions)
     const authTables = getAuthTables(betterAuthOptions)
 
-    console.log('authTables', JSON.stringify(authTables, null, 2))
+    // console.log('authTables', Object.keys(authTables))
+    // console.log('authTables', JSON.stringify(authTables, null, 2))
 
     // console.log('keys authEndpoints:', Object.keys(authEndpoints.api))
     // console.log(
@@ -273,12 +212,15 @@ export const betterAuthPlugin =
 
     if (authCollection) {
       authCollection.auth = {
-        disableLocalStrategy: true,
+        // disableLocalStrategy: true,
         strategies: [...betterAuthStrategies],
       }
+      authCollection.endpoints = payloadBetterAuthEndpoints
     }
+    // config.endpoints = payloadBetterAuthEndpoints
 
     // console.log('authCollection', authCollection)
+    // console.log('authCollection', authCollection?.slug)
 
     ///////////////////////////////////////////
     // Add Better Auth - Admin Customization
@@ -291,7 +233,7 @@ export const betterAuthPlugin =
     config.admin.routes = {
       ...config.admin.routes,
       // account: '/auth/account'
-      // createFirstUser: '/admin/auth/create-first-user',
+      // createFirstUser: '/auth/create-first-user',
       // forgot: '/auth/forgot'
       // inactivity: '/auth/inactivity'
       // login: '/auth/login'
@@ -314,35 +256,39 @@ export const betterAuthPlugin =
       // Better Auth Custom Views
       views: {
         // account: {
-        //   path: '/admin/auth/account',
+        //   path: '/auth/account',
         //   Component: 'payload-better-auth/rsc#AccountServer',
         // },
         // login: {
         //   path: '/auth/login',
         //   Component: 'payload-better-auth/rsc#LoginServer',
         // },
+        // createFirstUser: {
+        //   path: '/auth/create-first-user',
+        //   Component: 'payload-better-auth/rsc#CreateFirstUserServer',
+        // },
         // forgot: {
-        //   path: '/admin/auth/forgot',
+        //   path: '/auth/forgot',
         //   Component: 'payload-better-auth/rsc#ForgotServer',
         // },
         // inactivity: {
-        //   path: '/admin/auth/inactivity',
+        //   path: '/auth/inactivity',
         //   Component: 'payload-better-auth/rsc#InactivityServer',
         // },
         // login: {
-        //   path: '/admin/auth/login',
+        //   path: '/auth/login',
         //   Component: 'payload-better-auth/rsc#LoginServer',
         // },
         // logout: {
-        //   path: '/admin/auth/logout',
+        //   path: '/auth/logout',
         //   Component: 'payload-better-auth/rsc#LogoutServer',
         // },
         // reset: {
-        //   path: '/admin/auth/reset',
+        //   path: '/auth/reset',
         //   Component: 'payload-better-auth/rsc#ResetServer',
         // },
         // unauthorized: {
-        //   path: '/admin/auth/unauthorized',
+        //   path: '/auth/unauthorized',
         //   Component: 'payload-better-auth/rsc#UnauthorizedServer',
         // },
       },
@@ -362,7 +308,7 @@ export const betterAuthPlugin =
     const incomingOnInit = config.onInit
 
     config.onInit = async (payload) => {
-      // console.log(`\n- betterAuthPlugin onInit`)
+      console.log(`\n- betterAuthPlugin onInit`)
       // Ensure we are executing any existing onInit functions before running our own.
       if (incomingOnInit) {
         await incomingOnInit(payload)
@@ -370,24 +316,6 @@ export const betterAuthPlugin =
 
       // attach payload instance to better-auth's payload adapter
       payloadSingleton(payload)
-
-      // const { totalDocs } = await payload.count({
-      //   collection: 'plugin-collection',
-      //   where: {
-      //     id: {
-      //       equals: 'seeded-by-plugin',
-      //     },
-      //   },
-      // })
-
-      // if (totalDocs === 0) {
-      //   await payload.create({
-      //     collection: 'plugin-collection',
-      //     data: {
-      //       id: 'seeded-by-plugin',
-      //     },
-      //   })
-      // }
     }
 
     return config
