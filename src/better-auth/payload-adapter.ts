@@ -21,16 +21,16 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
     const schema = getAuthTables(options)
 
     const resolvePayload = async () => {
-      const payloadPromise: Promise<Payload | undefined> = new Promise(
-        (resolve) => {
-          if (config.payload) {
-            resolve(config.payload)
-          } else {
-            resolve(getPayload())
-          }
-        },
-      )
-      const payload = await payloadPromise
+      // const payloadPromise: Promise<Payload | undefined> = new Promise(
+      //   (resolve) => {
+      //     if (config.payload) {
+      //       resolve(config.payload)
+      //     } else {
+      //       resolve(getPayload())
+      //     }
+      //   },
+      // )
+      const payload = config.payload || getPayload()
       if (!payload) {
         throw new Error('Payload is not initialized')
       }
