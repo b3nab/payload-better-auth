@@ -16,6 +16,9 @@ export const generatePayloadCollections = (
 
   for (const [key, value] of Object.entries(authTables)) {
     const newCollection: CollectionConfig = {
+      admin: {
+        group: 'Better Auth',
+      },
       slug: key,
       fields: convertToPayloadFields(value.fields),
     }
