@@ -14,6 +14,7 @@ export const payloadBetterAuthEndpoints: Endpoint[] = wrapInternalEndpoints([
   //   method: 'post',
   //   path: '/forgot-password',
   // },
+  // /init is not needed because it's handled by payloadcms
   // {
   //   handler: initHandler,
   //   method: 'get',
