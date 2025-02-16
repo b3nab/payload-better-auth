@@ -1,5 +1,6 @@
-import type { AuthStrategy, AuthStrategyFunction } from 'payload'
+import type { AuthStrategy, AuthStrategyFunction, User } from 'payload'
 import type { betterAuth, BetterAuthOptions } from 'better-auth'
+import { getBetterAuth } from './singleton.better-auth.js'
 
 // async ({ req, res }) => {
 //   try {
@@ -26,6 +27,7 @@ const emailAndPasswordStrategy: AuthStrategyFunction = async ({
   isGraphQL,
   strategyName,
 }) => {
+  console.log('emailAndPasswordStrategy', headers)
   return {
     user: null,
   }
@@ -37,12 +39,43 @@ const socialStrategy: AuthStrategyFunction = async ({
   isGraphQL,
   strategyName,
 }) => {
+  console.log('socialStrategy', headers)
   return {
     user: null,
   }
 }
 
+const betterAuthStrategy: AuthStrategyFunction = async ({
+  headers,
+  payload,
+  isGraphQL,
+  strategyName = 'better-auth',
+}) => {
+  console.log('betterAuthStrategy', headers)
+  const betterAuth = getBetterAuth()
+  const result = await betterAuth?.api.getSession({
+    headers: headers,
+  })
+  console.log('betterAuthStrategy result', result)
+
+  const user = result?.user
+    ? {
+        ...result.user,
+        collection: payload.config.admin.user,
+        id: result.user.id,
+        email: result.user.email,
+        // username: result.user.username,
+      }
+    : null
+
+  return {
+    user: user ?? null,
+  }
+}
+
 const defaultStrategies: Record<string, AuthStrategyFunction> = {
+  // better-auth example
+  betterAuth: betterAuthStrategy,
   // built-in
   emailAndPassword: emailAndPasswordStrategy,
   social: socialStrategy,
@@ -62,6 +95,10 @@ export const createAuthStrategies = (
   const { betterAuthOptions } = options
 
   return [
+    {
+      name: 'better-auth',
+      authenticate: defaultStrategies.betterAuth,
+    },
     // Email & Password Strategy
     {
       name: 'email-password',
