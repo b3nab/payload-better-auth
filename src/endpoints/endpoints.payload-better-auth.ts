@@ -1,7 +1,9 @@
 import type { Endpoint } from 'payload'
 import { wrapInternalEndpoints } from '../payload-utilities/wrapInternalEndpoints.js'
 import { loginHandler } from './login.js'
+import { logoutHandler } from './logout.js'
 import { meHandler } from './me.js'
+import { refreshHandler } from './refresh.js'
 import { registerFirstUserHandler } from './registerFirstUser.js'
 
 // TODO: add all endpoints
@@ -22,21 +24,21 @@ export const payloadBetterAuthEndpoints: Endpoint[] = wrapInternalEndpoints([
     method: 'post',
     path: '/login',
   },
-  // {
-  //   handler: logoutHandler,
-  //   method: 'post',
-  //   path: '/logout',
-  // },
+  {
+    handler: logoutHandler,
+    method: 'post',
+    path: '/logout',
+  },
   {
     handler: meHandler,
     method: 'get',
     path: '/me',
   },
-  // {
-  //   handler: refreshHandler,
-  //   method: 'post',
-  //   path: '/refresh-token',
-  // },
+  {
+    handler: refreshHandler,
+    method: 'post',
+    path: '/refresh-token',
+  },
   {
     handler: registerFirstUserHandler,
     method: 'post',
