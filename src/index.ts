@@ -29,13 +29,7 @@ import {
 } from 'better-auth'
 import { getEndpoints } from 'better-auth/api'
 
-import {
-  accountCollection,
-  generatePayloadCollections,
-  sessionCollection,
-  userCollection,
-  verificationCollection,
-} from './core-schema/index.js'
+import { generatePayloadCollections } from './core-schema/index.js'
 import { EndpointFactory } from './factory.endpoint.js'
 import { createAuthStrategies } from './factory.strategy.js'
 import { betterAuthSingleton } from './singleton.better-auth.js'
@@ -43,7 +37,6 @@ import { getPayload, payloadSingleton } from './singleton.payload.js'
 import { payloadAdapter } from './better-auth/payload-adapter.js'
 import { getAuthTables } from 'better-auth/db'
 import { payloadBetterAuthEndpoints } from './endpoints/endpoints.payload-better-auth.js'
-// import { createAuthClient } from 'better-auth/react'
 import { pluginsToLoad } from './better-auth/plugins.server.js'
 import { nextCookies } from 'better-auth/next-js'
 
@@ -94,8 +87,11 @@ export type BetterAuthPluginOptions = {
     [key: string]: () => BetterAuthPlugin
   }
 }
-
-// Plugin PayloadCMS che utilizza l'adapter
+/**
+ * Better Auth Plugin for PayloadCMS
+ * @type {BetterAuthPluginOptions} pluginOptions - Options for the plugin
+ * @returns - The plugin function for payloadcms
+ */
 export const betterAuthPlugin =
   (pluginOptions: BetterAuthPluginOptions) =>
   (incomingConfig: Config): Config => {
@@ -143,7 +139,6 @@ export const betterAuthPlugin =
     // extract api endpoints the same way as better-auth do.
     const auth = betterAuth(betterAuthOptions)
     betterAuthSingleton(auth)
-    // const authClient = createAuthClient(betterAuthOptions)
     // console.log('keys:', Object.keys(auth.api))
     // console.log(`[better-auth] auth.api: ${JSON.stringify(auth.api, null, 2)}`)
     const authEndpoints = getEndpoints(auth.$context, betterAuthOptions)
@@ -224,86 +219,11 @@ export const betterAuthPlugin =
 
     ///////////////////////////////////////////
     // Add Better Auth - Admin Customization
+    // TODO: add admin customization - planned? what?
     ///////////////////////////////////////////
-
-    if (!config.admin) {
-      config.admin = {}
-    }
-
-    config.admin.routes = {
-      ...config.admin.routes,
-      // account: '/auth/account'
-      // createFirstUser: '/auth/create-first-user',
-      // forgot: '/auth/forgot'
-      // inactivity: '/auth/inactivity'
-      // login: '/auth/login'
-      // logout: '/auth/logout'
-      // reset: '/auth/reset'
-      // unauthorized: '/auth/unauthorized'
-    }
-
-    if (!config.admin.components) {
-      config.admin.components = {}
-    }
-
-    config.admin.components = {
-      ...config.admin.components,
-      // beforeLogin: [
-      //   // `payload-better-auth/client#BeforeLoginClient`,
-      //   `payload-better-auth/rsc#BeforeLoginServer`,
-      // ],
-
-      // Better Auth Custom Views
-      views: {
-        // account: {
-        //   path: '/auth/account',
-        //   Component: 'payload-better-auth/rsc#AccountServer',
-        // },
-        // login: {
-        //   path: '/auth/login',
-        //   Component: 'payload-better-auth/rsc#LoginServer',
-        // },
-        // createFirstUser: {
-        //   path: '/auth/create-first-user',
-        //   Component: 'payload-better-auth/rsc#CreateFirstUserServer',
-        // },
-        // forgot: {
-        //   path: '/auth/forgot',
-        //   Component: 'payload-better-auth/rsc#ForgotServer',
-        // },
-        // inactivity: {
-        //   path: '/auth/inactivity',
-        //   Component: 'payload-better-auth/rsc#InactivityServer',
-        // },
-        // login: {
-        //   path: '/auth/login',
-        //   Component: 'payload-better-auth/rsc#LoginServer',
-        // },
-        // logout: {
-        //   path: '/auth/logout',
-        //   Component: 'payload-better-auth/rsc#LogoutServer',
-        // },
-        // reset: {
-        //   path: '/auth/reset',
-        //   Component: 'payload-better-auth/rsc#ResetServer',
-        // },
-        // unauthorized: {
-        //   path: '/auth/unauthorized',
-        //   Component: 'payload-better-auth/rsc#UnauthorizedServer',
-        // },
-      },
-    }
-
-    // if (!config.admin.components.beforeDashboard) {
-    //   config.admin.components.beforeDashboard = []
+    // if (!config.admin) {
+    //   config.admin = {}
     // }
-
-    // config.admin.components.beforeDashboard.push(
-    //   `payload-better-auth/client#BeforeDashboardClient`,
-    // )
-    // config.admin.components.beforeDashboard.push(
-    //   `payload-better-auth/rsc#BeforeDashboardServer`,
-    // )
 
     const incomingOnInit = config.onInit
 
