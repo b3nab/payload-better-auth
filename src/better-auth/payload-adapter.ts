@@ -15,21 +15,21 @@ export interface PayloadAdapterConfig {
 
 export const payloadAdapter = (config: PayloadAdapterConfig) => {
   // console.log(`\n- payloadAdapter WRAPPER`)
-  const payloadPromise: Promise<Payload | undefined> = new Promise(
-    (resolve) => {
-      if (config.payload) {
-        resolve(config.payload)
-      } else {
-        resolve(getPayload())
-      }
-    },
-  )
 
   return (options: BetterAuthOptions): Adapter => {
     // console.log(`\n- - payloadAdapter CLOSURE`)
     const schema = getAuthTables(options)
 
     const resolvePayload = async () => {
+      const payloadPromise: Promise<Payload | undefined> = new Promise(
+        (resolve) => {
+          if (config.payload) {
+            resolve(config.payload)
+          } else {
+            resolve(getPayload())
+          }
+        },
+      )
       const payload = await payloadPromise
       if (!payload) {
         throw new Error('Payload is not initialized')
@@ -49,12 +49,14 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
         data: any
         select?: string[]
       }): Promise<any> {
-        console.log(`\n- - payloadAdapter - create`)
+        console.log(
+          `\n- - payloadAdapter - create >> ${JSON.stringify(data, null, 2)}`,
+        )
         const payload = await resolvePayload()
         const { model, data: values } = data
 
         try {
-          const result = await payload.create({
+          const result = await payload.db.create({
             collection: getCollectionName(model),
             data: values,
           })
@@ -72,7 +74,9 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
         where?: Where[]
         select?: string[]
       }): Promise<any | null> {
-        console.log(`\n- - payloadAdapter - findOne`)
+        console.log(
+          `\n- - payloadAdapter - findOne >> ${JSON.stringify(data, null, 2)}`,
+        )
         const payload = await resolvePayload()
         const { model, where } = data
 
@@ -98,7 +102,9 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
         offset?: number
         sortBy?: { field: string; direction: 'asc' | 'desc' }
       }): Promise<any[]> {
-        console.log(`\n- - payloadAdapter - findMany`)
+        console.log(
+          `\n- - payloadAdapter - findMany >> ${JSON.stringify(data, null, 2)}`,
+        )
         const payload = await resolvePayload()
         const { model, where, limit, offset, sortBy } = data
 
@@ -127,7 +133,9 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
         where?: Where[]
         update: any
       }): Promise<any> {
-        console.log(`\n- - payloadAdapter - update`)
+        console.log(
+          `\n- - payloadAdapter - update >> ${JSON.stringify(data, null, 2)}`,
+        )
         const payload = await resolvePayload()
         const { model, where, update: values } = data
 
@@ -161,7 +169,9 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
         where?: Where[]
         update: any
       }): Promise<number> {
-        console.log(`\n- - payloadAdapter - updateMany`)
+        console.log(
+          `\n- - payloadAdapter - updateMany >> ${JSON.stringify(data, null, 2)}`,
+        )
         const payload = await resolvePayload()
         const { model, where, update: values } = data
 
@@ -190,7 +200,9 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
       },
 
       async delete(data: { model: string; where?: Where[] }): Promise<void> {
-        console.log(`\n- - payloadAdapter - delete`)
+        console.log(
+          `\n- - payloadAdapter - delete >> ${JSON.stringify(data, null, 2)}`,
+        )
         const payload = await resolvePayload()
         const { model, where } = data
 
@@ -218,7 +230,9 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
         model: string
         where?: Where[]
       }): Promise<number> {
-        console.log(`\n- - payloadAdapter - deleteMany`)
+        console.log(
+          `\n- - payloadAdapter - deleteMany >> ${JSON.stringify(data, null, 2)}`,
+        )
         const payload = await resolvePayload()
         const { model, where } = data
 
