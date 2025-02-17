@@ -3,12 +3,7 @@
 > ⚠️ **WARNING**: This plugin is currently a Proof of Concept and not ready for production use.
 
 A plugin that integrates [Better Auth](https://www.better-auth.com) with [Payload CMS v3](https://payloadcms.com), providing enhanced authentication capabilities.
-
-## DO NOT USE IN PRODUCTION YET! THIS IS A POC, NOT COMPLETED
-
-Better Auth plugin for Payload CMS v3!🔥
-
-NOT YET: This plugin is thought to be used in production, with real users, so to be rock solid. 🗿
+This plugin is thought to be used in production, with real users, so to be rock solid. 🗿
 
 ## Description
 
