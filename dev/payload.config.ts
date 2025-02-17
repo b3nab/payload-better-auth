@@ -48,10 +48,9 @@ export default buildConfig({
   plugins: [
     betterAuthPlugin({
       betterAuth: {},
-      collections: {
-        posts: true,
+      betterAuthPlugins: {
+        twoFactor: true,
       },
-      collectionUser: 'user',
     }),
   ],
   secret: process.env.PAYLOAD_SECRET || 'test-secret_key',

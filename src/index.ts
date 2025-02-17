@@ -42,22 +42,15 @@ import { nextCookies } from 'better-auth/next-js'
 
 export type BetterAuthPluginOptions = {
   /**
-   * Disable the plugin but keep added collections/fields to mantain database consistency
-   */
-  disabled?: boolean
-  /**
-   * List of collections to add a custom field
-   */
-  collections?: Partial<Record<CollectionSlug, true>>
-  collectionUser?: string
-  /**
    * Better Auth Config. https://www.better-auth.com/docs/reference/options
+   * This config will override the default ones from the plugin itself.
    */
   betterAuth?: Omit<BetterAuthOptions, 'database'>
+  /**
+   * Better Auth Plugins Config. https://www.better-auth.com/docs/concepts/plugins
+   * This config will override the default ones from the plugin itself.
+   */
   betterAuthPlugins?: {
-    /**
-     * List of plugins to add to better-auth
-     */
     // core authentication
     twoFactor?: boolean
     username?: boolean
@@ -84,7 +77,7 @@ export type BetterAuthPluginOptions = {
     harmony?: boolean
     validator?: boolean
   } & {
-    [key: string]: () => BetterAuthPlugin
+    [key: string]: (() => BetterAuthPlugin) | boolean
   }
 }
 /**
@@ -162,14 +155,6 @@ export const betterAuthPlugin =
       ...(config.collections || []),
       ...betterAuthCollections,
     ]
-
-    if (pluginOptions.disabled) {
-      /**
-       * If the plugin is disabled, we still want to keep added collections/fields so the database schema is consistent which is important for migrations.
-       * If your plugin heavily modifies the database schema, you may want to remove this property.
-       */
-      return config
-    }
 
     ///////////////////////////////////
     // Add Better Auth - Endpoints
