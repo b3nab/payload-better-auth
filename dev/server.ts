@@ -19,11 +19,11 @@ const handle = app.getRequestHandler()
 
 await app.prepare()
 
-await open(`http://localhost:7777/admin`)
+await open(`http://localhost:3000/admin`)
 
 const server = createServer((req, res) => {
   const parsedUrl = parse(req.url!, true)
   void handle(req, res, parsedUrl)
 })
 
-server.listen(7777)
+server.listen(3000)
