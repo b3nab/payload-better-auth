@@ -8,6 +8,7 @@ NOT YET: This plugin is thought to be used in production, with real users, so to
 
 ### READ CAREFULLY
 
+- The plugin may run some operations that may be disruptive to your application and database.
 - This plugin is not yet ready for production use.
 - Mantainers are not responsible for any issues that may occur when using this plugin.
 - It is highly encouraged to contribute to the project by opening issues and pull requests.
