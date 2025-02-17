@@ -86,50 +86,53 @@ export const registerFirstUserHandler: PayloadHandler = async (req) => {
 
   const betterAuth = getBetterAuth()
 
-  const result = await betterAuth?.api.signUpEmail({
+  const response = await betterAuth?.api.signUpEmail({
     body: {
       name: authData.name,
       // username: authData.username,
       email: authData.email,
       password: authData.password,
-      emailVerified: authData.emailVerified,
+      emailVerified: verify ? true : authData.emailVerified,
       twoFactorEnabled: authData.twoFactorEnabled,
     },
+    asResponse: true,
   })
+  invariant(response, 'Failed to register user')
 
-  invariant(result, 'Failed to register user')
+  const result = await response.json()
   invariant(result.token, 'User registered but no token returned')
 
-  if (verify) {
-    // auto-verify (if applicable)
-    await payload.update({
-      id: result.user.id,
-      collection: slug,
-      data: {
-        _verified: true,
-      },
-      req,
-    })
-  }
+  // if (verify) {
+  //   // auto-verify (if applicable)
+  //   await payload.update({
+  //     id: result.user.id,
+  //     collection: slug,
+  //     data: {
+  //       _verified: true,
+  //     },
+  //     req,
+  //   })
+  // }
 
-  const cookie = generatePayloadCookie({
-    collectionAuthConfig: collection.config.auth,
-    cookiePrefix: req.payload.config.cookiePrefix,
-    token: result.token,
-  })
+  // const cookie = generatePayloadCookie({
+  //   collectionAuthConfig: collection.config.auth,
+  //   cookiePrefix: req.payload.config.cookiePrefix,
+  //   token: result.token,
+  // })
 
   return Response.json(
     {
-      exp: result.exp,
+      // exp: result.exp,
       message: t('authentication:successfullyRegisteredFirstUser'),
       token: result.token,
       user: result.user,
     },
     {
       headers: headersWithCors({
-        headers: new Headers({
-          'Set-Cookie': cookie,
-        }),
+        headers: response.headers,
+        // new Headers({
+        //   'Set-Cookie': cookie,
+        // }),
         req,
       }),
       status: httpStatus.OK,
