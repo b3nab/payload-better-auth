@@ -45,7 +45,8 @@
     "lint": "eslint",
     "lint:fix": "eslint ./src --fix",
     "prepublishOnly": "pnpm clean && pnpm build",
-    "test": "jest -w"
+    "test": "jest -w",
+    "ci:test-coverage": "jest --coverage"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
