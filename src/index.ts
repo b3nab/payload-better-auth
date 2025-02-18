@@ -14,20 +14,15 @@
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
-import type {
-  AuthStrategyFunction,
-  CollectionSlug,
-  Config,
-  Endpoint,
-  PayloadHandler,
-} from 'payload'
+import type { Config } from 'payload'
 import {
   betterAuth,
   type BetterAuthOptions,
   type BetterAuthPlugin,
 } from 'better-auth'
 import { getEndpoints } from 'better-auth/api'
+import { getAuthTables } from 'better-auth/db'
+import { nextCookies } from 'better-auth/next-js'
 
 import { generatePayloadCollections } from './core-schema/index.js'
 import { EndpointFactory } from './factory.endpoint.js'
@@ -35,10 +30,8 @@ import { createAuthStrategies } from './factory.strategy.js'
 import { betterAuthSingleton } from './singleton.better-auth.js'
 import { getPayload, payloadSingleton } from './singleton.payload.js'
 import { payloadAdapter } from './better-auth/payload-adapter.js'
-import { getAuthTables } from 'better-auth/db'
 import { payloadBetterAuthEndpoints } from './endpoints/endpoints.payload-better-auth.js'
 import { pluginsToLoad } from './better-auth/plugins.server.js'
-import { nextCookies } from 'better-auth/next-js'
 
 export type BetterAuthPluginOptions = {
   /**
@@ -49,6 +42,10 @@ export type BetterAuthPluginOptions = {
   /**
    * Better Auth Plugins Config. https://www.better-auth.com/docs/concepts/plugins
    * This config will override the default ones from the plugin itself.
+   * @default {
+   *  twoFactor: true,
+   *  passkey: true,
+   *  openAPI: true,
    */
   betterAuthPlugins?: {
     // core authentication
@@ -79,6 +76,11 @@ export type BetterAuthPluginOptions = {
   } & {
     [key: string]: (() => BetterAuthPlugin) | boolean
   }
+  /**
+   * Set the log level for the plugin.
+   * @default 'info'
+   */
+  logs?: false | 'debug' | 'info' | 'warn' | 'error'
 }
 /**
  * Better Auth Plugin for PayloadCMS
@@ -97,7 +99,6 @@ export const betterAuthPlugin =
     ///////////////////////////////////
 
     const betterAuthOptions: BetterAuthOptions = {
-      //////////////////////////////
       // defaults (sane defaults)
       //////////////////////////////
       database: payloadAdapter({
@@ -108,12 +109,10 @@ export const betterAuthPlugin =
       },
       plugins: [...pluginsToLoad(pluginOptions), nextCookies()],
 
-      ////////////////////////////
       // options from plugin
       ////////////////////////////
       ...(pluginOptions.betterAuth || {}),
 
-      //////////////////////////////////
       // merge options (nested ones)
       //////////////////////////////////
       trustedOrigins: [
@@ -132,6 +131,7 @@ export const betterAuthPlugin =
     // extract api endpoints the same way as better-auth do.
     const auth = betterAuth(betterAuthOptions)
     betterAuthSingleton(auth)
+
     // console.log('keys:', Object.keys(auth.api))
     // console.log(`[better-auth] auth.api: ${JSON.stringify(auth.api, null, 2)}`)
     const authEndpoints = getEndpoints(auth.$context, betterAuthOptions)
@@ -156,6 +156,30 @@ export const betterAuthPlugin =
       ...betterAuthCollections,
     ]
 
+    const authCollection = config.collections.find(
+      (collection) => collection.auth === true,
+    )
+
+    ///////////////////////////////////
+    // Add Better Auth - Strategies
+    ///////////////////////////////////
+
+    const betterAuthStrategies = createAuthStrategies({
+      betterAuthOptions,
+    })
+
+    if (authCollection) {
+      authCollection.auth = {
+        // disableLocalStrategy: true,
+        strategies: [...betterAuthStrategies],
+      }
+      authCollection.endpoints = payloadBetterAuthEndpoints
+    }
+    // config.endpoints = payloadBetterAuthEndpoints
+
+    // console.log('authCollection', authCollection)
+    // console.log('authCollection', authCollection?.slug)
+
     ///////////////////////////////////
     // Add Better Auth - Endpoints
     ///////////////////////////////////
@@ -177,30 +201,6 @@ export const betterAuthPlugin =
     // )
 
     config.endpoints = [...(config.endpoints || []), ...betterAuthEndpoints]
-
-    ///////////////////////////////////
-    // Add Better Auth - Strategies
-    ///////////////////////////////////
-
-    const betterAuthStrategies = createAuthStrategies({
-      betterAuthOptions,
-    })
-
-    const authCollection = config.collections.find(
-      (collection) => collection.auth === true,
-    )
-
-    if (authCollection) {
-      authCollection.auth = {
-        // disableLocalStrategy: true,
-        strategies: [...betterAuthStrategies],
-      }
-      authCollection.endpoints = payloadBetterAuthEndpoints
-    }
-    // config.endpoints = payloadBetterAuthEndpoints
-
-    // console.log('authCollection', authCollection)
-    // console.log('authCollection', authCollection?.slug)
 
     ///////////////////////////////////////////
     // Add Better Auth - Admin Customization

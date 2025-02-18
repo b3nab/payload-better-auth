@@ -59,12 +59,19 @@ export default buildConfig({
         // used by two factor plugin as an issuer and other things
         appName: 'My App',
         // better-auth secret - you can omit it if your env variable is named `BETTER_AUTH_SECRET`
+        /** you can generate a good secret
+         * using the following command:
+         * @example
+         * ```bash
+         * openssl rand -base64 32
+         * ```
+         */
         secret: process.env.BETTER_AUTH_SECRET,
       },
       // Plugin options that override the default ones from the plugin
-      betterAuthPlugins: {
-        twoFactor: true,
-      },
+      // betterAuthPlugins: {
+      //   twoFactor: true,
+      // },
     }),
 
     // ... other plugins

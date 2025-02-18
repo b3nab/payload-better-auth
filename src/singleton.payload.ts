@@ -3,6 +3,7 @@ import type { Payload } from 'payload'
 let payload: Payload | undefined = undefined
 
 export const payloadSingleton = (payloadInstance: Payload) => {
+  console.log('>>>>>> refreshing payloadSingleton')
   payload = payloadInstance
 }
 

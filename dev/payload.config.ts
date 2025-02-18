@@ -48,9 +48,10 @@ export default buildConfig({
   plugins: [
     betterAuthPlugin({
       betterAuth: {},
-      betterAuthPlugins: {
-        twoFactor: true,
-      },
+      // betterAuthPlugins: {
+      //   twoFactor: true,
+      // },
+      logs: 'debug',
     }),
   ],
   secret: process.env.PAYLOAD_SECRET || 'test-secret_key',
