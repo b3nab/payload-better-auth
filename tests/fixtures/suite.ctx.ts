@@ -9,18 +9,16 @@ import type { NextRESTClient } from '../../dev/helpers/NextRESTClient.ts'
 import type { getEndpoints } from 'better-auth/api'
 import type { getAuthTables } from 'better-auth/db'
 
-export type Suite =
-  | {
-      memoryDB: MongoMemoryReplSet
-      payload: Payload
-      restClient: NextRESTClient
-      betterAuth: ReturnType<typeof betterAuth>
-      betterAuthEndpoints: ReturnType<typeof getEndpoints>
-      betterAuthTables: ReturnType<typeof getAuthTables>
-      // betterAuthOptions: BetterAuthOptions
-      // betterAuthPlugins: BetterAuthPlugin[]
-    }
-  | undefined
+export type Suite = {
+  memoryDB: MongoMemoryReplSet
+  payload: Payload
+  restClient: NextRESTClient
+  betterAuth: ReturnType<typeof betterAuth>
+  betterAuthEndpoints: ReturnType<typeof getEndpoints>
+  betterAuthTables: ReturnType<typeof getAuthTables>
+  // betterAuthOptions: BetterAuthOptions
+  // betterAuthPlugins: BetterAuthPlugin[]
+}
 
 let suite: Suite | undefined
 
