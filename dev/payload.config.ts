@@ -4,7 +4,10 @@ import sharp from 'sharp'
 import { buildConfig } from 'payload'
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
-import { betterAuthPlugin } from 'payload-better-auth'
+import {
+  betterAuthPlugin,
+  type BetterAuthPluginOptions,
+} from 'payload-better-auth'
 
 import { devUser } from './helpers/credentials.js'
 import { testEmailAdapter } from './helpers/testEmailAdapter.js'
@@ -16,6 +19,14 @@ const dirname = path.dirname(filename)
 if (!process.env.ROOT_DIR) {
   process.env.ROOT_DIR = dirname
 }
+
+export const betterAuthPluginConfig = {
+  betterAuth: {},
+  // betterAuthPlugins: {
+  //   twoFactor: true,
+  // },
+  logs: 'debug',
+} satisfies BetterAuthPluginOptions
 
 export default buildConfig({
   admin: {
@@ -45,15 +56,7 @@ export default buildConfig({
   // onInit: async (payload) => {
   //   await seed(payload)
   // },
-  plugins: [
-    betterAuthPlugin({
-      betterAuth: {},
-      // betterAuthPlugins: {
-      //   twoFactor: true,
-      // },
-      logs: 'debug',
-    }),
-  ],
+  plugins: [betterAuthPlugin(betterAuthPluginConfig)],
   secret: process.env.PAYLOAD_SECRET || 'test-secret_key',
   sharp,
   typescript: {
