@@ -31,7 +31,7 @@ export const beforeAllFixtures = () => async () => {
   })
 
   if (!process.env.DATABASE_URI) {
-    console.log('Starting memory database')
+    // console.log('Starting memory database')
     suite.memoryDB = await MongoMemoryReplSet.create({
       replSet: {
         count: 1,
@@ -40,7 +40,7 @@ export const beforeAllFixtures = () => async () => {
       },
     })
     await suite.memoryDB.waitUntilRunning()
-    console.log('Memory database started')
+    // console.log('Memory database started')
 
     process.env.DATABASE_URI = `${suite.memoryDB.getUri()}&retryWrites=true`
   }
