@@ -34,10 +34,12 @@ export const beforeAllFixtures = () => async () => {
     console.log('Starting memory database')
     suite.memoryDB = await MongoMemoryReplSet.create({
       replSet: {
-        count: 3,
+        count: 1,
         dbName: 'payloadmemory',
+        storageEngine: 'wiredTiger',
       },
     })
+    await suite.memoryDB.waitUntilRunning()
     console.log('Memory database started')
 
     process.env.DATABASE_URI = `${suite.memoryDB.getUri()}&retryWrites=true`
@@ -49,7 +51,6 @@ export const beforeAllFixtures = () => async () => {
 
   suite.payload = await getPayload({ config })
   suite.restClient = new NextRESTClient(suite.payload.config)
-
   suite.betterAuth = betterAuth(
     generateBetterAuthOptions(betterAuthPluginConfig),
   )
