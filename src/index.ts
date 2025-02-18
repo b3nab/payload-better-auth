@@ -28,10 +28,9 @@ import { generatePayloadCollections } from './core-schema/index.js'
 import { EndpointFactory } from './factory.endpoint.js'
 import { createAuthStrategies } from './factory.strategy.js'
 import { betterAuthSingleton } from './singleton.better-auth.js'
-import { getPayload, payloadSingleton } from './singleton.payload.js'
-import { payloadAdapter } from './better-auth/payload-adapter.js'
+import { payloadSingleton } from './singleton.payload.js'
 import { payloadBetterAuthEndpoints } from './endpoints/endpoints.payload-better-auth.js'
-import { pluginsToLoad } from './better-auth/plugins.server.js'
+import { generateBetterAuthOptions } from './better-auth/generate-options.js'
 
 export type BetterAuthPluginOptions = {
   /**
@@ -98,36 +97,8 @@ export const betterAuthPlugin =
     // Better Auth - INSTANCE
     ///////////////////////////////////
 
-    const betterAuthOptions: BetterAuthOptions = {
-      // defaults (sane defaults)
-      //////////////////////////////
-      database: payloadAdapter({
-        payload: getPayload(),
-      }),
-      emailAndPassword: {
-        enabled: true,
-      },
-      plugins: [...pluginsToLoad(pluginOptions), nextCookies()],
-
-      // options from plugin
-      ////////////////////////////
-      ...(pluginOptions.betterAuth || {}),
-
-      // merge options (nested ones)
-      //////////////////////////////////
-      trustedOrigins: [
-        // url for hoppscotch extension proxy
-        'chrome-extension://amknoiejhlmhancpahfcfcfhllgkpbld',
-        ...(pluginOptions.betterAuth?.trustedOrigins || []),
-      ],
-      // user: {
-      //   additionalFields: {
-      //     name: {
-      //       type: 'string',
-      //     },
-      //   },
-      // },
-    }
+    const betterAuthOptions: BetterAuthOptions =
+      generateBetterAuthOptions(pluginOptions)
     // extract api endpoints the same way as better-auth do.
     const auth = betterAuth(betterAuthOptions)
     betterAuthSingleton(auth)
