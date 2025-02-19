@@ -119,7 +119,6 @@ export const betterAuthPlugin =
     ///////////////////////////////////
     // Add Better Auth - Core Schema
     ///////////////////////////////////
-    // TODO: add core schema dynamically from authTables
     const betterAuthCollections = generatePayloadCollections(authTables)
     // Default collections
     config.collections = [
