@@ -54,7 +54,9 @@ const convertToPayloadFields = (
           // TODO: how to map better-auth FieldAttributeConfig . input ??
           defaultValue: fieldValue.defaultValue,
           // TODO: how to map better-auth FieldAttributeConfig . references ??
-          unique: fieldValue.unique, // TODO: better-auth FieldAttributeConfig . sortable has the same "reason to exists" as the payload FieldBase . index ??  index: fieldValue.sortable,
+          unique: fieldValue.unique,
+          // TODO: better-auth FieldAttributeConfig . sortable has the same "reason to exists" as the payload FieldBase . index ??
+          index: fieldValue.sortable,
         }) as PayloadField,
     )
 }
