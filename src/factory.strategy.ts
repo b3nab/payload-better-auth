@@ -1,6 +1,7 @@
 import type { AuthStrategy, AuthStrategyFunction, User } from 'payload'
 import type { betterAuth, BetterAuthOptions } from 'better-auth'
 import { getBetterAuth } from './singleton.better-auth.js'
+import { payloadSingleton } from './singleton.payload.js'
 
 // async ({ req, res }) => {
 //   try {
@@ -51,7 +52,9 @@ const betterAuthStrategy: AuthStrategyFunction = async ({
   isGraphQL,
   strategyName = 'better-auth',
 }) => {
-  console.log('betterAuthStrategy', headers)
+  payloadSingleton(payload)
+  console.log('betterAuthStrategy')
+  // console.log('betterAuthStrategy', headers)
   const betterAuth = getBetterAuth()
   const result = await betterAuth?.api.getSession({
     headers: headers,
