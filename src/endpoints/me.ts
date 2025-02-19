@@ -12,9 +12,10 @@ import { headers } from 'next/headers.js'
 // import { meOperation } from '../payload-operations/me.js'
 
 export const meHandler: PayloadHandler = async (req) => {
-  console.log('meHandler', req.headers)
+  console.log('meHandler')
   const collection = getRequestCollection(req)
 
+  // console.log('meHandler req: ', req)
   // const currentToken = extractJWT(req)
   // const result = await meOperation({
   //   collection,
@@ -34,8 +35,8 @@ export const meHandler: PayloadHandler = async (req) => {
   // invariant(result.session, 'No session found')
 
   const result = await response.json()
-  console.log('result', result)
-  console.log('headers', response.headers)
+  // console.log('meHandler result', result)
+  // console.log('headers', response.headers)
 
   const formatResultForPayload = () => {
     // const { session, user } = result
@@ -58,7 +59,7 @@ export const meHandler: PayloadHandler = async (req) => {
     },
     {
       headers: headersWithCors({
-        headers: new Headers(),
+        headers: response.headers,
         req,
       }),
       status: httpStatus.OK,
