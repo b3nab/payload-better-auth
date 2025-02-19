@@ -6,8 +6,26 @@
     "name": "Benedetto Abbenanti",
     "url": "https://ben.abbenanti.com"
   },
+  "bugs": {
+    "url": "https://github.com/b3nab/payload-better-auth/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/b3nab/payload-better-auth"
+  },
   "license": "AGPL-3.0-only",
   "type": "module",
+  "keywords": [
+    "payload-plugin",
+    "payload",
+    "cms",
+    "plugin",
+    "better-auth",
+    "security",
+    "auth",
+    "authentication",
+    "authorization"
+  ],
   "exports": {
     ".": {
       "import": "./src/index.ts",
