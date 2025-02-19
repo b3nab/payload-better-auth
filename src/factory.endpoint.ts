@@ -26,21 +26,31 @@ export class EndpointFactory {
         if (value?.path) return true
         return false
       })
-      .map(([authPath, authEndpoint]) => {
+      .reduce((acc: Endpoint[], [authPath, authEndpoint]) => {
         const endpointHandler: PayloadHandler = async (req) => {
-          const { payload } = req
           console.info('ENDPOINT HANDLER FOR: ', authPath)
           return this.betterAuthInstance.handler(req as Request)
-          // return auth.api?.[authPath] || Response.json({error: "bo"})
         }
 
-        return {
-          path: `/auth${authEndpoint.path}`,
-          method: Array.isArray(authEndpoint.method)
-            ? authEndpoint.method[0].toLowerCase() || 'get'
-            : authEndpoint.method.toLowerCase(),
-          handler: endpointHandler,
-        } as Endpoint
-      })
+        if (typeof authEndpoint.method === 'string') {
+          acc.push({
+            path: `/auth${authEndpoint.path}`,
+            method: authEndpoint.method.toLowerCase(),
+            handler: endpointHandler,
+          } as Endpoint)
+        }
+
+        if (Array.isArray(authEndpoint.method)) {
+          for (const method of authEndpoint.method) {
+            acc.push({
+              path: `/auth${authEndpoint.path}`,
+              method: method.toLowerCase(),
+              handler: endpointHandler,
+            } as Endpoint)
+          }
+        }
+
+        return acc
+      }, [])
   }
 }
