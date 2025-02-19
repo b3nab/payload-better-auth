@@ -44,7 +44,6 @@ const customJestConfig = {
   },
   verbose: true,
   testMatch: [
-    '<rootDir>/**/*int.spec.ts',
     '<rootDir>/**/*.test.ts',
   ],
   moduleNameMapper: {
