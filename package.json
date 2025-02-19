@@ -46,7 +46,7 @@
     "lint:fix": "eslint ./src --fix",
     "prepublishOnly": "pnpm clean && pnpm build",
     "test": "jest -w",
-    "ci:test-coverage": "jest --coverage"
+    "ci:test-coverage": "jest --coverage --detectOpenHandles --verbose --forceExit"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
