@@ -4,6 +4,9 @@ import {
   type PayloadHandler,
   headersWithCors,
   generateExpiredPayloadCookie,
+  Payload,
+  type Auth,
+  generateCookie,
 } from 'payload'
 
 import { getRequestCollection } from '../payload-utilities/getRequestEntity.js'
@@ -12,41 +15,52 @@ import invariant from 'tiny-invariant'
 // import { logoutOperation } from '../payload-operations/logout.js'
 
 export const logoutHandler: PayloadHandler = async (req) => {
+  console.log('[server] [logoutHandler]')
   const collection = getRequestCollection(req)
   const { t } = req
 
   const betterAuth = getBetterAuth()
   invariant(betterAuth, 'BetterAuth is not initialized')
-  const response = await betterAuth.api.signOut({
-    headers: req.headers,
-    asResponse: true,
-  })
 
-  const result = await response.json()
-  const headers = headersWithCors({
-    headers: response.headers,
-    req,
-  })
+  let response: Response | undefined
+  let result: any
+
+  try {
+    response = await betterAuth.api.signOut({
+      headers: req.headers,
+      asResponse: true,
+    })
+    result = await response.json()
+  } catch (error) {
+    console.error('[server] [logoutHandler] [error]', error)
+  }
 
   // const result = await logoutOperation({
   //   collection,
   //   req,
   // })
 
-  // const headers = headersWithCors({
-  //   headers: new Headers(),
-  //   req,
-  // })
+  // FIX - remove better-auth.two_factor cookie by setting expired cookie
+  const headers = headersWithCors({
+    headers: response?.headers ?? new Headers(),
+    req,
+  })
+  const expiredCookie = generateExpiredBetterAuthCookie({
+    collectionAuthConfig: collection.config.auth,
+    cookieName: 'better-auth.two_factor',
+  })
+  headers.set('Set-Cookie', expiredCookie)
+  // END FIX
 
   if (!result) {
     return Response.json(
       {
-        message: t('error:logoutFailed'),
+        message: t('authentication:logoutSuccessful'),
+        // message: t('error:logoutFailed'),
       },
       {
         headers,
-        status: response.status,
-        // status: httpStatus.BAD_REQUEST,
+        status: httpStatus.OK,
       },
     )
   }
@@ -65,8 +79,58 @@ export const logoutHandler: PayloadHandler = async (req) => {
     },
     {
       headers,
-      status: response.status,
-      // status: httpStatus.OK,
+      status: response?.status ?? httpStatus.OK,
     },
   )
+}
+
+type CookieObject = {
+  domain?: string
+  expires?: string
+  httpOnly?: boolean
+  maxAge?: number
+  name: string
+  path?: string
+  sameSite?: 'Lax' | 'None' | 'Strict'
+  secure?: boolean
+  value: string | undefined
+}
+
+type GeneratePayloadCookieArgs = {
+  /* The auth collection config */
+  collectionAuthConfig: Auth
+  /* Prefix to scope the cookie */
+  cookieName: string
+  /* The returnAs value */
+  returnCookieAsObject?: boolean
+  /* The token to be stored in the cookie */
+  token: string
+}
+
+export const generateExpiredBetterAuthCookie = <
+  T extends Omit<GeneratePayloadCookieArgs, 'token'>,
+>({
+  collectionAuthConfig,
+  cookieName,
+  returnCookieAsObject = false,
+}: T): T['returnCookieAsObject'] extends true ? CookieObject : string => {
+  const sameSite =
+    typeof collectionAuthConfig.cookies.sameSite === 'string'
+      ? collectionAuthConfig.cookies.sameSite
+      : collectionAuthConfig.cookies.sameSite
+        ? 'Strict'
+        : undefined
+
+  const expires = new Date(Date.now() - 1000)
+
+  return generateCookie<T['returnCookieAsObject']>({
+    name: cookieName,
+    domain: collectionAuthConfig.cookies.domain ?? undefined,
+    expires,
+    httpOnly: true,
+    path: '/',
+    returnCookieAsObject,
+    sameSite,
+    secure: collectionAuthConfig.cookies.secure,
+  })
 }
