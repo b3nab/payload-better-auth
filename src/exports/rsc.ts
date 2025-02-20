@@ -9,3 +9,8 @@
 // export { LogoutView as LogoutServer } from '../views/Logout/index.js'
 // export { ResetPassword as ResetServer } from '../views/ResetPassword/index.js'
 // export { UnauthorizedView as UnauthorizedServer } from '../views/Unauthorized/index.js'
+
+// Server Components
+export { BetterAuthServerWrapper } from '../components/providers/BetterAuthProvider.server.js'
+export { SetupTwoFactorServer } from '../components/views/two-factor/SetupTwoFactor.server.js'
+export { VerifyTwoFactorServer } from '../components/views/two-factor/VerifyTwoFactor.server.js'

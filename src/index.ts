@@ -26,7 +26,7 @@ import { nextCookies } from 'better-auth/next-js'
 
 import { generatePayloadCollections } from './core-schema/index.js'
 import { EndpointFactory } from './factory.endpoint.js'
-import { createAuthStrategies } from './factory.strategy.js'
+import { createAuthStrategies } from './strategies/strategies.payload-better-auth.js'
 import { betterAuthSingleton } from './singleton.better-auth.js'
 import { payloadSingleton } from './singleton.payload.js'
 import { payloadBetterAuthEndpoints } from './endpoints/endpoints.payload-better-auth.js'
@@ -174,11 +174,34 @@ export const betterAuthPlugin =
 
     ///////////////////////////////////////////
     // Add Better Auth - Admin Customization
-    // TODO: add admin customization - planned? what?
     ///////////////////////////////////////////
-    // if (!config.admin) {
-    //   config.admin = {}
-    // }
+    if (!config.admin) {
+      config.admin = {}
+    }
+
+    config.admin.components = {
+      ...(config.admin.components || {}),
+      providers: [
+        ...(config.admin.components?.providers || []),
+        {
+          path: 'payload-better-auth/rsc#BetterAuthServerWrapper',
+          serverProps: {
+            pluginOptions,
+          },
+        },
+      ],
+      views: {
+        ...(config.admin.components?.views || {}),
+        SetupTwoFactor: {
+          path: '/two-factor-setup',
+          Component: 'payload-better-auth/rsc#SetupTwoFactorServer',
+        },
+        VerifyTwoFactor: {
+          path: '/two-factor-verify',
+          Component: 'payload-better-auth/rsc#VerifyTwoFactorServer',
+        },
+      },
+    }
 
     const incomingOnInit = config.onInit
 
