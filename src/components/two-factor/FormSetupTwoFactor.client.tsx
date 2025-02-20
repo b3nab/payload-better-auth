@@ -1,0 +1,175 @@
+'use client'
+
+import { useState, type FC } from 'react'
+// import '../../index.css'
+
+import {
+  EmailField,
+  Form,
+  FormSubmit,
+  PasswordField,
+  TextField,
+  toast,
+  useConfig,
+  useTranslation,
+} from '@payloadcms/ui'
+import type { FormState } from 'payload'
+import { useBetterAuthClient } from '../providers/BetterAuthProvider.client.js'
+import { QRCodeSVG } from 'qrcode.react'
+import { redirect } from 'next/navigation.js'
+
+interface FormsTwoFactorProps {
+  action: 'enable' | 'disable'
+}
+
+export const FormsTwoFactor: FC<FormsTwoFactorProps> = ({
+  action: actionFromProps,
+}) => {
+  const [action, setAction] = useState<'enable' | 'disable'>(actionFromProps)
+  const { config, getEntityConfig } = useConfig()
+
+  const {
+    admin: {
+      routes: { forgot: forgotRoute },
+      user: userSlug,
+    },
+    routes: { admin: adminRoute, api: apiRoute },
+  } = config
+
+  const { t } = useTranslation()
+
+  const initialState: FormState = {
+    password: {
+      initialValue: '',
+      valid: false,
+      value: '',
+    },
+  }
+
+  const [needVerification, setNeedVerification] = useState(false)
+  const [qrCodeURI, setQrCodeURI] = useState<string | null>(null)
+
+  const { betterAuthClient } = useBetterAuthClient()
+
+  const submitTwoFactorEnable = async (data: FormState) => {
+    console.log('[two-factor] [enable] data', data)
+    const response = await betterAuthClient.twoFactor.enable({
+      password: data.password.value as string,
+    })
+    console.log('response', response)
+    if (response.error) {
+      toast.error(response.error.message || 'An error occurred')
+    } else {
+      setNeedVerification(true)
+      setQrCodeURI(response.data.totpURI)
+      toast.success(
+        'Two factor authentication enabled - verify your TOTP code to complete setup',
+      )
+      setAction('disable')
+    }
+  }
+
+  const submitTwoFactorDisable = async (data: FormState) => {
+    console.log('[two-factor] [disable] data', data)
+    const response = await betterAuthClient.twoFactor.disable({
+      password: data.password.value as string,
+    })
+    console.log('response', response)
+    toast.success('Two factor authentication disabled')
+    setAction('enable')
+  }
+
+  const submitTwoFactorVerify = async (data: FormState) => {
+    console.log('[two-factor] [verify] data', data)
+    const response = await betterAuthClient.twoFactor.verifyTotp({
+      code: data.password.value as string,
+    })
+    console.log('response', response)
+    if (response.error) {
+      toast.error(response.error.message || 'An error occurred')
+    } else {
+      toast.success('Two factor authentication verified')
+      redirect('/admin')
+    }
+  }
+
+  return (
+    <>
+      {!needVerification ? (
+        <Form
+          onSubmit={
+            action === 'enable' ? submitTwoFactorEnable : submitTwoFactorDisable
+          }
+          initialState={initialState}
+          method="POST"
+        >
+          <div className={'form-header'}>
+            <h1>
+              {action === 'enable'
+                ? 'Enable Two Factor Authentication'
+                : 'Disable Two Factor Authentication'}
+            </h1>
+            <p>
+              {action === 'enable'
+                ? 'Enter your password to enable two factor authentication'
+                : 'Enter your password to disable two factor authentication'}
+            </p>
+          </div>
+
+          <PasswordField
+            field={{
+              name: 'password',
+              label: t('general:password'),
+              required: true,
+            }}
+            autoComplete="current-password"
+            path="password"
+          />
+
+          <FormSubmit size="large">
+            {action === 'enable' ? 'Enable' : 'Disable'}
+            {/* {t('general:submit')} */}
+          </FormSubmit>
+        </Form>
+      ) : (
+        <div>
+          <div className={'form-header'}>
+            <h1>Verify Two Factor Authentication</h1>
+            <p>
+              Scan the QR code with your authenticator app and enter the code
+              below
+            </p>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <QRCodeSVG
+              value={qrCodeURI || ''}
+              title={'Scan the QR code with your authenticator app'}
+              size={128}
+              bgColor={'#ffffff'}
+              fgColor={'#000000'}
+              level={'L'}
+            />
+          </div>
+
+          <Form
+            onSubmit={submitTwoFactorVerify}
+            initialState={initialState}
+            method="POST"
+          >
+            <PasswordField
+              field={{
+                name: 'password',
+                label: 'Code',
+                required: true,
+              }}
+              autoComplete="one-time-code"
+              path="password"
+            />
+
+            <FormSubmit size="large">{t('general:submit')}</FormSubmit>
+          </Form>
+        </div>
+      )}
+    </>
+  )
+}
