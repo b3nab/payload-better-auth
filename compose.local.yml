@@ -12,18 +12,18 @@ services:
     ports:
       - '37001:27017'
 
-  postgres:
-    image: postgres:16
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
-      # PGDATA: /var/lib/postgresql/data
-    volumes:
-       - ba-postgres:/var/lib/postgresql/data
-    ports:
-      - "37002:5432"
-    restart: unless-stopped
+  # postgres:
+  #   image: postgres:16
+  #   environment:
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: postgres
+  #     POSTGRES_DB: postgres
+  #     # PGDATA: /var/lib/postgresql/data
+  #   volumes:
+  #      - ba-postgres:/var/lib/postgresql/data
+  #   ports:
+  #     - "37002:5432"
+  #   restart: unless-stopped
 
   mailpit:
     image: axllent/mailpit
@@ -41,5 +41,5 @@ services:
 
 volumes:
   ba-mongo:
-  ba-postgres:
+  # ba-postgres:
   ba-mailpit:
