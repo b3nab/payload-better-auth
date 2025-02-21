@@ -12,10 +12,12 @@ import {
 import { getRequestCollection } from '../payload-utilities/getRequestEntity.js'
 import { getBetterAuth } from '../singleton.better-auth.js'
 import invariant from 'tiny-invariant'
+import { getLogger } from '../logger.js'
 // import { logoutOperation } from '../payload-operations/logout.js'
 
 export const logoutHandler: PayloadHandler = async (req) => {
-  console.log('[server] [logoutHandler]')
+  const logger = getLogger()
+  logger.trace('[server] [logoutHandler]')
   const collection = getRequestCollection(req)
   const { t } = req
 
@@ -32,7 +34,12 @@ export const logoutHandler: PayloadHandler = async (req) => {
     })
     result = await response.json()
   } catch (error) {
-    console.error('[server] [logoutHandler] [error]', error)
+    logger.error(
+      {
+        error,
+      },
+      '[server] [logoutHandler] [error]',
+    )
   }
 
   // const result = await logoutOperation({
@@ -49,8 +56,22 @@ export const logoutHandler: PayloadHandler = async (req) => {
     collectionAuthConfig: collection.config.auth,
     cookieName: 'better-auth.two_factor',
   })
-  headers.set('Set-Cookie', expiredCookie)
+  logger.debug(
+    {
+      setCookies: headers.get('Set-Cookie'),
+    },
+    '[server] [logoutHandler] [FIX headers]',
+  )
+  headers.append('Set-Cookie', expiredCookie)
   // END FIX
+
+  logger.debug(
+    {
+      result,
+      headers,
+    },
+    '[server] [logoutHandler] [headers]',
+  )
 
   if (!result) {
     return Response.json(
