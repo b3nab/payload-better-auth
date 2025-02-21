@@ -25,7 +25,7 @@ export const betterAuthPluginConfig = {
   // betterAuthPlugins: {
   //   twoFactor: true,
   // },
-  logs: 'debug',
+  logs: 'trace',
 } satisfies BetterAuthPluginOptions
 
 export default buildConfig({
