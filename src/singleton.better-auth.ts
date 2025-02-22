@@ -1,11 +1,13 @@
 import type { betterAuth } from 'better-auth'
 
-let betterAuthInstance: ReturnType<typeof betterAuth> | undefined = undefined
+let betterAuthInstance: ReturnType<typeof betterAuthSingleton> | undefined =
+  undefined
 
-export const betterAuthSingleton = (
-  betterAuthIncoming: ReturnType<typeof betterAuth>,
+export const betterAuthSingleton = <T extends ReturnType<typeof betterAuth>>(
+  betterAuthIncoming: T,
 ) => {
   betterAuthInstance = betterAuthIncoming
+  return betterAuthIncoming
 }
 
 export const getBetterAuth = (throwError = false) => {

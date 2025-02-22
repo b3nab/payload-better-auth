@@ -27,14 +27,8 @@ import { passkey } from 'better-auth/plugins/passkey'
 import { sso } from 'better-auth/plugins/sso'
 import type { BetterAuthPluginOptions } from '../index.js'
 
-export const defaultPlugins: BetterAuthPlugin[] = [
-  twoFactor(),
-  passkey(),
-  openAPI(),
-]
-export const pluginsToLoad = (
-  pluginOptions: BetterAuthPluginOptions,
-): BetterAuthPlugin[] =>
+export const defaultPlugins = [twoFactor(), passkey(), openAPI()]
+export const pluginsToLoad = (pluginOptions: BetterAuthPluginOptions) =>
   pluginOptions.betterAuthPlugins
     ? Object.entries(pluginOptions.betterAuthPlugins)
         .map(([key, plugin]) => {
@@ -59,7 +53,7 @@ export const pluginsToLoad = (
               // core enterprise
               // TODO: need to pass options for plugin
               // oidcProvider: oidcProvider(),
-              sso: sso(),
+              // sso: sso(),
               // core utility
               bearer: bearer(),
               multiSession: multiSession(),

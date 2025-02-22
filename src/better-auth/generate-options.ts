@@ -7,8 +7,9 @@ import type { BetterAuthPluginOptions } from '../index.js'
 
 export const generateBetterAuthOptions = (
   pluginOptions: BetterAuthPluginOptions,
-): BetterAuthOptions => {
-  return {
+) => {
+  const plugins = [...pluginsToLoad(pluginOptions), nextCookies()]
+  const options = {
     // defaults (sane defaults)
     //////////////////////////////
     database: payloadAdapter({
@@ -17,7 +18,7 @@ export const generateBetterAuthOptions = (
     emailAndPassword: {
       enabled: true,
     },
-    plugins: [...pluginsToLoad(pluginOptions), nextCookies()],
+    plugins,
 
     // options from plugin
     ////////////////////////////
@@ -38,4 +39,6 @@ export const generateBetterAuthOptions = (
     //   },
     // },
   }
+
+  return options
 }
