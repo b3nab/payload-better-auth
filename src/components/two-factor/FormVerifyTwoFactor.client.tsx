@@ -53,7 +53,8 @@ export const FormVerifyTwoFactor: FC = () => {
      */
     const maxRecurs = 1
     let triedRecurs = 0
-    const fireVerify2FA = async (recursion = false) => {
+    // biome-ignore lint/suspicious/noExplicitAny: this is an internal temporary workaround, Promise<any> is fine
+    const fireVerify2FA = async (recursion = false): Promise<any> => {
       if (recursion) triedRecurs++
       let finalResponse: any
       try {
