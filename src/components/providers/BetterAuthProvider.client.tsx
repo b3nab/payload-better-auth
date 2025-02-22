@@ -1,18 +1,20 @@
 'use client'
 import type React from 'react'
 import { createContext, useContext, useEffect } from 'react'
+import type { Payload } from 'payload'
+import { formatAdminURL } from '@payloadcms/ui/shared'
+import { usePathname, useRouter } from 'next/navigation.js'
+import { useAuth } from '@payloadcms/ui'
 import { createAuthClient } from 'better-auth/react'
-import type { BetterAuthPluginOptions } from '../../index.js'
 import { twoFactorClient } from 'better-auth/plugins'
-import { passkeyClient } from 'better-auth/plugins/passkey'
+import { passkeyClient } from 'better-auth/client/plugins'
 import type { BetterAuthClientPlugin } from 'better-auth/types'
+import type { BetterAuthPluginOptions } from '../../index.js'
 
 // Types imported just to make the types work
 import type * as nanostores from 'nanostores'
 import type * as simplewebauthn from '@simplewebauthn/server'
-import type { Payload } from 'payload'
-import { formatAdminURL } from '@payloadcms/ui/shared'
-import { usePathname, useRouter } from 'next/navigation.js'
+import type * as betterauthserverplugins from 'better-auth/plugins'
 
 function generateBetterAuthClient(pluginOptions: BetterAuthPluginOptions) {
   const clientPlugins = []
@@ -81,6 +83,7 @@ export function useBetterAuthClient() {
 const CheckAuthFlows = ({
   authFlows,
 }: { authFlows: BetterAuthProviderProps['authFlows'] }) => {
+  const { user } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
 
@@ -90,11 +93,29 @@ const CheckAuthFlows = ({
       authFlows.twoFactor.redirectUrl,
     )
 
-    if (authFlows.twoFactor.enabled && !isVerifyTwoFactorPage) {
-      window.location.href = authFlows.twoFactor.redirectUrl
-      // router.push(authFlows.twoFactor.redirectUrl)
+    // if (pathname.includes('/logout')) {
+    //   // FIX! this is a hack to refresh the logout page since at first sight there is an issue:
+    //   // PayloadCMS has a client hook useAuth() that has logOut function wrapped in a useCallback
+    //   // and this useCallback is not updated when the page is refreshed
+    //   // probably because of a conflict with the latest update of PayloadCMS v3.24.0 that uses reactTransition
+    //   // so we need to refresh the page to get it to call the logOut function and retrieve the Set-Cookie
+    //   // that contains the expired cookies set by the logout endpoint
+    //   console.warn(
+    //     '[client] [CheckAuthFlows] [useEffect] [logout] [refreshing]',
+    //   )
+    //   router.refresh()
+    // }
+
+    if (
+      user?.id === 'two-factor-id' &&
+      authFlows.twoFactor.enabled &&
+      !isVerifyTwoFactorPage &&
+      !pathname.includes('/logout')
+    ) {
+      // window.location.href = authFlows.twoFactor.redirectUrl
+      router.push(authFlows.twoFactor.redirectUrl)
     }
-  }, [authFlows, pathname, router])
+  }, [authFlows, pathname, router, user])
 
   return null
 }

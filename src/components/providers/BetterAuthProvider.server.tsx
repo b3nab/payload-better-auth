@@ -5,36 +5,61 @@ import { cookies as nextCookies, headers as nextHeaders } from 'next/headers.js'
 import { redirect } from 'next/navigation.js'
 import { BetterAuthProvider } from './BetterAuthProvider.client.js'
 import invariant from 'tiny-invariant'
+import { getLogger } from '../../logger.js'
 
 interface BetterAuthWrapperProps extends ServerComponentProps {
   children: React.ReactNode
   pluginOptions: BetterAuthPluginOptions
 }
 
-export const BetterAuthServerWrapper = async ({
-  children,
-  pluginOptions,
-  payload,
-  user,
-  req,
-}: BetterAuthWrapperProps) => {
+export const BetterAuthServerWrapper = async (
+  wrapperProps: BetterAuthWrapperProps,
+) => {
+  const logger = getLogger()
+  logger.trace('[server] [BetterAuthServerWrapper]')
+  const { children, pluginOptions, payload, user, req } = wrapperProps
+  // console.log('[server] [BetterAuthServerWrapper] [wrapperProps]', wrapperProps)
   const cookies = await nextCookies()
   const headers = await nextHeaders()
 
-  console.log('[server] [BetterAuthServerWrapper] [cookies]', cookies)
-  console.log('[server] [BetterAuthServerWrapper] [headers]', headers)
+  logger.debug(
+    {
+      cookies,
+      headers,
+      req,
+      user,
+    },
+    '[server] [BetterAuthServerWrapper]',
+  )
 
-  console.log('[server] [BetterAuthServerWrapper] [req]', req)
-  console.log('[server] [BetterAuthServerWrapper] [user]', user)
+  // logger.debug(
+  //   `[server] [BetterAuthServerWrapper] [cookies]: ${String(cookies)}`,
+  // )
+  // logger.debug(
+  //   `[server] [BetterAuthServerWrapper] [headers]: ${String(headers)}`,
+  // )
+
+  // logger.debug(`[server] [BetterAuthServerWrapper] [req]: ${String(req)}`)
+  // logger.debug(`[server] [BetterAuthServerWrapper] [user]: ${String(user)}`)
   // console.log('[server] [BetterAuthServerWrapper] [payload]', payload)
 
   const twoFactorSession = cookies.get('better-auth.two_factor')
+  const redirected = headers.get('x-two-factor-redirect')
+
+  if (twoFactorSession && redirected) {
+    logger.debug(
+      `[server] [BetterAuthServerWrapper] [redirected]: ${String(redirected)}`,
+    )
+    return redirect(
+      formatAdminURL({
+        adminRoute: payload.config.routes.admin,
+        path: '/two-factor-verify',
+      }),
+    )
+  }
 
   // get current url
   // console.log('[better-auth] [strategy] [twoFactor] headers', headers)
-  const refererURL = headers.get('referer')
-
-  console.log('[server] [BetterAuthServerWrapper] [refererURL]', refererURL)
 
   // invariant(refererURL, 'Referer URL is required')
 
@@ -74,7 +99,7 @@ export const BetterAuthServerWrapper = async ({
       // payloadConfig={payload}
       authFlows={{
         twoFactor: {
-          enabled: !!twoFactorSession,
+          enabled: payload.config.custom.authFlows.twoFactor,
           redirectUrl: formatAdminURL({
             adminRoute: payload.config.routes.admin,
             path: '/two-factor-verify',
