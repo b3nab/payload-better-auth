@@ -10,10 +10,19 @@ import { headers } from 'next/headers.js'
 // import { headersWithCors } from '../payload-utilities/headersWithCors.js'
 // import { extractJWT } from '../payload-utilities/extractJWT.js'
 // import { meOperation } from '../payload-operations/me.js'
+import { getLogger } from '../logger.js'
 
 export const meHandler: PayloadHandler = async (req) => {
+  const logger = getLogger()
   console.log('meHandler')
+  logger.info('[server] [meHandler]')
   const collection = getRequestCollection(req)
+
+  const { headers, user } = req
+
+  // const result = {
+  //   user: null,
+  // }
 
   // console.log('meHandler req: ', req)
   // const currentToken = extractJWT(req)
@@ -35,17 +44,21 @@ export const meHandler: PayloadHandler = async (req) => {
   // invariant(result.session, 'No session found')
 
   const result = await response.json()
-  // console.log('meHandler result', result)
-  // console.log('headers', response.headers)
+  logger.trace('meHandler result', result)
+  logger.trace('headers', response.headers)
 
   const formatResultForPayload = () => {
-    // const { session, user } = result
     return {
       collection: collection.config.slug,
       exp: result?.session?.expiresAt,
-      strategy: req.user?._strategy || 'better-auth',
+      strategy: req.user?._strategy,
       token: result?.session?.token,
-      user: result?.user,
+      user: {
+        ...result?.user,
+        collection: collection.config.slug,
+        _strategy: req.user?._strategy,
+        by: 'endpoint-me',
+      },
     }
   }
   // if (collection.config.auth.removeTokenFromResponses) {
@@ -59,7 +72,7 @@ export const meHandler: PayloadHandler = async (req) => {
     },
     {
       headers: headersWithCors({
-        headers: response.headers,
+        headers,
         req,
       }),
       status: httpStatus.OK,
