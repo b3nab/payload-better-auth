@@ -8,12 +8,15 @@ import type {
 import { generateId, BetterAuthError } from 'better-auth'
 import { getAuthTables } from 'better-auth/db'
 import { getPayload } from '../singleton.payload.js'
+import { getLogger } from '../logger.js'
 
 export interface PayloadAdapterConfig {
   payload?: Payload
 }
 
 export const payloadAdapter = (config: PayloadAdapterConfig) => {
+  const logger = getLogger()
+  logger.trace('payloadAdapter')
   // console.log(`\n- payloadAdapter WRAPPER`)
 
   return (options: BetterAuthOptions): Adapter => {
@@ -49,7 +52,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
         data: any
         select?: string[]
       }): Promise<any> {
-        console.log(
+        logger.trace(
           `\n- - payloadAdapter - create >> ${JSON.stringify(data, null, 2)}`,
         )
         const payload = await resolvePayload()
@@ -74,7 +77,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
         where?: Where[]
         select?: string[]
       }): Promise<any | null> {
-        console.log(
+        logger.trace(
           `\n- - payloadAdapter - findOne >> ${JSON.stringify(data, null, 2)}`,
         )
         const payload = await resolvePayload()
@@ -102,7 +105,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
         offset?: number
         sortBy?: { field: string; direction: 'asc' | 'desc' }
       }): Promise<any[]> {
-        console.log(
+        logger.trace(
           `\n- - payloadAdapter - findMany >> ${JSON.stringify(data, null, 2)}`,
         )
         const payload = await resolvePayload()
@@ -133,7 +136,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
         where?: Where[]
         update: any
       }): Promise<any> {
-        console.log(
+        logger.trace(
           `\n- - payloadAdapter - update >> ${JSON.stringify(data, null, 2)}`,
         )
         const payload = await resolvePayload()
@@ -169,7 +172,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
         where?: Where[]
         update: any
       }): Promise<number> {
-        console.log(
+        logger.trace(
           `\n- - payloadAdapter - updateMany >> ${JSON.stringify(data, null, 2)}`,
         )
         const payload = await resolvePayload()
@@ -200,7 +203,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
       },
 
       async delete(data: { model: string; where?: Where[] }): Promise<void> {
-        console.log(
+        logger.trace(
           `\n- - payloadAdapter - delete >> ${JSON.stringify(data, null, 2)}`,
         )
         const payload = await resolvePayload()
@@ -230,7 +233,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
         model: string
         where?: Where[]
       }): Promise<number> {
-        console.log(
+        logger.trace(
           `\n- - payloadAdapter - deleteMany >> ${JSON.stringify(data, null, 2)}`,
         )
         const payload = await resolvePayload()
