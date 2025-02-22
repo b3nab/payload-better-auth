@@ -24,13 +24,16 @@ import { getEndpoints } from 'better-auth/api'
 import { getAuthTables } from 'better-auth/db'
 import { nextCookies } from 'better-auth/next-js'
 
-import { generatePayloadCollections } from './core-schema/index.js'
+import { generatePayloadCollections } from './core/index.js'
 import { EndpointFactory } from './factory.endpoint.js'
 import { createAuthStrategies } from './strategies/strategies.payload-better-auth.js'
 import { betterAuthSingleton } from './singleton.better-auth.js'
-import { payloadSingleton } from './singleton.payload.js'
+import { getPayload, payloadSingleton } from './singleton.payload.js'
 import { payloadBetterAuthEndpoints } from './endpoints/endpoints.payload-better-auth.js'
 import { generateBetterAuthOptions } from './better-auth/generate-options.js'
+import { initLogger, type LoggerConfig } from './logger.js'
+import { openAPI, twoFactor } from 'better-auth/plugins'
+import { payloadAdapter } from './better-auth/payload-adapter.js'
 
 export type BetterAuthPluginOptions = {
   /**
@@ -79,7 +82,7 @@ export type BetterAuthPluginOptions = {
    * Set the log level for the plugin.
    * @default 'info'
    */
-  logs?: false | 'debug' | 'info' | 'warn' | 'error'
+  logs?: false | LoggerConfig['level'] // 'debug' | 'info' | 'warn' | 'error'
 }
 /**
  * Better Auth Plugin for PayloadCMS
@@ -91,17 +94,34 @@ export const betterAuthPlugin =
   (incomingConfig: Config): Config => {
     const config = { ...incomingConfig }
 
-    // console.log(`\n- betterAuthPlugin`)
+    const logger = initLogger({
+      level: pluginOptions.logs || 'info',
+    })
+
+    logger.info(`\n- betterAuthPlugin`)
 
     ///////////////////////////////////
     // Better Auth - INSTANCE
     ///////////////////////////////////
 
-    const betterAuthOptions: BetterAuthOptions =
-      generateBetterAuthOptions(pluginOptions)
+    const betterAuthOptions = generateBetterAuthOptions(pluginOptions)
     // extract api endpoints the same way as better-auth do.
     const auth = betterAuth(betterAuthOptions)
-    betterAuthSingleton(auth)
+    // const auth = betterAuth({
+    //   database: payloadAdapter({
+    //     payload: getPayload(),
+    //   }),
+    //   emailAndPassword: {
+    //     enabled: true,
+    //   },
+    //   plugins: [twoFactor(), openAPI()],
+    // })
+    // auth.api.verifyTOTP({
+    //   body: {
+    //     code: '',
+    //   },
+    // })
+    betterAuthSingleton<typeof auth>(auth)
 
     // console.log('keys:', Object.keys(auth.api))
     // console.log(`[better-auth] auth.api: ${JSON.stringify(auth.api, null, 2)}`)
@@ -200,6 +220,18 @@ export const betterAuthPlugin =
           path: '/two-factor-verify',
           Component: 'payload-better-auth/rsc#VerifyTwoFactorServer',
         },
+      },
+    }
+
+    // add custom config for auth flows
+    config.custom = {
+      ...(config.custom || {}),
+      authFlows: {
+        twoFactor:
+          pluginOptions.betterAuthPlugins?.twoFactor ??
+          betterAuthOptions.plugins?.some(
+            (plugin) => plugin.id === 'two-factor',
+          ),
       },
     }
 
