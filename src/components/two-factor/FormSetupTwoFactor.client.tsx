@@ -77,6 +77,7 @@ export const FormsTwoFactor: FC<FormsTwoFactorProps> = ({
     console.log('response', response)
     toast.success('Two factor authentication disabled')
     setAction('enable')
+    redirect('/admin')
   }
 
   const submitTwoFactorVerify = async (data: FormState) => {
