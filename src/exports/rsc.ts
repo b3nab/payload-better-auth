@@ -1,6 +1,11 @@
 // export { BeforeDashboardServer } from '../components/BeforeDashboardServer.js'
 
-// Views
+// Server Providers
+export { BetterAuthServerWrapper } from '../components/providers/BetterAuthProvider.server.js'
+
+// Server Views
+export { SetupTwoFactorServer } from '../components/views/two-factor/SetupTwoFactor.server.js'
+export { VerifyTwoFactorServer } from '../components/views/two-factor/VerifyTwoFactor.server.js'
 // export { Account as AccountServer } from '../views/Account/index.js'
 // export { CreateFirstUserView as CreateFirstUserServer } from '../views/CreateFirstUser/index.js'
 // export { ForgotPasswordView as ForgotServer } from '../views/ForgotPassword/index.js'
@@ -11,6 +16,3 @@
 // export { UnauthorizedView as UnauthorizedServer } from '../views/Unauthorized/index.js'
 
 // Server Components
-export { BetterAuthServerWrapper } from '../components/providers/BetterAuthProvider.server.js'
-export { SetupTwoFactorServer } from '../components/views/two-factor/SetupTwoFactor.server.js'
-export { VerifyTwoFactorServer } from '../components/views/two-factor/VerifyTwoFactor.server.js'
