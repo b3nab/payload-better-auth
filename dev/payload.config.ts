@@ -58,6 +58,7 @@ export default buildConfig({
   // },
   plugins: [betterAuthPlugin(betterAuthPluginConfig)],
   secret: process.env.PAYLOAD_SECRET || 'test-secret_key',
+  serverURL: process.env.NEXT_PUBLIC_SERVER_URL,
   sharp,
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
