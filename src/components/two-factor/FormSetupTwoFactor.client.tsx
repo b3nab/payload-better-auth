@@ -16,8 +16,8 @@ import {
 } from '@payloadcms/ui'
 import type { FormState } from 'payload'
 import { useBetterAuthClient } from '../providers/BetterAuthProvider.client.js'
-import { QRCodeSVG } from 'qrcode.react'
 import { redirect } from 'next/navigation.js'
+import { QRCode2FA } from './QRCode.client.js'
 
 interface FormsTwoFactorProps {
   action: 'enable' | 'disable'
@@ -159,14 +159,7 @@ export const FormsTwoFactor: FC<FormsTwoFactorProps> = ({
             </p>
           </div>
           <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <QRCodeSVG
-              value={qrCodeURI || ''}
-              title={'Scan the QR code with your authenticator app'}
-              size={128}
-              bgColor={'#ffffff'}
-              fgColor={'#000000'}
-              level={'L'}
-            />
+            <QRCode2FA uri={qrCodeURI || ''} />
           </div>
 
           <Form
