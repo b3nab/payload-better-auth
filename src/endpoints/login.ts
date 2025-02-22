@@ -3,11 +3,13 @@ import { status as httpStatus } from 'http-status'
 
 import type { PayloadHandler } from 'payload'
 import { headersWithCors, generatePayloadCookie } from 'payload'
+import { formatAdminURL } from '@payloadcms/ui/shared'
 
 import { getRequestCollection } from '../payload-utilities/getRequestEntity.js'
 import { isNumber } from '../payload-utilities/isNumber.js'
 import { getBetterAuth } from '../singleton.better-auth.js'
 import invariant from 'tiny-invariant'
+import { redirect } from 'next/navigation.js'
 // import { loginOperation } from '../payload-operations/login.js'
 
 export const loginHandler: PayloadHandler = async (req) => {
@@ -40,6 +42,7 @@ export const loginHandler: PayloadHandler = async (req) => {
   invariant(betterAuth, 'BetterAuth not initialized')
 
   const response = await betterAuth.api.signInEmail({
+    headers: req.headers,
     body: {
       email: authData.email,
       password: authData.password,
@@ -53,11 +56,49 @@ export const loginHandler: PayloadHandler = async (req) => {
   console.log('result', result)
   console.log('headers', response.headers)
 
+  // if (result.twoFactorRedirect) {
+  //   console.log('redirecting to two factor')
+  //   // return redirect(`${req.payload.config.routes.admin}/two-factor`)
+  //   return Response.redirect(
+  //     formatAdminURL({
+  //       adminRoute: req.payload.config.routes.admin,
+  //       path: '/two-factor-verify',
+  //     }),
+  //   )
+  // }
+
+  // Check if 2FA is required
+  // if (result.twoFactorRedirect) {
+  //   // Construct full URL for redirect
+  //   const protocol = req.headers.get('x-forwarded-proto') || 'http'
+  //   const redirectUrl = new URL(
+  //     formatAdminURL({
+  //       adminRoute: req.payload.config.routes.admin,
+  //       path: '/two-factor-verify',
+  //     }),
+  //     `${protocol}://${req.headers.get('host')}`,
+  //   ).toString()
+
+  //   // return redirect(redirectUrl)
+  //   return Response.redirect(redirectUrl, 303)
+  // }
+
   // const cookie = generatePayloadCookie({
   //   collectionAuthConfig: collection.config.auth,
   //   cookiePrefix: req.payload.config.cookiePrefix,
   //   token: result.token,
   // })
+
+  if (result.twoFactorRedirect) {
+    result.user = {
+      ...result,
+      ...result.user,
+      id: 'two-factor-id',
+      email: 'two-factor-email',
+      collection: req.payload.config.admin.user,
+      by: 'endpoint-login',
+    }
+  }
 
   if (collection.config.auth.removeTokenFromResponses) {
     result.token = undefined
@@ -67,6 +108,10 @@ export const loginHandler: PayloadHandler = async (req) => {
     {
       message: t('authentication:passed'),
       ...result,
+      user: {
+        ...result.user,
+        by: 'endpoint-login',
+      },
     },
     {
       headers: headersWithCors({
