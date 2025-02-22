@@ -10,6 +10,7 @@ import {
   PasswordField,
   TextField,
   toast,
+  useAuth,
   useConfig,
   useTranslation,
 } from '@payloadcms/ui'
@@ -49,6 +50,7 @@ export const FormsTwoFactor: FC<FormsTwoFactorProps> = ({
   const [needVerification, setNeedVerification] = useState(false)
   const [qrCodeURI, setQrCodeURI] = useState<string | null>(null)
 
+  const { setUser } = useAuth()
   const { betterAuthClient } = useBetterAuthClient()
 
   const submitTwoFactorEnable = async (data: FormState) => {
@@ -90,6 +92,21 @@ export const FormsTwoFactor: FC<FormsTwoFactorProps> = ({
       toast.error(response.error.message || 'An error occurred')
     } else {
       toast.success('Two factor authentication verified')
+      try {
+        // try to set the user, even here it could return response.data as a Blob the first time
+        // but here we don't do the same workaround as the /two-factor-verify
+        // the user will be set later by the /api/user/me call
+        setUser({
+          token: response.data.token,
+          exp: 60 * 60 * 24, // 1 day if exp is in seconds
+          user: {
+            collection: 'user',
+            ...response.data.user,
+          },
+        })
+      } catch (error) {
+        console.error('[two-factor] [1st-verify] [error]', error)
+      }
       redirect('/admin')
     }
   }
