@@ -159,7 +159,7 @@ export const FormsTwoFactor: FC<FormsTwoFactorProps> = ({
             </p>
           </div>
           <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <QRCode2FA uri={qrCodeURI || ''} />
+            <QRCode2FA uri={qrCodeURI} />
           </div>
 
           <Form

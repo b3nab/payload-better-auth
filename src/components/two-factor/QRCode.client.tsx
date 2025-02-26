@@ -2,18 +2,19 @@ import QRCode from 'qrcode'
 import { useEffect, useState } from 'react'
 
 interface QrCode2FAProps {
-  uri: string
+  uri: string | null
 }
 
 export const QRCode2FA = ({ uri }: QrCode2FAProps) => {
-  const [qrcode, setQrcode] = useState('')
+  const [qrcode, setQrcode] = useState<string | null>(null)
   useEffect(() => {
     const getQRCodeImage = async () => {
+      if (!uri) return
       const imageData = await QRCode.toDataURL(uri)
       setQrcode(imageData)
     }
 
-    uri && getQRCodeImage()
+    getQRCodeImage()
   }, [uri])
-  return <img src={qrcode} alt="Two Factor QR Code" />
+  return qrcode && <img src={qrcode} alt="Two Factor QR Code" />
 }
