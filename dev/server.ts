@@ -19,7 +19,9 @@ const handle = app.getRequestHandler()
 
 await app.prepare()
 
-await open(`http://localhost:3000/admin`)
+await open(
+  `${process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:3000'}/admin`,
+)
 
 const server = createServer((req, res) => {
   const parsedUrl = parse(req.url!, true)

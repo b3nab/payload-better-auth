@@ -27,8 +27,7 @@ export const generateBetterAuthOptions = (
     // merge options (nested ones)
     //////////////////////////////////
     trustedOrigins: [
-      // url for hoppscotch extension proxy
-      'chrome-extension://amknoiejhlmhancpahfcfcfhllgkpbld',
+      process.env.NEXT_PUBLIC_SERVER_URL,
       ...(pluginOptions.betterAuth?.trustedOrigins || []),
     ],
     // user: {

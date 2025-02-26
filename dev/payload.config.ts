@@ -29,6 +29,7 @@ export const betterAuthPluginConfig = {
 } satisfies BetterAuthPluginOptions
 
 export default buildConfig({
+  cors: ['http://authdemo.local:3000'],
   admin: {
     // autoLogin: devUser,
     importMap: {
