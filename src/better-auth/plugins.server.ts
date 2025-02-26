@@ -27,6 +27,8 @@ import { passkey } from 'better-auth/plugins/passkey'
 import { sso } from 'better-auth/plugins/sso'
 import type { BetterAuthPluginOptions } from '../index.js'
 
+import type * as sssoplugintype from 'better-auth/plugins/sso'
+
 export const defaultPlugins = [twoFactor(), passkey(), openAPI()]
 export const pluginsToLoad = (pluginOptions: BetterAuthPluginOptions) =>
   pluginOptions.betterAuthPlugins
