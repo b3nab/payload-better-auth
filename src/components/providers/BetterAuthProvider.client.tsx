@@ -15,6 +15,7 @@ import type { BetterAuthPluginOptions } from '../../index.js'
 import type * as nanostores from 'nanostores'
 import type * as simplewebauthn from '@simplewebauthn/server'
 import type * as betterauthserverplugins from 'better-auth/plugins'
+import type * as betterfetch from '@better-fetch/fetch'
 
 function generateBetterAuthClient(pluginOptions: BetterAuthPluginOptions) {
   const clientPlugins = []

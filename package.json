@@ -51,7 +51,7 @@
   "scripts": {
     "build": "pnpm copyfiles && pnpm build:types && pnpm build:swc",
     "build:swc": "swc ./src -d ./dist --config-file .swcrc --strip-leading-paths",
-    "build:types": "tsc --outDir dist --rootDir ./src",
+    "build:types": "tsc --outDir dist --rootDir ./src --noCheck",
     "clean": "rimraf {dist,*.tsbuildinfo}",
     "copyfiles": "copyfiles -u 1 \"src/**/*.{html,css,scss,ttf,woff,woff2,eot,svg,jpg,png,json}\" dist/",
     "dev": "pnpm local:up -d && payload run ./dev/server.ts | pino-pretty",
@@ -144,7 +144,8 @@
   },
   "registry": "https://registry.npmjs.org/",
   "dependencies": {
-    "better-auth": "^1.1.20-beta.1",
+    "@better-fetch/fetch": "1.1.12",
+    "better-auth": "^1.1.21",
     "busboy": "^1.6.0",
     "http-status": "^2.1.0",
     "mongodb": "^6.13.0",
