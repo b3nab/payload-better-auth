@@ -110,6 +110,7 @@ export const loginHandler: PayloadHandler = async (req) => {
       ...result,
       user: {
         ...result.user,
+        collection: req.payload.config.admin.user,
         by: 'endpoint-login',
       },
     },
