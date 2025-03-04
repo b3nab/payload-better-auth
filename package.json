@@ -1,6 +1,6 @@
 {
   "name": "payload-better-auth",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "A Payload CMS 3 plugin for Better Auth",
   "author": {
     "name": "Benedetto Abbenanti",
@@ -76,13 +76,13 @@
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@eslint/eslintrc": "^3.2.0",
-    "@payloadcms/db-mongodb": "3.23.0",
-    "@payloadcms/db-postgres": "3.23.0",
-    "@payloadcms/db-sqlite": "3.23.0",
+    "@payloadcms/db-mongodb": "latest",
+    "@payloadcms/db-postgres": "latest",
+    "@payloadcms/db-sqlite": "latest",
     "@payloadcms/eslint-config": "3.9.0",
-    "@payloadcms/next": "3.23.0",
-    "@payloadcms/richtext-lexical": "3.23.0",
-    "@payloadcms/ui": "3.23.0",
+    "@payloadcms/next": "latest",
+    "@payloadcms/richtext-lexical": "latest",
+    "@payloadcms/ui": "latest",
     "@playwright/test": "^1.50.1",
     "@simplewebauthn/server": "13.1.1",
     "@swc-node/register": "1.10.9",
@@ -104,7 +104,7 @@
     "nanostores": "0.11.3",
     "next": "15.1.5",
     "open": "^10.1.0",
-    "payload": "3.23.0",
+    "payload": "latest",
     "pino-pretty": "^13.0.0",
     "prettier": "^3.4.2",
     "qs-esm": "7.0.2",
@@ -116,7 +116,7 @@
     "typescript": "5.7.3"
   },
   "peerDependencies": {
-    "payload": "^3.23.0"
+    "payload": "^3"
   },
   "engines": {
     "node": "^18.20.2 || >=20.9.0",
