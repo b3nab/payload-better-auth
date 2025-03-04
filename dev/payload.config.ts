@@ -21,7 +21,7 @@ if (!process.env.ROOT_DIR) {
 }
 
 export const betterAuthPluginConfig = {
-  betterAuth: {},
+  // betterAuth: {},
   // betterAuthPlugins: {
   //   twoFactor: true,
   // },
