@@ -131,9 +131,9 @@
         "default": "./dist/index.js"
       },
       "./nextjs": {
-        "import": "./src/nextjs/index.tsx",
-        "types": "./src/nextjs/index.tsx",
-        "default": "./src/nextjs/index.tsx"
+        "import": "./dist/nextjs/index.js",
+        "types": "./dist/nextjs/index.d.ts",
+        "default": "./dist/nextjs/index.js"
       },
       "./client": {
         "import": "./dist/exports/client.js",
