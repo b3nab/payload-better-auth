@@ -3,7 +3,7 @@ import { guardBefore } from './guard.before.js'
 import { redirect } from 'next/navigation.js'
 import type { Guard } from './guard.type.js'
 
-export const isAuth: Guard = async (configPromise, redirectUrl) => {
+export const isGuest: Guard = async (configPromise, redirectUrl) => {
   const { payload, betterAuth } = await guardBefore(configPromise)
 
   const data = await betterAuth.api.getSession({
@@ -13,9 +13,9 @@ export const isAuth: Guard = async (configPromise, redirectUrl) => {
 
   // const data = await responseSession.json()
 
-  // console.log('ISAUTH - data:: ', data)
+  // console.log('ISGUEST - data:: ', data)
 
-  if (redirectUrl && !data?.session.token) redirect(redirectUrl)
+  if (redirectUrl && data?.session.token) redirect(redirectUrl)
 
   return {
     hasSession: !!data?.session.token && !!data?.user,
