@@ -35,17 +35,17 @@ export const meHandler: PayloadHandler = async (req) => {
   const betterAuth = getBetterAuth()
   invariant(betterAuth, 'BetterAuth not initialized')
 
-  const response = await betterAuth.api.getSession({
+  const result = await betterAuth.api.getSession({
     headers: req.headers,
-    asResponse: true,
+    // asResponse: true,
   })
 
   // invariant(result, 'Failed to get session')
   // invariant(result.session, 'No session found')
 
-  const result = await response.json()
+  // const result = await response.json()
   logger.trace('meHandler result', result)
-  logger.trace('headers', response.headers)
+  // logger.trace('headers', response.headers)
 
   const formatResultForPayload = () => {
     return {

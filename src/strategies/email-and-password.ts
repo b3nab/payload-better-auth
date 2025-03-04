@@ -14,11 +14,11 @@ export const emailAndPasswordStrategy: AuthStrategyFunction = async ({
   logger.trace('[server] [strategy] [emailAndPassword]')
   // console.log('emailAndPassword', headers)
   const betterAuth = getBetterAuth()
-  const response = await betterAuth?.api.getSession({
+  const result = await betterAuth?.api.getSession({
     headers: headers,
-    asResponse: true,
+    // asResponse: true,
   })
-  const result = await response?.json()
+  // const result = await response?.json()
   logger.debug(
     `[server] [strategy] [emailAndPassword] getSession result: ${!!result}`,
   )
