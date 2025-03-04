@@ -3,16 +3,10 @@ import { headers } from 'next/headers.js'
 import { getPayload } from 'payload'
 import { getBetterAuth, isAuth } from 'payload-better-auth/nextjs'
 
-export const SSRComponent = async () => {
+export default async function isAuthServerPage() {
   const { hasSession, data } = await isAuth(configPromise)
 
-  console.log('getSession Json response:: ', data)
-
-  // const data = await payload.find({
-  //   collection: 'users',
-  // })
-
-  // return Response.json(data)
+  console.log('isAuth Json response:: ', data)
 
   return hasSession ? (
     <div>
@@ -23,5 +17,3 @@ export const SSRComponent = async () => {
     <p>no user</p>
   )
 }
-
-export default SSRComponent
