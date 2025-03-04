@@ -1,6 +1,6 @@
 {
   "name": "payload-better-auth",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A Payload CMS 3 plugin for Better Auth",
   "author": {
     "name": "Benedetto Abbenanti",
@@ -131,9 +131,9 @@
         "default": "./dist/index.js"
       },
       "./nextjs": {
-        "import": "./src/nextjs/index.tsx",
-        "types": "./src/nextjs/index.tsx",
-        "default": "./src/nextjs/index.tsx"
+        "import": "./dist/nextjs/index.js",
+        "types": "./dist/nextjs/index.d.ts",
+        "default": "./dist/nextjs/index.js"
       },
       "./client": {
         "import": "./dist/exports/client.js",
