@@ -1,6 +1,6 @@
 {
   "name": "payload-better-auth",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A Payload CMS 3 plugin for Better Auth",
   "author": {
     "name": "Benedetto Abbenanti",
@@ -31,6 +31,11 @@
       "import": "./src/index.ts",
       "types": "./src/index.ts",
       "default": "./src/index.ts"
+    },
+    "./nextjs": {
+      "import": "./src/nextjs/index.tsx",
+      "types": "./src/nextjs/index.tsx",
+      "default": "./src/nextjs/index.tsx"
     },
     "./client": {
       "import": "./src/exports/client.ts",
@@ -118,11 +123,17 @@
     "pnpm": "^9"
   },
   "publishConfig": {
+    "registry": "https://registry.npm.abbenanti.com/",
     "exports": {
       ".": {
         "import": "./dist/index.js",
         "types": "./dist/index.d.ts",
         "default": "./dist/index.js"
+      },
+      "./nextjs": {
+        "import": "./src/nextjs/index.tsx",
+        "types": "./src/nextjs/index.tsx",
+        "default": "./src/nextjs/index.tsx"
       },
       "./client": {
         "import": "./dist/exports/client.js",
@@ -143,7 +154,7 @@
       "sharp"
     ]
   },
-  "registry": "https://registry.npmjs.org/",
+  "registry": "https://registry.npm.abbenanti.com/",
   "dependencies": {
     "@better-fetch/fetch": "1.1.12",
     "better-auth": "^1.1.21",
