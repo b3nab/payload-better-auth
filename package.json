@@ -156,8 +156,8 @@
   },
   "registry": "https://registry.npm.abbenanti.com/",
   "dependencies": {
-    "@better-fetch/fetch": "1.1.12",
-    "better-auth": "^1.1.21",
+    "@better-fetch/fetch": "1.1.15",
+    "better-auth": "1.2.2",
     "busboy": "^1.6.0",
     "http-status": "^2.1.0",
     "mongodb": "^6.13.0",
