@@ -21,6 +21,7 @@ import {
   type BetterAuthPlugin,
 } from 'better-auth'
 import { getEndpoints } from 'better-auth/api'
+// @ts-ignore
 import { getAuthTables } from 'better-auth/db'
 import { nextCookies } from 'better-auth/next-js'
 
@@ -32,7 +33,6 @@ import { getPayload, payloadSingleton } from './singleton.payload.js'
 import { payloadBetterAuthEndpoints } from './endpoints/endpoints.payload-better-auth.js'
 import { generateBetterAuthOptions } from './better-auth/generate-options.js'
 import { initLogger, type LoggerConfig } from './logger.js'
-import { openAPI, twoFactor } from 'better-auth/plugins'
 import { payloadAdapter } from './better-auth/payload-adapter.js'
 
 export type BetterAuthPluginOptions = {
@@ -128,7 +128,7 @@ export const betterAuthPlugin =
     const authEndpoints = getEndpoints(auth.$context, betterAuthOptions)
     const authTables = getAuthTables(betterAuthOptions)
 
-    // console.log('authTables', Object.keys(authTables))
+    logger.debug({ authTables: Object.keys(authTables) }, 'authTables')
     // console.log('authTables', JSON.stringify(authTables, null, 2))
 
     // console.log('keys authEndpoints:', Object.keys(authEndpoints.api))
@@ -183,9 +183,12 @@ export const betterAuthPlugin =
       authEndpoints.api,
     ).buildEndpoints()
 
-    // console.log(
-    //   `[plugin-better-auth] endpoints api: ${Object.keys(betterAuthEndpoints)}`,
-    // )
+    logger.debug(
+      {
+        endpoints: betterAuthEndpoints.map((endpnt) => endpnt.path),
+      },
+      '[plugin-better-auth] endpoints api',
+    )
     // console.log(
     //   `[plugin-better-auth] endpoints api: ${JSON.stringify(betterAuthEndpoints, null, 2)}`,
     // )
