@@ -9,19 +9,19 @@ export const isAuth = async (
 ) => {
   const { payload, betterAuth } = await guardBefore(configPromise)
 
-  const responseSession = await betterAuth.api.getSession({
+  const data = await betterAuth.api.getSession({
     headers: await headers(),
-    asResponse: true,
+    // asResponse: true,
   })
 
-  const data = await responseSession.json()
+  // const data = await responseSession.json()
 
   // console.log('ISAUTH - data:: ', data)
 
-  if (redirectUrl && !data.session.token) redirect(redirectUrl)
+  if (redirectUrl && !data?.session.token) redirect(redirectUrl)
 
   return {
-    hasSession: !!data.session.token && !!data.user,
+    hasSession: !!data?.session.token && !!data?.user,
     data,
     payload,
     betterAuth,
