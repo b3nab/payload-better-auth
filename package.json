@@ -71,7 +71,7 @@
     "publish:local": "pnpm publish --registry http://0.0.0.0:4873 --no-git-checks",
     "prepublishOnly": "pnpm clean && pnpm build",
     "test": "jest -w",
-    "ci:test-coverage": "jest --coverage --detectOpenHandles --verbose --forceExit"
+    "test:coverage": "jest --coverage --detectOpenHandles --verbose --forceExit"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
@@ -165,5 +165,6 @@
     "pnpm": "9",
     "qrcode": "^1.5.4",
     "tiny-invariant": "^1.3.3"
-  }
+  },
+  "packageManager": "pnpm@9.15.6+sha512.139cab068fdf0b751268179ac5f909b5be72afb4a75c513d1905d151befc8977b593d3cf8671ed83d4d6637c5c94b98ffbce108125de4a5a27a31233601a99de"
 }
