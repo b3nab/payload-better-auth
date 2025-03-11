@@ -4,14 +4,10 @@ import sharp from 'sharp'
 import { buildConfig } from 'payload'
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
-import {
-  betterAuthPlugin,
-  type BetterAuthPluginOptions,
-} from 'payload-better-auth'
-
 import { devUser } from './helpers/credentials.js'
 import { testEmailAdapter } from './helpers/testEmailAdapter.js'
 import { seed } from './seed.js'
+import { plugins } from './payload.plugins.js'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -19,14 +15,6 @@ const dirname = path.dirname(filename)
 if (!process.env.ROOT_DIR) {
   process.env.ROOT_DIR = dirname
 }
-
-export const betterAuthPluginConfig = {
-  // betterAuth: {},
-  // betterAuthPlugins: {
-  //   twoFactor: true,
-  // },
-  logs: 'trace',
-} satisfies BetterAuthPluginOptions
 
 export default buildConfig({
   cors: ['http://authdemo.local:3000'],
@@ -57,7 +45,7 @@ export default buildConfig({
   // onInit: async (payload) => {
   //   await seed(payload)
   // },
-  plugins: [betterAuthPlugin(betterAuthPluginConfig)],
+  plugins: [...plugins],
   secret: process.env.PAYLOAD_SECRET || 'test-secret_key',
   serverURL: process.env.NEXT_PUBLIC_SERVER_URL,
   sharp,

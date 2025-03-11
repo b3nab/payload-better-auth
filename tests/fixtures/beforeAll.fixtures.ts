@@ -11,6 +11,7 @@ import { getEndpoints } from 'better-auth/api'
 import { getAuthTables } from 'better-auth/db'
 import { generateBetterAuthOptions } from '../../src/better-auth/generate-options.ts'
 import { setSuite, type Suite } from './suite.ctx.js'
+import { betterAuthPluginConfig } from '../../dev/payload.plugins.ts'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -45,9 +46,7 @@ export const beforeAllFixtures = () => async () => {
     process.env.DATABASE_URI = `${suite.memoryDB.getUri()}&retryWrites=true`
   }
 
-  const { default: config, betterAuthPluginConfig } = await import(
-    '../../dev/payload.config.ts'
-  )
+  const { default: config } = await import('../../dev/payload.config.ts')
 
   suite.payload = await getPayload({ config })
   suite.restClient = new NextRESTClient(suite.payload.config)
