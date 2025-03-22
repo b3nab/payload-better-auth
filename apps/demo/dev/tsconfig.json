@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../../tsconfig.json",
   "exclude": [],
   "include": [
     "**/*.js",
@@ -15,7 +15,7 @@
     "./dev/next-env.d.ts"
   ],
   "compilerOptions": {
-    "baseUrl": "./dev/",
+    "baseUrl": "./",
     "paths": {
       "@payload-config": [
         "./payload.config.ts"
