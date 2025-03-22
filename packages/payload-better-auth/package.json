@@ -1,6 +1,6 @@
 {
   "name": "payload-better-auth",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "A Payload CMS 3 plugin for Better Auth",
   "author": {
     "name": "Benedetto Abbenanti",
@@ -150,7 +150,7 @@
   "registry": "https://registry.npm.abbenanti.com/",
   "dependencies": {
     "@better-fetch/fetch": "1.1.15",
-    "better-auth": "1.2.2",
+    "better-auth": "1.2.4",
     "busboy": "^1.6.0",
     "http-status": "^2.1.0",
     "mongodb": "^6.13.0",
