@@ -44,7 +44,7 @@ import { bearer } from 'better-auth/plugins/bearer'
 import { multiSession } from 'better-auth/plugins/multi-session'
 import { oAuthProxy } from 'better-auth/plugins/oauth-proxy'
 // @ts-ignore
-import { openAPI } from 'better-auth/plugins'
+import { BetterAuthPlugin, openAPI } from 'better-auth/plugins'
 import { jwt } from 'better-auth/plugins/jwt'
 import type { BetterAuthPluginOptions } from '../index.js'
 
@@ -93,5 +93,5 @@ export const pluginsToLoad = (pluginOptions: BetterAuthPluginOptions) =>
           return plugin()
         })
         // need to filter out undefined plugins
-        .filter((plugin) => !!plugin)
+        .filter((plugin: BetterAuthPlugin | undefined) => !!plugin)
     : defaultPlugins
