@@ -1,7 +1,7 @@
 import {
   betterAuthPlugin,
   type BetterAuthPluginOptions,
-} from '../packages/payload-better-auth/src/index.js'
+} from 'payload-better-auth'
 
 export const betterAuthPluginConfig = {
   // betterAuth: {},
