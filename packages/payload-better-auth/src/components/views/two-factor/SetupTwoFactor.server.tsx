@@ -5,7 +5,7 @@ import type { Payload, AdminViewProps } from 'payload'
 
 import { MinimalTemplate } from '@payloadcms/next/templates'
 import { Gutter } from '@payloadcms/ui'
-import { FormsTwoFactor } from '../../two-factor/FormSetupTwoFactor.client.js'
+import { FormsTwoFactor } from '../../two-factor/FormSetupTwoFactor.client.jsx'
 import { redirect } from 'next/navigation.js'
 
 type AdminViewServerProps = AdminViewProps & {

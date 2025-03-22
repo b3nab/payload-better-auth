@@ -15,9 +15,9 @@ import {
   useTranslation,
 } from '@payloadcms/ui'
 import type { FormState } from 'payload'
-import { useBetterAuthClient } from '../providers/BetterAuthProvider.client.js'
+import { useBetterAuthClient } from '../providers/BetterAuthProvider.client.jsx'
 import { redirect } from 'next/navigation.js'
-import { QRCode2FA } from './QRCode.client.js'
+import { QRCode2FA } from './QRCode.client.jsx'
 
 interface FormsTwoFactorProps {
   action: 'enable' | 'disable'

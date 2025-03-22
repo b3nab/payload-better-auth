@@ -6,7 +6,7 @@ import type { Payload, AdminViewProps } from 'payload'
 import { MinimalTemplate } from '@payloadcms/next/templates'
 import { Button, Gutter, Logout } from '@payloadcms/ui'
 import { redirect } from 'next/navigation.js'
-import { FormVerifyTwoFactor } from '../../../components/two-factor/FormVerifyTwoFactor.client.js'
+import { FormVerifyTwoFactor } from '../../two-factor/FormVerifyTwoFactor.client.js'
 import { formatAdminURL } from '@payloadcms/ui/shared'
 
 type AdminViewServerProps = AdminViewProps & {
