@@ -1,5 +1,5 @@
 {
-  "extends": "../tsconfig.json",
+  "extends": "../../tsconfig.json",
   "exclude": [],
   "include": [
     "**/*.js",
@@ -11,10 +11,11 @@
     "../packages/payload-better-auth/src/**/*.ts",
     "../packages/payload-better-auth/src/**/*.tsx",
     "next.config.mjs",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "./dev/next-env.d.ts"
   ],
   "compilerOptions": {
-    "baseUrl": "./",
+    "baseUrl": "./dev/",
     "paths": {
       "@payload-config": [
         "./payload.config.ts"
