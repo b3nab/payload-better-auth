@@ -8,9 +8,14 @@ import open from 'open'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
+const DEV_PORT = 7125
+
+console.log(`DEV_PORT is ${DEV_PORT}`)
+
 const opts: NextServerOptions = {
   dev: true,
   dir: dirname,
+  port: DEV_PORT,
 }
 
 // @ts-expect-error next types do not import
@@ -20,7 +25,7 @@ const handle = app.getRequestHandler()
 await app.prepare()
 
 await open(
-  `${process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:3000'}/admin`,
+  `${process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:7125'}/admin`,
 )
 
 const server = createServer((req, res) => {
@@ -28,4 +33,4 @@ const server = createServer((req, res) => {
   void handle(req, res, parsedUrl)
 })
 
-server.listen(3000)
+server.listen(DEV_PORT)
