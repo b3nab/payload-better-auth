@@ -18,17 +18,17 @@ export const registerFirstUserHandler: PayloadHandler = async (req) => {
   const authData: Record<string, any> = collection.config.auth
     ?.loginWithUsername
     ? {
-        email: typeof req.data?.email === 'string' ? req.data.email : '',
-        password:
-          typeof req.data?.password === 'string' ? req.data.password : '',
-        username:
-          typeof req.data?.username === 'string' ? req.data.username : '',
-      }
+      email: typeof req.data?.email === 'string' ? req.data.email : '',
+      password:
+        typeof req.data?.password === 'string' ? req.data.password : '',
+      username:
+        typeof req.data?.username === 'string' ? req.data.username : '',
+    }
     : {
-        email: typeof req.data?.email === 'string' ? req.data.email : '',
-        password:
-          typeof req.data?.password === 'string' ? req.data.password : '',
-      }
+      email: typeof req.data?.email === 'string' ? req.data.email : '',
+      password:
+        typeof req.data?.password === 'string' ? req.data.password : '',
+    }
 
   authData.name = typeof req.data?.name === 'string' ? req.data.name : ''
   authData.emailVerified =
@@ -88,6 +88,7 @@ export const registerFirstUserHandler: PayloadHandler = async (req) => {
 
   const response = await betterAuth?.api.signUpEmail({
     body: {
+      role: 'admin',
       name: authData.name,
       // username: authData.username,
       email: authData.email,
@@ -102,6 +103,14 @@ export const registerFirstUserHandler: PayloadHandler = async (req) => {
   const result = await response.json()
   invariant(result.token, 'User registered but no token returned')
 
+  const fixRoleResponse = await payload.update({
+    collection: 'user',
+    id: result.user.id,
+    data: {
+      role: 'admin',
+    },
+    overrideAccess: true,
+  })
   // if (verify) {
   //   // auto-verify (if applicable)
   //   await payload.update({
