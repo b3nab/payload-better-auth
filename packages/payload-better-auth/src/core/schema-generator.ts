@@ -5,28 +5,39 @@ import type {
 } from 'better-auth/db'
 import type {
   CollectionConfig,
+  CollectionSlug,
   Field as PayloadField,
   FieldTypes as PayloadFieldTypes,
 } from 'payload'
+import deepmerge from '@fastify/deepmerge'
+import type { BetterAuthPluginOptions } from '../index.js'
+import { getLogger } from '../logger.js'
 
 export const generatePayloadCollections = (
   authTables: BetterAuthDbSchema,
+  extendsCollections?: BetterAuthPluginOptions['extendsCollections'],
 ): CollectionConfig[] => {
   const collections: CollectionConfig[] = []
 
   for (const [key, value] of Object.entries(authTables)) {
-    const newCollection: CollectionConfig = {
+    const modelName = value.modelName as CollectionSlug
+    let newCollection: CollectionConfig = {
       admin: {
         group: 'Better Auth',
       },
-      slug: key,
+      slug: modelName,
       fields: convertToPayloadFields(value.fields),
     }
     if (key === 'user') {
       newCollection.auth = true
     }
+    if (extendsCollections?.[modelName]) {
+      newCollection = deepmerge()(newCollection, extendsCollections[modelName])
+    }
     collections.push(newCollection)
   }
+
+  getLogger().trace(collections, 'output from generatePayloadCollections')
 
   return collections
 }

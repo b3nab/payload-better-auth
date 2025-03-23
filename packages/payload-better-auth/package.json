@@ -150,6 +150,7 @@
   "registry": "https://registry.npm.abbenanti.com/",
   "dependencies": {
     "@better-fetch/fetch": "1.1.15",
+    "@fastify/deepmerge": "^3.0.0",
     "better-auth": "1.2.4",
     "busboy": "^1.6.0",
     "http-status": "^2.1.0",
