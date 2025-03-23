@@ -4,14 +4,14 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { getPayload } from 'payload'
-import { NextRESTClient } from '../../dev/helpers/NextRESTClient.ts'
+import { NextRESTClient } from '@/../../apps/demo/dev/helpers/NextRESTClient'
 import { MongoMemoryReplSet } from 'mongodb-memory-server'
 import { betterAuth } from 'better-auth'
 import { getEndpoints } from 'better-auth/api'
 import { getAuthTables } from 'better-auth/db'
-import { generateBetterAuthOptions } from '../../src/better-auth/generate-options.ts'
+import { generateBetterAuthOptions } from '../../src/better-auth/generate-options'
 import { setSuite, type Suite } from './suite.ctx.js'
-import { betterAuthPluginConfig } from '../../dev/payload.plugins.ts'
+import { betterAuthPluginConfig } from '@/../../apps/demo/dev/payload.plugins'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -46,7 +46,7 @@ export const beforeAllFixtures = () => async () => {
     process.env.DATABASE_URI = `${suite.memoryDB.getUri()}&retryWrites=true`
   }
 
-  const { default: config } = await import('../../dev/payload.config.ts')
+  const { default: config } = await import('@/../../apps/demo/dev/payload.config')
 
   suite.payload = await getPayload({ config })
   suite.restClient = new NextRESTClient(suite.payload.config)
