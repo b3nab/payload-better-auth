@@ -28,7 +28,7 @@
   "scripts": {
     "---DEMO---": "",
     "demo--": "pnpm --filter demo-app",
-    "dev": "pnpm demo-- dev",
+    "dev": "pnpm demo-- dev:all",
     "---PLUGIN---": "",
     "plugin--": "pnpm --filter payload-better-auth",
     "test": "pnpm plugin-- test",

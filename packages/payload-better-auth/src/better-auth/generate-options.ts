@@ -11,21 +11,24 @@ export const generateBetterAuthOptions = (
   const plugins = [...pluginsToLoad(pluginOptions), nextCookies()]
 
   // leave this way.. typescript types are shit..
-  let trustedOrigins: BetterAuthOptions['trustedOrigins'] = []
-  if (pluginOptions.betterAuth?.trustedOrigins) {
+  let trustedOrigins: BetterAuthOptions["trustedOrigins"] = []
+  if(pluginOptions.betterAuth?.trustedOrigins) {
     const trusted = pluginOptions.betterAuth.trustedOrigins
     if (Array.isArray(trusted)) {
-      trustedOrigins = [process.env.NEXT_PUBLIC_SERVER_URL ?? '', ...trusted]
-    } else {
-      trustedOrigins = async (request: Request) => [
+      trustedOrigins = [
         process.env.NEXT_PUBLIC_SERVER_URL ?? '',
-        ...(await trusted(request)),
+        ...trusted
       ]
+    } else {
+      trustedOrigins = (request: Request) => ([
+        process.env.NEXT_PUBLIC_SERVER_URL ?? '',
+        ...trusted(request)
+      ])
     }
   }
   // end cry on typescript types
 
-  const options: BetterAuthOptions = {
+  const options : BetterAuthOptions = {
     // defaults (sane defaults)
     //////////////////////////////
     database: payloadAdapter({
