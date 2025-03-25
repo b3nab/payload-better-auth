@@ -1,7 +1,7 @@
 import type { AuthStrategyFunction } from 'payload'
 import { payloadSingleton } from '../singleton.payload.js'
 import { getBetterAuth } from '../singleton.better-auth.js'
-import { getLogger } from '../logger.js'
+import { getLogger } from '../singleton.logger.js'
 
 export const emailAndPasswordStrategy: AuthStrategyFunction = async ({
   headers,

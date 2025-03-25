@@ -11,7 +11,7 @@ import type {
 } from 'payload'
 import deepmerge from '@fastify/deepmerge'
 import type { BetterAuthPluginOptions } from '../index.js'
-import { getLogger } from '../logger.js'
+import { getLogger } from '../singleton.logger.js'
 
 export const generatePayloadCollections = (
   authTables: BetterAuthDbSchema,

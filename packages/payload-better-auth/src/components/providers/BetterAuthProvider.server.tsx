@@ -5,7 +5,7 @@ import { cookies as nextCookies, headers as nextHeaders } from 'next/headers.js'
 import { redirect } from 'next/navigation.js'
 import { BetterAuthProvider } from './BetterAuthProvider.client.js'
 import invariant from 'tiny-invariant'
-import { getLogger } from '../../logger.js'
+import { getLogger } from '../../singleton.logger.js'
 
 interface BetterAuthWrapperProps extends ServerComponentProps {
   children: React.ReactNode

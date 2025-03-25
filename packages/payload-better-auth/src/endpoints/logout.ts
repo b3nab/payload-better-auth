@@ -12,7 +12,7 @@ import {
 import { getRequestCollection } from '../payload-utilities/getRequestEntity.js'
 import { getBetterAuth } from '../singleton.better-auth.js'
 import invariant from 'tiny-invariant'
-import { getLogger } from '../logger.js'
+import { getLogger } from '../singleton.logger.js'
 // import { logoutOperation } from '../payload-operations/logout.js'
 
 export const logoutHandler: PayloadHandler = async (req) => {

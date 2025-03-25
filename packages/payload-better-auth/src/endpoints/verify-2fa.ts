@@ -10,7 +10,7 @@ import { isNumber } from '../payload-utilities/isNumber.js'
 import { getBetterAuth } from '../singleton.better-auth.js'
 import invariant from 'tiny-invariant'
 import { redirect } from 'next/navigation.js'
-import { getLogger } from '../logger.js'
+import { getLogger } from '../singleton.logger.js'
 // import { verify2faOperation } from '../payload-operations/verify2fa.js'
 
 export const verify2faHandler: PayloadHandler = async (req) => {

@@ -32,7 +32,7 @@ import { betterAuthSingleton } from './singleton.better-auth.js'
 import { getPayload, payloadSingleton } from './singleton.payload.js'
 import { payloadBetterAuthEndpoints } from './endpoints/endpoints.payload-better-auth.js'
 import { generateBetterAuthOptions } from './better-auth/generate-options.js'
-import { initLogger, type LoggerConfig } from './logger.js'
+import { initLogger, type LoggerConfig } from './singleton.logger.js'
 import { payloadAdapter } from './better-auth/payload-adapter.js'
 
 export type CollectionConfigExtend<T extends CollectionSlug> = Pick<

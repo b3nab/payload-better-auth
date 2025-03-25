@@ -10,7 +10,7 @@ import { headers } from 'next/headers.js'
 // import { headersWithCors } from '../payload-utilities/headersWithCors.js'
 // import { extractJWT } from '../payload-utilities/extractJWT.js'
 // import { meOperation } from '../payload-operations/me.js'
-import { getLogger } from '../logger.js'
+import { getLogger } from '../singleton.logger.js'
 
 export const meHandler: PayloadHandler = async (req) => {
   const logger = getLogger()

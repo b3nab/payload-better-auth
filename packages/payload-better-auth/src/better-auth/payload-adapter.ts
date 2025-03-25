@@ -8,7 +8,7 @@ import type {
 import { generateId, BetterAuthError } from 'better-auth'
 import { getAuthTables } from 'better-auth/db'
 import { getPayload } from '../singleton.payload.js'
-import { getLogger } from '../logger.js'
+import { getLogger } from '../singleton.logger.js'
 
 export interface PayloadAdapterConfig {
   payload?: Payload

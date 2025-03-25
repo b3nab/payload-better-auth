@@ -10,9 +10,11 @@ import { isNumber } from '../payload-utilities/isNumber.js'
 import { getBetterAuth } from '../singleton.better-auth.js'
 import invariant from 'tiny-invariant'
 import { redirect } from 'next/navigation.js'
+import { getLogger } from '../singleton.logger.js'
 // import { loginOperation } from '../payload-operations/login.js'
 
 export const loginHandler: PayloadHandler = async (req) => {
+  const logger = getLogger()
   const collection = getRequestCollection(req)
   const { searchParams, t } = req
   const depth = searchParams.get('depth')
