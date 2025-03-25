@@ -1,14 +1,16 @@
 import type { BetterAuthOptions } from 'better-auth'
+import { admin } from 'better-auth/plugins'
+import { nextCookies } from 'better-auth/next-js'
 import { payloadAdapter } from './payload-adapter.js'
 import { getPayload } from '../singleton.payload.js'
 import { pluginsToLoad } from './plugins.server.js'
-import { nextCookies } from 'better-auth/next-js'
 import type { BetterAuthPluginOptions } from '../index.js'
+import { ac, roles } from './permissions.js'
 
 export const generateBetterAuthOptions = (
   pluginOptions: BetterAuthPluginOptions,
 ) => {
-  const plugins = [...pluginsToLoad(pluginOptions), nextCookies()]
+  const plugins = [...pluginsToLoad(pluginOptions), admin({ac, roles}), nextCookies()]
 
   // leave this way.. typescript types are shit..
   let trustedOrigins: BetterAuthOptions["trustedOrigins"] = []

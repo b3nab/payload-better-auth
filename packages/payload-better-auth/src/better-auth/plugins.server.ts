@@ -28,7 +28,7 @@ import type { BetterAuthPluginOptions } from '../index.js'
 
 import type * as sssoplugintype from 'better-auth/plugins/sso'
 
-export const defaultPlugins = [twoFactor(), admin(), openAPI()]
+export const defaultPlugins = [twoFactor(), openAPI()]
 export const pluginsToLoad = (pluginOptions: BetterAuthPluginOptions) =>
   pluginOptions.betterAuthPlugins
     ? Object.entries(pluginOptions.betterAuthPlugins)

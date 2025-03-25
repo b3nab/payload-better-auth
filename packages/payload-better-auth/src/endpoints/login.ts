@@ -21,17 +21,17 @@ export const loginHandler: PayloadHandler = async (req) => {
   const authData =
     collection.config.auth?.loginWithUsername !== false
       ? {
-          email: typeof req.data?.email === 'string' ? req.data.email : '',
-          password:
-            typeof req.data?.password === 'string' ? req.data.password : '',
-          username:
-            typeof req.data?.username === 'string' ? req.data.username : '',
-        }
+        email: typeof req.data?.email === 'string' ? req.data.email : '',
+        password:
+          typeof req.data?.password === 'string' ? req.data.password : '',
+        username:
+          typeof req.data?.username === 'string' ? req.data.username : '',
+      }
       : {
-          email: typeof req.data?.email === 'string' ? req.data.email : '',
-          password:
-            typeof req.data?.password === 'string' ? req.data.password : '',
-        }
+        email: typeof req.data?.email === 'string' ? req.data.email : '',
+        password:
+          typeof req.data?.password === 'string' ? req.data.password : '',
+      }
 
   // const result = await loginOperation({
   //   collection,
@@ -58,6 +58,20 @@ export const loginHandler: PayloadHandler = async (req) => {
   console.log('result', result)
   console.log('headers', response.headers)
 
+  const canEnterCMS = await betterAuth.api.userHasPermission({
+    body: {
+      userId: result.user.id,
+      permission: {
+        payloadcms: ['access'],
+      },
+    },
+  })
+
+  logger.debug(canEnterCMS.success, '[loginHandler] canEnterCMS ==')
+
+  invariant(canEnterCMS.success, 'cannot enter cms, permission denied.')
+
+  logger.debug(canEnterCMS.success, '[loginHandler] SUCCESS! Entering CMS..')
   // if (result.twoFactorRedirect) {
   //   console.log('redirecting to two factor')
   //   // return redirect(`${req.payload.config.routes.admin}/two-factor`)
