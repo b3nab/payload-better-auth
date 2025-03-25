@@ -20,9 +20,9 @@ export const generateBetterAuthOptions = (
         ...trusted
       ]
     } else {
-      trustedOrigins = (request: Request) => ([
+      trustedOrigins = async (request: Request) => ([
         process.env.NEXT_PUBLIC_SERVER_URL ?? '',
-        ...trusted(request)
+        ...(await trusted(request))
       ])
     }
   }
