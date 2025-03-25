@@ -141,7 +141,7 @@ export const betterAuthPlugin =
       const authEndpoints = getEndpoints(auth.$context, betterAuthOptions)
       const authTables = getAuthTables(betterAuthOptions)
 
-      logger.debug({ authTables: Object.keys(authTables) }, 'authTables')
+      logger.trace({ authTables: Object.keys(authTables) }, 'authTables')
       // console.log('authTables', JSON.stringify(authTables, null, 2))
 
       // console.log('keys authEndpoints:', Object.keys(authEndpoints.api))
@@ -199,7 +199,7 @@ export const betterAuthPlugin =
         authEndpoints.api,
       ).buildEndpoints()
 
-      logger.debug(
+      logger.trace(
         {
           endpoints: betterAuthEndpoints.map((endpnt) => endpnt.path),
         },
