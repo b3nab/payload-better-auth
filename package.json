@@ -1,6 +1,6 @@
 {
-  "name": "payload-better-auth",
-  "version": "0.0.8",
+  "name": "workspace-payload-better-auth",
+  "version": "0.0.0",
   "description": "A Payload CMS 3 plugin for Better Auth",
   "author": {
     "name": "Benedetto Abbenanti",
@@ -33,7 +33,9 @@
     "plugin--": "pnpm --filter payload-better-auth",
     "test": "pnpm plugin-- test",
     "test:coverage": "pnpm plugin-- test:coverage",
-    "build": "pnpm plugin-- build"
+    "build": "pnpm plugin-- build",
+    "pub": "pnpm publish --filter payload-better-auth",
+    "pub:local": "pnpm plugin-- publish:local"
   },
   "packageManager": "pnpm@9.15.6+sha512.139cab068fdf0b751268179ac5f909b5be72afb4a75c513d1905d151befc8977b593d3cf8671ed83d4d6637c5c94b98ffbce108125de4a5a27a31233601a99de"
 }

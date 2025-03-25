@@ -1,6 +1,6 @@
 {
   "name": "payload-better-auth",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "A Payload CMS 3 plugin for Better Auth",
   "author": {
     "name": "Benedetto Abbenanti",
@@ -50,9 +50,7 @@
   },
   "main": "./src/index.ts",
   "types": "./src/index.ts",
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "scripts": {
     "build": "pnpm copyfiles && pnpm build:types && pnpm build:swc",
     "build:swc": "swc ./src -d ./dist --config-file .swcrc --strip-leading-paths",
@@ -143,9 +141,7 @@
     "types": "./dist/index.d.ts"
   },
   "pnpm": {
-    "onlyBuiltDependencies": [
-      "sharp"
-    ]
+    "onlyBuiltDependencies": ["sharp"]
   },
   "registry": "https://registry.npm.abbenanti.com/",
   "dependencies": {
