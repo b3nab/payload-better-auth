@@ -54,6 +54,7 @@ export type SupportedTimezones =
   | 'Asia/Singapore'
   | 'Asia/Tokyo'
   | 'Asia/Seoul'
+  | 'Australia/Brisbane'
   | 'Australia/Sydney'
   | 'Pacific/Guam'
   | 'Pacific/Noumea'
@@ -64,6 +65,7 @@ export interface Config {
   auth: {
     user: UserAuthOperations;
   };
+  blocks: {};
   collections: {
     posts: Post;
     media: Media;
@@ -72,7 +74,6 @@ export interface Config {
     account: Account;
     verification: Verification;
     twoFactor: TwoFactor;
-    passkey: Passkey;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -86,7 +87,6 @@ export interface Config {
     account: AccountSelect<false> | AccountSelect<true>;
     verification: VerificationSelect<false> | VerificationSelect<true>;
     twoFactor: TwoFactorSelect<false> | TwoFactorSelect<true>;
-    passkey: PasskeySelect<false> | PasskeySelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -160,6 +160,11 @@ export interface User {
   emailVerified: boolean;
   image?: string | null;
   twoFactorEnabled?: boolean | null;
+  role?: string | null;
+  banned?: boolean | null;
+  banReason?: string | null;
+  banExpires?: string | null;
+  posts?: (string | Post)[] | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -182,6 +187,7 @@ export interface Session {
   ipAddress?: string | null;
   userAgent?: string | null;
   userId: string;
+  impersonatedBy?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -230,23 +236,6 @@ export interface TwoFactor {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "passkey".
- */
-export interface Passkey {
-  id: string;
-  name?: string | null;
-  publicKey: string;
-  userId: string;
-  credentialID: string;
-  counter: number;
-  deviceType: string;
-  backedUp: boolean;
-  transports?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -279,10 +268,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'twoFactor';
         value: string | TwoFactor;
-      } | null)
-    | ({
-        relationTo: 'passkey';
-        value: string | Passkey;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -360,6 +345,11 @@ export interface UserSelect<T extends boolean = true> {
   emailVerified?: T;
   image?: T;
   twoFactorEnabled?: T;
+  role?: T;
+  banned?: T;
+  banReason?: T;
+  banExpires?: T;
+  posts?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -380,6 +370,7 @@ export interface SessionSelect<T extends boolean = true> {
   ipAddress?: T;
   userAgent?: T;
   userId?: T;
+  impersonatedBy?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -420,22 +411,6 @@ export interface TwoFactorSelect<T extends boolean = true> {
   secret?: T;
   backupCodes?: T;
   userId?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "passkey_select".
- */
-export interface PasskeySelect<T extends boolean = true> {
-  name?: T;
-  publicKey?: T;
-  userId?: T;
-  credentialID?: T;
-  counter?: T;
-  deviceType?: T;
-  backedUp?: T;
-  transports?: T;
   updatedAt?: T;
   createdAt?: T;
 }

@@ -20,6 +20,9 @@
       "@payload-config": [
         "./payload.config.ts"
       ],
+      "@/*": [
+        "./*"
+      ],
       "payload-better-auth": [
         "../packages/payload-better-auth/src/index.ts"
       ],
