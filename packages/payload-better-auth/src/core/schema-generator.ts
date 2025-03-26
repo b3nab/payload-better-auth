@@ -12,6 +12,7 @@ import type {
 import deepmerge from '@fastify/deepmerge'
 import type { BetterAuthPluginOptions } from '../index.js'
 import { getLogger } from '../singleton.logger.js'
+import { isAdmin, isUser } from './access.js'
 
 export const generatePayloadCollections = (
   authTables: BetterAuthDbSchema,
@@ -25,11 +26,23 @@ export const generatePayloadCollections = (
       admin: {
         group: 'Better Auth',
       },
+      access: {
+        create: isAdmin,
+        read: isAdmin,
+        update: isAdmin,
+        delete: isAdmin,
+        readVersions: isAdmin,
+      },
       slug: modelName,
       fields: convertToPayloadFields(value.fields),
     }
     if (key === 'user') {
       newCollection.auth = true
+      newCollection.access = {
+        ...newCollection.access,
+        admin: isAdmin,
+        unlock: isAdmin,
+      }
     }
     if (extendsCollections?.[modelName]) {
       newCollection = deepmerge()(newCollection, extendsCollections[modelName])
