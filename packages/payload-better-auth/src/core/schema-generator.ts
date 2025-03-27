@@ -20,6 +20,17 @@ export const generatePayloadCollections = (
 ): CollectionConfig[] => {
   const collections: CollectionConfig[] = []
 
+  const relationMap: Record<string, CollectionSlug> = Object.keys(
+    authTables,
+  ).reduce(
+    (acc, k) => ({
+      // biome-ignore lint/performance/noAccumulatingSpread: <explanation>
+      ...acc,
+      [`${k}Id`]: authTables[k].modelName,
+    }),
+    {},
+  )
+
   for (const [key, value] of Object.entries(authTables)) {
     const modelName = value.modelName as CollectionSlug
     let newCollection: CollectionConfig = {
@@ -34,7 +45,7 @@ export const generatePayloadCollections = (
         readVersions: isAdmin,
       },
       slug: modelName,
-      fields: convertToPayloadFields(value.fields),
+      fields: convertToPayloadFields(value.fields, relationMap),
     }
     if (key === 'user') {
       newCollection.auth = true
@@ -50,6 +61,7 @@ export const generatePayloadCollections = (
     collections.push(newCollection)
   }
 
+  getLogger().trace(relationMap, 'output from relationMap')
   getLogger().trace(collections, 'output from generatePayloadCollections')
 
   return collections
@@ -62,6 +74,7 @@ export const generatePayloadCollections = (
  */
 const convertToPayloadFields = (
   fields: Record<string, FieldAttribute<FieldType>>,
+  relationMap: Record<string, CollectionSlug>,
 ): PayloadField[] => {
   return Object.entries(fields)
     .filter(
@@ -71,16 +84,21 @@ const convertToPayloadFields = (
       ([fieldKey, fieldValue]) =>
         ({
           name: fieldKey,
-          type: convertToPayloadType(fieldValue.type),
           required: fieldValue.required,
-          // TODO: better-auth FieldAttributeConfig . returned has the same "reason to exists" as the payload FieldBase . hidden ??
-          hidden: fieldValue.returned,
+          access: {
+            create: ({ req: { user } }) => false,
+            read: ({ req: { user }, id }) => user?.id === id,
+            update: ({ req: { user }, id }) => user?.id === id,
+          },
+          hidden:
+            fieldValue.returned === undefined ? false : fieldValue.returned,
           // TODO: how to map better-auth FieldAttributeConfig . input ??
           defaultValue: fieldValue.defaultValue,
-          // TODO: how to map better-auth FieldAttributeConfig . references ??
           unique: fieldValue.unique,
           // TODO: better-auth FieldAttributeConfig . sortable has the same "reason to exists" as the payload FieldBase . index ??
           index: fieldValue.sortable,
+          // type: convertToPayloadType(fieldValue.type),
+          ...convertToPayloadType(fieldValue, fieldKey, relationMap),
         }) as PayloadField,
     )
 }
@@ -89,14 +107,50 @@ const convertToPayloadFields = (
 // "string" | "number" | "boolean" | "date" | `${"string" | "number"}[]`
 // PAYLOAD FieldTypes
 // "text" | "number" | "checkbox" | "date" | "array"
-function convertToPayloadType(fieldType: FieldType): PayloadFieldTypes {
-  return ({
-    // TODO: better-auth FieldType "number[]" or "string[]" are not mapped strictly to payload FieldTypes "array"
-    'number[]': 'array',
-    'string[]': 'array',
-    string: 'text',
-    number: 'number',
-    boolean: 'checkbox',
-    date: 'date',
-  }[String(fieldType)] || 'text') as PayloadFieldTypes
+function convertToPayloadType(
+  { type: fieldType, references }: FieldAttribute<FieldType>,
+  fieldKey: string,
+  relationMap: Record<string, CollectionSlug>,
+): Partial<PayloadField> {
+  const relationTo = relationMap[fieldKey]
+  // TODO: how to map better-auth FieldAttributeConfig . references ??
+  // if(references) {
+  //   return {
+
+  //     type: 'relationship',
+
+  //   }
+  // }
+  if (relationTo) {
+    return {
+      type: 'relationship',
+      relationTo,
+    }
+  }
+  const defaultType: Partial<PayloadField> = {
+    type: 'text',
+  }
+  const internalFieldMap: Record<string, Partial<PayloadField>> = {
+    'number[]': {
+      type: 'number',
+      hasMany: true,
+    },
+    'string[]': {
+      type: 'text',
+      hasMany: true,
+    },
+    string: {
+      type: 'text',
+    },
+    number: {
+      type: 'number',
+    },
+    boolean: {
+      type: 'checkbox',
+    },
+    date: {
+      type: 'date',
+    },
+  }
+  return internalFieldMap[String(fieldType)] || defaultType
 }
