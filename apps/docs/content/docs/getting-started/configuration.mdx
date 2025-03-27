@@ -1,0 +1,88 @@
+---
+title: Configuration Guide
+description: Learn how to configure Payload Better Auth
+---
+
+# Configuration Guide
+
+This guide covers all configuration options available in Payload Better Auth.
+
+## Plugin Options
+
+The plugin accepts the following configuration options:
+
+```typescript
+type BetterAuthPluginOptions = {
+  betterAuth: {
+    appName: string;           // Used for 2FA issuer and other features
+    secret?: string;          // Better Auth secret (defaults to BETTER_AUTH_SECRET env var)
+  };
+  betterAuthPlugins?: {
+    twoFactor?: boolean;      // Enable/disable 2FA plugin
+  };
+}
+```
+
+## Environment Variables
+
+The following environment variables are supported:
+
+```env
+# Required for encryption and signing
+BETTER_AUTH_SECRET=your-secret-here
+
+# Optional: Override the app name
+BETTER_AUTH_APP_NAME=My App Name
+```
+
+## Example Configurations
+
+### Basic Configuration
+
+```typescript
+import { buildConfig } from 'payload'
+import betterAuthPlugin from 'payload-better-auth'
+
+export default buildConfig({
+  plugins: [
+    betterAuthPlugin({
+      betterAuth: {
+        appName: 'My App',
+        secret: process.env.BETTER_AUTH_SECRET,
+      },
+    }),
+  ],
+})
+```
+
+### With Two-Factor Authentication
+
+```typescript
+import { buildConfig } from 'payload'
+import betterAuthPlugin from 'payload-better-auth'
+
+export default buildConfig({
+  plugins: [
+    betterAuthPlugin({
+      betterAuth: {
+        appName: 'My App',
+        secret: process.env.BETTER_AUTH_SECRET,
+      },
+      betterAuthPlugins: {
+        twoFactor: true,
+      },
+    }),
+  ],
+})
+```
+
+## Security Considerations
+
+1. Always use a strong secret for `BETTER_AUTH_SECRET`
+2. Keep your environment variables secure
+3. Use HTTPS in production
+4. Monitor authentication attempts
+
+## Advanced Configuration
+
+For advanced configuration options, see our [Advanced Guide](/docs/advanced/configuration).

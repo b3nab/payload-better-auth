@@ -1,0 +1,61 @@
+---
+title: Payload Better Auth
+description: A comprehensive authentication library for Payload CMS
+---
+
+# Payload Better Auth
+
+A powerful authentication plugin for Payload CMS that provides enhanced security features and seamless integration with Better Auth.
+
+## Features
+
+<Cards>
+  <Card title="Two-Factor Authentication" href="/docs/features/two-factor-auth" />
+  <Card title="Automatic Collections" href="/docs/features/automatic-collections" />
+  <Card title="API Endpoints" href="/docs/api-reference/endpoints" />
+  <Card title="Configuration Guide" href="/docs/getting-started/configuration" />
+</Cards>
+
+## Quick Start
+
+```bash
+npm install payload-better-auth
+# or
+yarn add payload-better-auth
+# or
+pnpm add payload-better-auth
+```
+
+## Basic Usage
+
+```typescript
+import { buildConfig } from 'payload'
+import betterAuthPlugin from 'payload-better-auth'
+
+export default buildConfig({
+  plugins: [
+    betterAuthPlugin({
+      betterAuth: {
+        appName: 'My App',
+        secret: process.env.BETTER_AUTH_SECRET,
+      },
+    }),
+  ],
+})
+```
+
+## Why Payload Better Auth?
+
+- **Enhanced Security**: Built-in two-factor authentication and advanced security features
+- **Seamless Integration**: Works out of the box with Payload CMS
+- **Flexible Configuration**: Easy to customize and extend
+- **Type-Safe**: Full TypeScript support
+- **Modern Architecture**: Built with modern best practices
+
+## Getting Started
+
+Check out our [Quick Start Guide](/docs/getting-started/quick-start) to get up and running in minutes.
+
+## Contributing
+
+We welcome contributions! Please see our [Contributing Guide](/docs/contributing) for details.
