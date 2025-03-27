@@ -17,10 +17,10 @@ export interface PayloadAdapterConfig {
 export const payloadAdapter = (config: PayloadAdapterConfig) => {
   const logger = getLogger()
   logger.trace('payloadAdapter')
-  // console.log(`\n- payloadAdapter WRAPPER`)
+  // console.log(`- payloadAdapter WRAPPER`)
 
   return (options: BetterAuthOptions): Adapter => {
-    // console.log(`\n- - payloadAdapter CLOSURE`)
+    // console.log(`- - payloadAdapter CLOSURE`)
     const schema = getAuthTables(options)
 
     const resolvePayload = async () => {
@@ -47,14 +47,35 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
     return {
       id: 'payloadcms',
 
+      async count(data: {
+        model: string
+        where?: Where[]
+      }): Promise<number> {
+        logger.trace(data, `- - payloadAdapter - count >>`)
+
+        const payload = await resolvePayload()
+        const { model, where } = data
+
+        try {
+          const { totalDocs } = await payload.count({
+            collection: getCollectionName(model),
+            where: where ? buildWhereClause(where) : {},
+          })
+
+          return totalDocs || 0
+        } catch (error) {
+          throw new BetterAuthError(
+            `Failed to find record in ${model}: ${(error as Error).message}`,
+          )
+        }
+      },
+
       async create(data: {
         model: string
         data: any
         select?: string[]
       }): Promise<any> {
-        logger.trace(
-          `\n- - payloadAdapter - create >> ${JSON.stringify(data, null, 2)}`,
-        )
+        logger.trace(data, `- - payloadAdapter - create >>`)
         const payload = await resolvePayload()
         const { model, data: values } = data
 
@@ -77,9 +98,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
         where?: Where[]
         select?: string[]
       }): Promise<any | null> {
-        logger.trace(
-          `\n- - payloadAdapter - findOne >> ${JSON.stringify(data, null, 2)}`,
-        )
+        logger.trace(data, `- - payloadAdapter - findOne >>`)
         const payload = await resolvePayload()
         const { model, where } = data
 
@@ -105,9 +124,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
         offset?: number
         sortBy?: { field: string; direction: 'asc' | 'desc' }
       }): Promise<any[]> {
-        logger.trace(
-          `\n- - payloadAdapter - findMany >> ${JSON.stringify(data, null, 2)}`,
-        )
+        logger.trace(data, `- - payloadAdapter - findMany >>`)
         const payload = await resolvePayload()
         const { model, where, limit, offset, sortBy } = data
 
@@ -136,9 +153,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
         where?: Where[]
         update: any
       }): Promise<any> {
-        logger.trace(
-          `\n- - payloadAdapter - update >> ${JSON.stringify(data, null, 2)}`,
-        )
+        logger.trace(data, `- - payloadAdapter - update >>`)
         const payload = await resolvePayload()
         const { model, where, update: values } = data
 
@@ -172,9 +187,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
         where?: Where[]
         update: any
       }): Promise<number> {
-        logger.trace(
-          `\n- - payloadAdapter - updateMany >> ${JSON.stringify(data, null, 2)}`,
-        )
+        logger.trace(data, `- - payloadAdapter - updateMany >>`)
         const payload = await resolvePayload()
         const { model, where, update: values } = data
 
@@ -203,9 +216,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
       },
 
       async delete(data: { model: string; where?: Where[] }): Promise<void> {
-        logger.trace(
-          `\n- - payloadAdapter - delete >> ${JSON.stringify(data, null, 2)}`,
-        )
+        logger.trace(data, `- - payloadAdapter - delete >`)
         const payload = await resolvePayload()
         const { model, where } = data
 
@@ -233,9 +244,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
         model: string
         where?: Where[]
       }): Promise<number> {
-        logger.trace(
-          `\n- - payloadAdapter - deleteMany >> ${JSON.stringify(data, null, 2)}`,
-        )
+        logger.trace(data, `- - payloadAdapter - deleteMany >>`)
         const payload = await resolvePayload()
         const { model, where } = data
 
@@ -272,8 +281,8 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
       return {
         [w.field]:
           w.operator === 'eq' || !w.operator
-            ? { equals: w.value }
-            : { [w.operator]: w.value },
+            ? { equals: extractWhereValue(w) }
+            : { [w.operator]: extractWhereValue(w) },
       }
     }
 
@@ -284,15 +293,23 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
       and: and.map((w) => ({
         [w.field]:
           w.operator === 'eq' || !w.operator
-            ? { equals: w.value }
-            : { [w.operator]: w.value },
+            ? { equals: extractWhereValue(w) }
+            : { [w.operator]: extractWhereValue(w) },
       })),
       or: or.map((w) => ({
         [w.field]:
           w.operator === 'eq' || !w.operator
-            ? { equals: w.value }
-            : { [w.operator]: w.value },
+            ? { equals: extractWhereValue(w) }
+            : { [w.operator]: extractWhereValue(w) },
       })),
     }
+  }
+
+  function extractWhereValue(where: Where): Where['value'] {
+    if (typeof where.value === 'object') {
+      // @ts-ignore
+      return where.value?.[where.field]
+    }
+    return where.value
   }
 }
