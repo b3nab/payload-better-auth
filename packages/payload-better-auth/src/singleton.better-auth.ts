@@ -1,24 +1,33 @@
-import type { betterAuth } from 'better-auth'
 import type { Payload } from 'payload'
-import { payloadSingleton } from './singleton.payload.js'
+import type { BetterAuthPluginOptions } from './index'
+import { payloadSingleton } from './singleton.payload'
+import type { InferBetterAuthInstance } from './better-auth/instance'
+import type { betterAuth, BetterAuthOptions } from 'better-auth'
 
-let betterAuthInstance: ReturnType<typeof betterAuthSingleton> | undefined =
-  undefined
+// Create a type-safe singleton store with proper type inference
+let betterAuthInstance:
+  | InferBetterAuthInstance<BetterAuthPluginOptions>
+  | undefined
 
-export const betterAuthSingleton = <T extends ReturnType<typeof betterAuth>>(
-  betterAuthIncoming: T,
-) => {
-  betterAuthInstance = betterAuthIncoming
-  return betterAuthIncoming
+// Create a type-safe setter that preserves type information
+export const betterAuthSingleton = <O extends BetterAuthPluginOptions>(
+  instance: InferBetterAuthInstance<O>,
+): void => {
+  betterAuthInstance = instance as unknown as InferBetterAuthInstance<O>
 }
 
-export const getBetterAuth = (
-  payload: Payload | null = null,
+// Create a type-safe getter with proper type inference
+export const getBetterAuth = <O extends BetterAuthPluginOptions>(
+  payload?: Payload,
   throwError = false,
-) => {
+): InferBetterAuthInstance<O> => {
   if (payload) payloadSingleton(payload)
   if (throwError && !betterAuthInstance) {
     throw new Error('BetterAuth is not initialized')
   }
-  return betterAuthInstance
+  return betterAuthInstance as InferBetterAuthInstance<O>
 }
+
+export const getBetterAuthSafe = <O extends BetterAuthPluginOptions>(
+  payload?: Payload,
+) => getBetterAuth<O>(payload, true)
