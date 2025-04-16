@@ -1,7 +1,7 @@
 import type { Endpoint, PayloadHandler } from 'payload'
 import type { betterAuth } from 'better-auth'
 import type { getEndpoints } from 'better-auth/api'
-import { payloadSingleton } from './singleton.payload.js'
+import { payloadSingleton } from './singleton.payload'
 
 type BetterAuthInstance = ReturnType<typeof betterAuth>
 type AuthEndpointsApi = ReturnType<typeof getEndpoints>['api']

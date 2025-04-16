@@ -3,9 +3,14 @@ import crypto from 'crypto'
 import fs, { WriteStream } from 'fs'
 import path from 'path'
 
-import type { FetchAPIFileUploadOptions } from '../../config/types.js'
+import type { FetchAPIFileUploadOptions } from '../../config/types'
 
-import { checkAndMakeDir, debugLog, deleteFile, getTempFilename } from './utilities.js'
+import {
+  checkAndMakeDir,
+  debugLog,
+  deleteFile,
+  getTempFilename,
+} from './utilities'
 
 type Handler = (
   options: FetchAPIFileUploadOptions,
@@ -49,13 +54,22 @@ export const tempFileHandler: Handler = (options, fieldname, filename) => {
       writeStream.end()
       deleteFile(tempFilePath, (err) =>
         err
-          ? debugLog(options, `Cleaning up temporary file ${tempFilePath} failed: ${err}`)
-          : debugLog(options, `Cleaning up temporary file ${tempFilePath} done.`),
+          ? debugLog(
+              options,
+              `Cleaning up temporary file ${tempFilePath} failed: ${err}`,
+            )
+          : debugLog(
+              options,
+              `Cleaning up temporary file ${tempFilePath} done.`,
+            ),
       )
     },
     complete: () => {
       completed = true
-      debugLog(options, `Upload ${fieldname}->${filename} completed, bytes:${fileSize}.`)
+      debugLog(
+        options,
+        `Upload ${fieldname}->${filename} completed, bytes:${fileSize}.`,
+      )
       if (writeStream instanceof WriteStream) {
         writeStream.end()
       }
@@ -64,13 +78,19 @@ export const tempFileHandler: Handler = (options, fieldname, filename) => {
     },
     dataHandler: (data) => {
       if (completed === true) {
-        debugLog(options, `Error: got ${fieldname}->${filename} data chunk for completed upload!`)
+        debugLog(
+          options,
+          `Error: got ${fieldname}->${filename} data chunk for completed upload!`,
+        )
         return
       }
       writeStream.write(data)
       hash.update(data)
       fileSize += data.length
-      debugLog(options, `Uploading ${fieldname}->${filename}, bytes:${fileSize}...`)
+      debugLog(
+        options,
+        `Uploading ${fieldname}->${filename}, bytes:${fileSize}...`,
+      )
     },
     getFilePath: () => tempFilePath,
     getFileSize: () => fileSize,
@@ -92,19 +112,28 @@ export const memHandler: Handler = (options, fieldname, filename) => {
       completed = true
     },
     complete: () => {
-      debugLog(options, `Upload ${fieldname}->${filename} completed, bytes:${fileSize}.`)
+      debugLog(
+        options,
+        `Upload ${fieldname}->${filename} completed, bytes:${fileSize}.`,
+      )
       completed = true
       return getBuffer()
     },
     dataHandler: (data) => {
       if (completed === true) {
-        debugLog(options, `Error: got ${fieldname}->${filename} data chunk for completed upload!`)
+        debugLog(
+          options,
+          `Error: got ${fieldname}->${filename} data chunk for completed upload!`,
+        )
         return
       }
       buffers.push(data)
       hash.update(data)
       fileSize += data.length
-      debugLog(options, `Uploading ${fieldname}->${filename}, bytes:${fileSize}...`)
+      debugLog(
+        options,
+        `Uploading ${fieldname}->${filename}, bytes:${fileSize}...`,
+      )
     },
     getFilePath: () => '',
     getFileSize: () => fileSize,

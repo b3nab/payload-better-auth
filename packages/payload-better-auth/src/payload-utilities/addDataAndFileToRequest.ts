@@ -1,7 +1,7 @@
 // @ts-strict-ignore
 import type { PayloadRequest, APIError } from 'payload'
 
-import { fetchAPIFileUpload } from './uploads/fetchAPI-multipart/index.js'
+import { fetchAPIFileUpload } from './uploads/fetchAPI-multipart/index'
 
 type AddDataAndFileToRequest = (req: PayloadRequest) => Promise<void>
 

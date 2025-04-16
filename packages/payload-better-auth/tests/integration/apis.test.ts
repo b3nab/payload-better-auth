@@ -4,9 +4,9 @@
  * They don't require running your Next.js so they are fast
  * Yet they still can test the Local API and custom endpoints using NextRESTClient helper.
  */
-import { beforeAllFixtures } from '../fixtures/beforeAll.fixtures.js'
-import { afterAllFixtures } from '../fixtures/afterAll.fixtures.js'
-import { getSuite } from '../fixtures/suite.ctx.js'
+import { beforeAllFixtures } from '../fixtures/beforeAll.fixtures'
+import { afterAllFixtures } from '../fixtures/afterAll.fixtures'
+import { getSuite } from '../fixtures/suite.ctx'
 
 describe('Better Auth API', () => {
   beforeAll(beforeAllFixtures())

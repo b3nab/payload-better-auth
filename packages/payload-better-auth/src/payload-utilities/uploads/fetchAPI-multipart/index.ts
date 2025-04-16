@@ -4,9 +4,9 @@ import path from 'path'
 
 import { type FetchAPIFileUploadOptions, APIError } from 'payload'
 
-import { isEligibleRequest } from './isEligibleRequest.js'
-import { processMultipart } from './processMultipart.js'
-import { debugLog } from './utilities.js'
+import { isEligibleRequest } from './isEligibleRequest'
+import { processMultipart } from './processMultipart'
+import { debugLog } from './utilities'
 
 const DEFAULT_OPTIONS: FetchAPIFileUploadOptions = {
   abortOnLimit: false,

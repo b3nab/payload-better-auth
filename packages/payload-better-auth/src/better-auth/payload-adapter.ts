@@ -7,8 +7,8 @@ import type {
 } from 'better-auth'
 import { generateId, BetterAuthError } from 'better-auth'
 import { getAuthTables } from 'better-auth/db'
-import { getPayload } from '../singleton.payload.js'
-import { getLogger } from '../singleton.logger.js'
+import { getPayload } from '../singleton.payload'
+import { getLogger } from '../singleton.logger'
 
 export interface PayloadAdapterConfig {
   payload?: Payload
@@ -51,7 +51,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
         model: string
         where?: Where[]
       }): Promise<number> {
-        logger.trace(data, `- - payloadAdapter - count >>`)
+        // logger.trace(data, `- - payloadAdapter - count >>`)
 
         const payload = await resolvePayload()
         const { model, where } = data
@@ -75,7 +75,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
         data: any
         select?: string[]
       }): Promise<any> {
-        logger.trace(data, `- - payloadAdapter - create >>`)
+        // logger.trace(data, `- - payloadAdapter - create >>`)
         const payload = await resolvePayload()
         const { model, data: values } = data
 
@@ -98,7 +98,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
         where?: Where[]
         select?: string[]
       }): Promise<any | null> {
-        logger.trace(data, `- - payloadAdapter - findOne >>`)
+        // logger.trace(data, `- - payloadAdapter - findOne >>`)
         const payload = await resolvePayload()
         const { model, where } = data
 
@@ -124,7 +124,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
         offset?: number
         sortBy?: { field: string; direction: 'asc' | 'desc' }
       }): Promise<any[]> {
-        logger.trace(data, `- - payloadAdapter - findMany >>`)
+        // logger.trace(data, `- - payloadAdapter - findMany >>`)
         const payload = await resolvePayload()
         const { model, where, limit, offset, sortBy } = data
 
@@ -153,7 +153,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
         where?: Where[]
         update: any
       }): Promise<any> {
-        logger.trace(data, `- - payloadAdapter - update >>`)
+        // logger.trace(data, `- - payloadAdapter - update >>`)
         const payload = await resolvePayload()
         const { model, where, update: values } = data
 
@@ -187,7 +187,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
         where?: Where[]
         update: any
       }): Promise<number> {
-        logger.trace(data, `- - payloadAdapter - updateMany >>`)
+        // logger.trace(data, `- - payloadAdapter - updateMany >>`)
         const payload = await resolvePayload()
         const { model, where, update: values } = data
 
@@ -216,7 +216,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
       },
 
       async delete(data: { model: string; where?: Where[] }): Promise<void> {
-        logger.trace(data, `- - payloadAdapter - delete >`)
+        // logger.trace(data, `- - payloadAdapter - delete >`)
         const payload = await resolvePayload()
         const { model, where } = data
 
@@ -244,7 +244,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
         model: string
         where?: Where[]
       }): Promise<number> {
-        logger.trace(data, `- - payloadAdapter - deleteMany >>`)
+        // logger.trace(data, `- - payloadAdapter - deleteMany >>`)
         const payload = await resolvePayload()
         const { model, where } = data
 

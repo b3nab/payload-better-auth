@@ -1,5 +1,5 @@
 import { betterAuth } from 'better-auth'
-import { payloadAdapter } from './payload-adapter.js'
+import { payloadAdapter } from './payload-adapter'
 import type { Payload } from 'payload'
 
 export const auth = (payload: Payload) =>

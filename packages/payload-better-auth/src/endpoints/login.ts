@@ -5,13 +5,13 @@ import type { PayloadHandler } from 'payload'
 import { headersWithCors, generatePayloadCookie } from 'payload'
 import { formatAdminURL } from '@payloadcms/ui/shared'
 
-import { getRequestCollection } from '../payload-utilities/getRequestEntity.js'
-import { isNumber } from '../payload-utilities/isNumber.js'
-import { getBetterAuth } from '../singleton.better-auth.js'
+import { getRequestCollection } from '../payload-utilities/getRequestEntity'
+import { isNumber } from '../payload-utilities/isNumber'
+import { getBetterAuth } from '../singleton.better-auth'
 import invariant from 'tiny-invariant'
-import { redirect } from 'next/navigation.js'
-import { getLogger } from '../singleton.logger.js'
-// import { loginOperation } from '../payload-operations/login.js'
+import { redirect } from 'next/navigation'
+import { getLogger } from '../singleton.logger'
+// import { loginOperation } from '../payload-operations/login'
 
 export const loginHandler: PayloadHandler = async (req) => {
   const logger = getLogger()
@@ -21,17 +21,17 @@ export const loginHandler: PayloadHandler = async (req) => {
   const authData =
     collection.config.auth?.loginWithUsername !== false
       ? {
-        email: typeof req.data?.email === 'string' ? req.data.email : '',
-        password:
-          typeof req.data?.password === 'string' ? req.data.password : '',
-        username:
-          typeof req.data?.username === 'string' ? req.data.username : '',
-      }
+          email: typeof req.data?.email === 'string' ? req.data.email : '',
+          password:
+            typeof req.data?.password === 'string' ? req.data.password : '',
+          username:
+            typeof req.data?.username === 'string' ? req.data.username : '',
+        }
       : {
-        email: typeof req.data?.email === 'string' ? req.data.email : '',
-        password:
-          typeof req.data?.password === 'string' ? req.data.password : '',
-      }
+          email: typeof req.data?.email === 'string' ? req.data.email : '',
+          password:
+            typeof req.data?.password === 'string' ? req.data.password : '',
+        }
 
   // const result = await loginOperation({
   //   collection,

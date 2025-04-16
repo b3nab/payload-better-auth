@@ -1,10 +1,10 @@
 import type { AuthStrategyFunction } from 'payload'
-import { payloadSingleton } from '../singleton.payload.js'
-import { getBetterAuth } from '../singleton.better-auth.js'
-import { cookies as nextCookies, headers as nextHeaders } from 'next/headers.js'
-import { redirect } from 'next/navigation.js'
+import { payloadSingleton } from '../singleton.payload'
+import { getBetterAuth } from '../singleton.better-auth'
+import { cookies as nextCookies, headers as nextHeaders } from 'next/headers'
+import { redirect } from 'next/navigation'
 import { formatAdminURL } from '@payloadcms/ui/shared'
-import { getLogger } from '../singleton.logger.js'
+import { getLogger } from '../singleton.logger'
 
 const userNull = (headers?: Headers) => {
   return {

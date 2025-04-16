@@ -3,7 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import { Readable } from 'stream'
 
-import type { FetchAPIFileUploadOptions } from '../../config/types.js'
+import type { FetchAPIFileUploadOptions } from '../../config/types'
 
 // Parameters for safe file name parsing.
 const SAFE_FILE_NAME_REGEX = /[^\w-]/g
@@ -42,14 +42,21 @@ export const isFunc = (value: any): value is FuncType => {
 /**
  * Set errorFunc to the same value as successFunc for callback mode.
  */
-type ErrorFunc = (resolve: () => void, reject: (err: Error) => void) => (err: Error) => void
-const errorFunc: ErrorFunc = (resolve, reject) => (isFunc(reject) ? reject : resolve)
+type ErrorFunc = (
+  resolve: () => void,
+  reject: (err: Error) => void,
+) => (err: Error) => void
+const errorFunc: ErrorFunc = (resolve, reject) =>
+  isFunc(reject) ? reject : resolve
 
 /**
  * Return a callback function for promise resole/reject args.
  * Ensures that callback is called only once.
  */
-type PromiseCallback = (resolve: () => void, reject: (err: Error) => void) => (err: Error) => void
+type PromiseCallback = (
+  resolve: () => void,
+  reject: (err: Error) => void,
+) => (err: Error) => void
 export const promiseCallback: PromiseCallback = (resolve, reject) => {
   let hasFired = false
   return (err: Error) => {
@@ -75,7 +82,8 @@ export const isSafeFromPollution: IsSafeFromPollution = (base, key) => {
   // We perform an instanceof check instead of Array.isArray as the former is more
   // permissive for cases in which the object as an Array prototype but was not constructed
   // via an Array constructor or literal.
-  const TOUCHES_ARRAY_PROTOTYPE = base instanceof Array && ARRAY_PROTOTYPE_KEYS.includes(key)
+  const TOUCHES_ARRAY_PROTOTYPE =
+    base instanceof Array && ARRAY_PROTOTYPE_KEYS.includes(key)
   const TOUCHES_OBJECT_PROTOTYPE = OBJECT_PROTOTYPE_KEYS.includes(key)
 
   return !TOUCHES_ARRAY_PROTOTYPE && !TOUCHES_OBJECT_PROTOTYPE
@@ -113,8 +121,14 @@ export const buildFields: BuildFields = (instance, field, value) => {
  * Creates a folder if it does not exist
  * for file specified in the path variable
  */
-type CheckAndMakeDir = (fileUploadOptions: FetchAPIFileUploadOptions, filePath: string) => boolean
-export const checkAndMakeDir: CheckAndMakeDir = (fileUploadOptions, filePath) => {
+type CheckAndMakeDir = (
+  fileUploadOptions: FetchAPIFileUploadOptions,
+  filePath: string,
+) => boolean
+export const checkAndMakeDir: CheckAndMakeDir = (
+  fileUploadOptions,
+  filePath,
+) => {
   if (!fileUploadOptions.createParentPath) {
     return false
   }
@@ -138,7 +152,11 @@ export const deleteFile: DeleteFile = (filePath, callback: (args) => void) =>
 /**
  * Copy file via streams
  */
-type CopyFile = (src: string, dst: string, callback: (err: Error) => void) => void
+type CopyFile = (
+  src: string,
+  dst: string,
+  callback: (err: Error) => void,
+) => void
 const copyFile: CopyFile = (src, dst, callback) => {
   // cbCalled flag and runCb helps to run cb only once.
   let cbCalled = false
@@ -176,7 +194,9 @@ export const moveFile: MoveFile = (src, dst, callback) =>
   fs.rename(src, dst, (err) => {
     if (err) {
       // Try to copy file if rename didn't work.
-      copyFile(src, dst, (cpErr) => (cpErr ? callback(cpErr) : deleteFile(src, callback)))
+      copyFile(src, dst, (cpErr) =>
+        cpErr ? callback(cpErr) : deleteFile(src, callback),
+      )
       return
     }
     // File was renamed successfully: Add true to the callback to indicate that.
@@ -253,7 +273,10 @@ type ParseFileNameExtension = (
   extension: string
   name: string
 }
-export const parseFileNameExtension: ParseFileNameExtension = (preserveExtension, fileName) => {
+export const parseFileNameExtension: ParseFileNameExtension = (
+  preserveExtension,
+  fileName,
+) => {
   const defaultResult = {
     name: fileName,
     extension: '',
@@ -264,7 +287,9 @@ export const parseFileNameExtension: ParseFileNameExtension = (preserveExtension
 
   // Define maximum extension length
   const maxExtLength =
-    typeof preserveExtension === 'boolean' ? MAX_EXTENSION_LENGTH : preserveExtension
+    typeof preserveExtension === 'boolean'
+      ? MAX_EXTENSION_LENGTH
+      : preserveExtension
 
   const nameParts = fileName.split('.')
   if (nameParts.length < 2) {
@@ -273,7 +298,8 @@ export const parseFileNameExtension: ParseFileNameExtension = (preserveExtension
 
   let extension = nameParts.pop()
   if (extension.length > maxExtLength && maxExtLength > 0) {
-    nameParts[nameParts.length - 1] += '.' + extension.substr(0, extension.length - maxExtLength)
+    nameParts[nameParts.length - 1] +=
+      '.' + extension.substr(0, extension.length - maxExtLength)
     extension = extension.substr(-maxExtLength)
   }
 
@@ -286,7 +312,10 @@ export const parseFileNameExtension: ParseFileNameExtension = (preserveExtension
 /**
  * Parse file name and extension.
  */
-type ParseFileName = (opts: FetchAPIFileUploadOptions, fileName: string) => string
+type ParseFileName = (
+  opts: FetchAPIFileUploadOptions,
+  fileName: string,
+) => string
 export const parseFileName: ParseFileName = (opts, fileName) => {
   // Check fileName argument
   if (!fileName || typeof fileName !== 'string') {
@@ -302,14 +331,21 @@ export const parseFileName: ParseFileName = (opts, fileName) => {
   }
   // Set regular expression for the file name.
   const nameRegex =
-    typeof opts.safeFileNames === 'object' && opts.safeFileNames instanceof RegExp
+    typeof opts.safeFileNames === 'object' &&
+    opts.safeFileNames instanceof RegExp
       ? opts.safeFileNames
       : SAFE_FILE_NAME_REGEX
   // Parse file name extension.
-  const parsedFileName = parseFileNameExtension(opts.preserveExtension, parsedName)
+  const parsedFileName = parseFileNameExtension(
+    opts.preserveExtension,
+    parsedName,
+  )
   if (parsedFileName.extension.length) {
-    parsedFileName.extension = '.' + parsedFileName.extension.replace(nameRegex, '')
+    parsedFileName.extension =
+      '.' + parsedFileName.extension.replace(nameRegex, '')
   }
 
-  return parsedFileName.name.replace(nameRegex, '').concat(parsedFileName.extension)
+  return parsedFileName.name
+    .replace(nameRegex, '')
+    .concat(parsedFileName.extension)
 }

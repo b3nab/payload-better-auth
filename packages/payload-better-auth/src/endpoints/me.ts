@@ -3,14 +3,14 @@ import { status as httpStatus } from 'http-status'
 
 import type { PayloadHandler } from 'payload'
 import { headersWithCors, extractJWT } from 'payload'
-import { getRequestCollection } from '../payload-utilities/getRequestEntity.js'
-import { getBetterAuth } from '../singleton.better-auth.js'
+import { getRequestCollection } from '../payload-utilities/getRequestEntity'
+import { getBetterAuth } from '../singleton.better-auth'
 import invariant from 'tiny-invariant'
-import { headers } from 'next/headers.js'
-// import { headersWithCors } from '../payload-utilities/headersWithCors.js'
-// import { extractJWT } from '../payload-utilities/extractJWT.js'
-// import { meOperation } from '../payload-operations/me.js'
-import { getLogger } from '../singleton.logger.js'
+import { headers } from 'next/headers'
+// import { headersWithCors } from '../payload-utilities/headersWithCors'
+// import { extractJWT } from '../payload-utilities/extractJWT'
+// import { meOperation } from '../payload-operations/me'
+import { getLogger } from '../singleton.logger'
 
 export const meHandler: PayloadHandler = async (req) => {
   const logger = getLogger()

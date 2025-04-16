@@ -10,9 +10,9 @@ import type {
   FieldTypes as PayloadFieldTypes,
 } from 'payload'
 import deepmerge from '@fastify/deepmerge'
-import type { BetterAuthPluginOptions } from '../index.js'
-import { getLogger } from '../singleton.logger.js'
-import { isAdmin, isUser } from './access.js'
+import type { BetterAuthPluginOptions } from '../index'
+import { getLogger } from '../singleton.logger'
+import { isAdmin, isUser } from './access'
 
 export const generatePayloadCollections = (
   authTables: BetterAuthDbSchema,
@@ -37,13 +37,13 @@ export const generatePayloadCollections = (
       admin: {
         group: 'Better Auth',
       },
-      access: {
-        create: isAdmin,
-        read: isAdmin,
-        update: isAdmin,
-        delete: isAdmin,
-        readVersions: isAdmin,
-      },
+      // access: {
+      //   create: isAdmin,
+      //   read: isAdmin,
+      //   update: isAdmin,
+      //   delete: isAdmin,
+      //   readVersions: isAdmin,
+      // },
       slug: modelName,
       fields: convertToPayloadFields(value.fields, relationMap),
     }
@@ -61,8 +61,8 @@ export const generatePayloadCollections = (
     collections.push(newCollection)
   }
 
-  getLogger().trace(relationMap, 'output from relationMap')
-  getLogger().trace(collections, 'output from generatePayloadCollections')
+  // getLogger().trace(relationMap, 'output from relationMap')
+  // getLogger().trace(collections, 'output from generatePayloadCollections')
 
   return collections
 }
@@ -85,13 +85,12 @@ const convertToPayloadFields = (
         ({
           name: fieldKey,
           required: fieldValue.required,
-          access: {
-            create: ({ req: { user } }) => false,
-            read: ({ req: { user }, id }) => user?.id === id,
-            update: ({ req: { user }, id }) => user?.id === id,
-          },
-          hidden:
-            fieldValue.returned === undefined ? false : fieldValue.returned,
+          // access: {
+          //   create: ({ req: { user } }) => false,
+          //   read: ({ req: { user }, id }) => user?.id === id,
+          //   update: ({ req: { user }, id }) => user?.id === id,
+          // },
+          hidden: fieldValue.returned ?? false,
           // TODO: how to map better-auth FieldAttributeConfig . input ??
           defaultValue: fieldValue.defaultValue,
           unique: fieldValue.unique,

@@ -1,5 +1,5 @@
-import type { FetchAPIFileUploadOptions } from '../../config/types.js'
-import type { FileShape } from './index.js'
+import type { FetchAPIFileUploadOptions } from '../../config/types'
+import type { FileShape } from './index'
 
 import {
   checkAndMakeDir,
@@ -8,7 +8,7 @@ import {
   moveFile,
   promiseCallback,
   saveBufferToFile,
-} from './utilities.js'
+} from './utilities'
 
 type MoveFile = (
   filePath: string,
@@ -20,19 +20,24 @@ type MoveFile = (
  * Returns Local function that moves the file to a different location on the filesystem
  * which takes two function arguments to make it compatible w/ Promise or Callback APIs
  */
-const moveFromTemp: MoveFile = (filePath, options, fileUploadOptions) => (resolve, reject) => {
-  debugLog(fileUploadOptions, `Moving temporary file ${options.tempFilePath} to ${filePath}`)
-  moveFile(options.tempFilePath, filePath, promiseCallback(resolve, reject))
-}
+const moveFromTemp: MoveFile =
+  (filePath, options, fileUploadOptions) => (resolve, reject) => {
+    debugLog(
+      fileUploadOptions,
+      `Moving temporary file ${options.tempFilePath} to ${filePath}`,
+    )
+    moveFile(options.tempFilePath, filePath, promiseCallback(resolve, reject))
+  }
 
 /**
  * Returns Local function that moves the file from buffer to a different location on the filesystem
  * which takes two function arguments to make it compatible w/ Promise or Callback APIs
  */
-const moveFromBuffer: MoveFile = (filePath, options, fileUploadOptions) => (resolve, reject) => {
-  debugLog(fileUploadOptions, `Moving uploaded buffer to ${filePath}`)
-  saveBufferToFile(options.buffer, filePath, promiseCallback(resolve, reject))
-}
+const moveFromBuffer: MoveFile =
+  (filePath, options, fileUploadOptions) => (resolve, reject) => {
+    debugLog(fileUploadOptions, `Moving uploaded buffer to ${filePath}`)
+    saveBufferToFile(options.buffer, filePath, promiseCallback(resolve, reject))
+  }
 
 type FileFactoryOptions = {
   buffer: Buffer
@@ -70,7 +75,9 @@ export const fileFactory: FileFactory = (options, fileUploadOptions) => {
       checkAndMakeDir(fileUploadOptions, filePath)
       // If callback is passed in, use the callback API, otherwise return a promise.
       const defaultReject = () => undefined
-      return isFunc(callback) ? moveFunc(callback, defaultReject) : new Promise(moveFunc)
+      return isFunc(callback)
+        ? moveFunc(callback, defaultReject)
+        : new Promise(moveFunc)
     },
     size: options.size,
     tempFilePath: options.tempFilePath,

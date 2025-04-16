@@ -9,11 +9,11 @@ import {
   generateCookie,
 } from 'payload'
 
-import { getRequestCollection } from '../payload-utilities/getRequestEntity.js'
-import { getBetterAuth } from '../singleton.better-auth.js'
+import { getRequestCollection } from '../payload-utilities/getRequestEntity'
+import { getBetterAuth } from '../singleton.better-auth'
 import invariant from 'tiny-invariant'
-import { getLogger } from '../singleton.logger.js'
-// import { logoutOperation } from '../payload-operations/logout.js'
+import { getLogger } from '../singleton.logger'
+// import { logoutOperation } from '../payload-operations/logout'
 
 export const logoutHandler: PayloadHandler = async (req) => {
   const logger = getLogger()

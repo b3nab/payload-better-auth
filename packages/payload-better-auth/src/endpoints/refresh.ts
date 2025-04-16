@@ -8,9 +8,9 @@ import {
 } from 'payload'
 import invariant from 'tiny-invariant'
 
-import { getRequestCollection } from '../payload-utilities/getRequestEntity.js'
-import { getBetterAuth } from '../singleton.better-auth.js'
-// import { refreshOperation } from '../operations/refresh.js'
+import { getRequestCollection } from '../payload-utilities/getRequestEntity'
+import { getBetterAuth } from '../singleton.better-auth'
+// import { refreshOperation } from '../operations/refresh'
 
 export const refreshHandler: PayloadHandler = async (req) => {
   const collection = getRequestCollection(req)

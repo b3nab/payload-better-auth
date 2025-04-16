@@ -8,12 +8,12 @@ import { getLogger } from '../singleton.logger'
 const isAdmin: NonNullable<CollectionConfig['access']>['admin'] = ({
   req: { user },
 }) => {
-  getLogger().debug(user, `ACCESS CONTROL on admin - for user:`)
+  // getLogger().debug(user, `ACCESS CONTROL on admin - for user:`)
   return Boolean(user?.role === 'admin')
 }
 
 const isUser: Access = ({ req: { user } }) => {
-  getLogger().debug(user, `ACCESS CONTROL on user - for user:`)
+  // getLogger().debug(user, `ACCESS CONTROL on user - for user:`)
   return Boolean(user?.role === 'user')
 }
 

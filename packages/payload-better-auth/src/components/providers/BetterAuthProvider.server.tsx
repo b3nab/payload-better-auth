@@ -1,11 +1,11 @@
 import type { ServerComponentProps } from 'payload'
 import { formatAdminURL } from '@payloadcms/ui/shared'
-import type { BetterAuthPluginOptions } from '../../index.js'
-import { cookies as nextCookies, headers as nextHeaders } from 'next/headers.js'
-import { redirect } from 'next/navigation.js'
-import { BetterAuthProvider } from './BetterAuthProvider.client.js'
+import type { BetterAuthPluginOptions } from '../../index'
+import { cookies as nextCookies, headers as nextHeaders } from 'next/headers'
+import { redirect } from 'next/navigation'
+import { BetterAuthProvider } from './BetterAuthProvider.client'
 import invariant from 'tiny-invariant'
-import { getLogger } from '../../singleton.logger.js'
+import { getLogger } from '../../singleton.logger'
 
 interface BetterAuthWrapperProps extends ServerComponentProps {
   children: React.ReactNode
@@ -22,15 +22,15 @@ export const BetterAuthServerWrapper = async (
   const cookies = await nextCookies()
   const headers = await nextHeaders()
 
-  logger.debug(
-    {
-      cookies,
-      headers,
-      req,
-      user,
-    },
-    '[server] [BetterAuthServerWrapper]',
-  )
+  // logger.debug(
+  //   {
+  //     cookies,
+  //     headers,
+  //     req,
+  //     user,
+  //   },
+  //   '[server] [BetterAuthServerWrapper]',
+  // )
 
   // logger.debug(
   //   `[server] [BetterAuthServerWrapper] [cookies]: ${String(cookies)}`,

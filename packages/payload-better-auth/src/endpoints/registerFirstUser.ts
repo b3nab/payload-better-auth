@@ -6,8 +6,8 @@ import {
   generatePayloadCookie,
 } from 'payload'
 import { status as httpStatus } from 'http-status'
-import { getRequestCollection } from '../payload-utilities/getRequestEntity.js'
-import { getBetterAuth } from '../singleton.better-auth.js'
+import { getRequestCollection } from '../payload-utilities/getRequestEntity'
+import { getBetterAuth } from '../singleton.better-auth'
 import invariant from 'tiny-invariant'
 
 export const registerFirstUserHandler: PayloadHandler = async (req) => {
@@ -18,17 +18,17 @@ export const registerFirstUserHandler: PayloadHandler = async (req) => {
   const authData: Record<string, any> = collection.config.auth
     ?.loginWithUsername
     ? {
-      email: typeof req.data?.email === 'string' ? req.data.email : '',
-      password:
-        typeof req.data?.password === 'string' ? req.data.password : '',
-      username:
-        typeof req.data?.username === 'string' ? req.data.username : '',
-    }
+        email: typeof req.data?.email === 'string' ? req.data.email : '',
+        password:
+          typeof req.data?.password === 'string' ? req.data.password : '',
+        username:
+          typeof req.data?.username === 'string' ? req.data.username : '',
+      }
     : {
-      email: typeof req.data?.email === 'string' ? req.data.email : '',
-      password:
-        typeof req.data?.password === 'string' ? req.data.password : '',
-    }
+        email: typeof req.data?.email === 'string' ? req.data.email : '',
+        password:
+          typeof req.data?.password === 'string' ? req.data.password : '',
+      }
 
   authData.name = typeof req.data?.name === 'string' ? req.data.name : ''
   authData.emailVerified =
