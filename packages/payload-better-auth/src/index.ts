@@ -57,6 +57,8 @@ import { sso } from 'better-auth/plugins/sso'
 import { passkey } from 'better-auth/plugins/passkey'
 // biome-ignore lint/style/useImportType: <explanation>
 import { emailHarmony } from 'better-auth-harmony'
+// biome-ignore lint/style/useImportType: <explanation>
+import { stripe } from '@better-auth/stripe'
 
 export type CollectionConfigExtend<T extends CollectionSlug> = Pick<
   CollectionConfig<T>,
@@ -79,29 +81,31 @@ export type BetterAuthPluginOptions = {
    */
   betterAuthPlugins?: {
     // core authentication
-    twoFactor?: boolean | Parameters<typeof twoFactor>
-    username?: boolean | Parameters<typeof username>
-    anonymous?: boolean | Parameters<typeof anonymous>
-    phoneNumber?: boolean | Parameters<typeof phoneNumber>
-    magicLink?: boolean | Parameters<typeof magicLink>
-    emailOTP?: boolean | Parameters<typeof emailOTP>
-    passkey?: boolean | Parameters<typeof passkey>
-    genericOAuth?: boolean | Parameters<typeof genericOAuth>
-    oneTap?: boolean | Parameters<typeof oneTap>
+    twoFactor?: boolean | Parameters<typeof twoFactor>[0]
+    username?: boolean | Parameters<typeof username>[0]
+    anonymous?: boolean | Parameters<typeof anonymous>[0]
+    phoneNumber?: boolean | Parameters<typeof phoneNumber>[0]
+    magicLink?: boolean | Parameters<typeof magicLink>[0]
+    emailOTP?: boolean | Parameters<typeof emailOTP>[0]
+    passkey?: boolean | Parameters<typeof passkey>[0]
+    genericOAuth?: boolean | Parameters<typeof genericOAuth>[0]
+    oneTap?: boolean | Parameters<typeof oneTap>[0]
     // core authorization
-    admin?: boolean | Parameters<typeof admin>
-    organization?: boolean | Parameters<typeof organization>
+    admin?: boolean | Parameters<typeof admin>[0]
+    organization?: boolean | Parameters<typeof organization>[0]
     // core enterprise
-    oidcProvider?: boolean | Parameters<typeof oidcProvider>
-    sso?: boolean | Parameters<typeof sso>
+    oidcProvider?: boolean | Parameters<typeof oidcProvider>[0]
+    sso?: boolean | Parameters<typeof sso>[0]
     // core utility
-    bearer?: boolean | Parameters<typeof bearer>
-    multiSession?: boolean | Parameters<typeof multiSession>
-    oAuthProxy?: boolean | Parameters<typeof oAuthProxy>
-    openAPI?: boolean | Parameters<typeof openAPI>
-    jwt?: boolean | Parameters<typeof jwt>
+    bearer?: boolean | Parameters<typeof bearer>[0]
+    multiSession?: boolean | Parameters<typeof multiSession>[0]
+    oAuthProxy?: boolean | Parameters<typeof oAuthProxy>[0]
+    openAPI?: boolean | Parameters<typeof openAPI>[0]
+    jwt?: boolean | Parameters<typeof jwt>[0]
+    // payments
+    stripe?: boolean | Omit<Parameters<typeof stripe>[0], 'stripeClient'>
     // third-party
-    emailHarmony?: boolean | Parameters<typeof emailHarmony>
+    emailHarmony?: boolean | Parameters<typeof emailHarmony>[0]
     // validator?: boolean | Parameters<typeof validator>
   }
   // & {
