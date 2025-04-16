@@ -1,5 +1,31 @@
 {
-  "extends": "../../tsconfig.json",
+"compilerOptions": {
+    "baseUrl": ".",
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ES2022"
+    ],
+    "rootDir": "./",
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "moduleResolution": "bundler",
+    "module": "preserve",
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "emitDeclarationOnly": true,
+    "target": "ES2022",
+    "composite": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+  },
   "include": [
     "./src/**/*.ts",
     "./src/**/*.tsx"
