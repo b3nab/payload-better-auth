@@ -1,8 +1,11 @@
 import type { ServerComponentProps } from 'payload'
+import type { FC } from 'react'
 
 import styles from './BeforeDashboardServer.module.css'
 
-export const BeforeDashboardServer = async (props: ServerComponentProps) => {
+export const BeforeDashboardServer: FC<ServerComponentProps> = async (
+  props,
+) => {
   const { payload } = props
 
   const { docs } = await payload.find({ collection: 'plugin-collection' })

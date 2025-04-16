@@ -6,15 +6,16 @@ import { redirect } from 'next/navigation'
 import { BetterAuthProvider } from './BetterAuthProvider.client'
 import invariant from 'tiny-invariant'
 import { getLogger } from '../../singleton.logger'
+import type { ReactNode, JSX } from 'react'
 
 interface BetterAuthWrapperProps extends ServerComponentProps {
-  children: React.ReactNode
+  children: ReactNode
   pluginOptions: BetterAuthPluginOptions
 }
 
 export const BetterAuthServerWrapper = async (
   wrapperProps: BetterAuthWrapperProps,
-) => {
+): Promise<JSX.Element> => {
   const logger = getLogger()
   logger.trace('[server] [BetterAuthServerWrapper]')
   const { children, pluginOptions, payload, user, req } = wrapperProps

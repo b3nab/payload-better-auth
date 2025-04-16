@@ -1,15 +1,18 @@
 'use client'
 import { useConfig } from '@payloadcms/ui'
 import { useEffect, useState } from 'react'
+import type { FC } from 'react'
 
-export const BeforeDashboardClient = () => {
+export const BeforeDashboardClient: FC = () => {
   const { config } = useConfig()
 
   const [message, setMessage] = useState('')
 
   useEffect(() => {
     const fetchMessage = async () => {
-      const response = await fetch(`${config.serverURL}${config.routes.api}/my-plugin-endpoint`)
+      const response = await fetch(
+        `${config.serverURL}${config.routes.api}/my-plugin-endpoint`,
+      )
       const result = await response.json()
       setMessage(result.message)
     }
