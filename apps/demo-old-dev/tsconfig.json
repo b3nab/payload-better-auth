@@ -1,0 +1,55 @@
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "noEmit": true,
+    "incremental": true,
+    "module": "preserve",
+    "esModuleInterop": true,
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@payload-config": [
+        "./src/payload.config.ts"
+      ],
+      "@/*": [
+        "./src/*"
+      ],
+      "payload-better-auth": [
+        "../packages/payload-better-auth/src/index.ts"
+      ],
+      "payload-better-auth/client": [
+        "../packages/payload-better-auth/src/exports/client.ts"
+      ],
+      "payload-better-auth/rsc": [
+        "../packages/payload-better-auth/src/exports/rsc.ts"
+      ]
+    },
+  },
+  "include": [
+    "next-env.d.ts",
+    ".next/types/**/*.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "../packages/payload-better-auth/src/**/*.ts",
+    "../packages/payload-better-auth/src/**/*.tsx",
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
