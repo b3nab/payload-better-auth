@@ -28,10 +28,12 @@
   "scripts": {
     "---DEMO---": "",
     "demo--": "pnpm --filter demo-app",
-    "dev": "pnpm demo-- dev:all",
+    "demo": "pnpm demo-- dev:all",
     "--DOCS--": "",
     "docs:dev": "pnpm --filter docs dev",
     "docs:build": "pnpm --filter docs build",
+    "--DEV--": "",
+    "dev": "pnpm plugin-- dev",
     "---PLUGIN---": "",
     "plugin--": "pnpm --filter payload-better-auth",
     "test": "pnpm plugin-- test",

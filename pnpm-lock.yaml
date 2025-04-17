@@ -82,7 +82,7 @@ importers:
         version: 7.0.3
       geist:
         specifier: ^1.3.0
-        version: 1.3.1(next@15.3.0(@babel/core@7.26.10)(@playwright/test@1.51.1)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(sass@1.77.4))
+        version: 1.3.1(next@15.3.0(@playwright/test@1.51.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(sass@1.77.4))
       graphql:
         specifier: ^16.8.2
         version: 16.10.0
@@ -91,7 +91,7 @@ importers:
         version: 0.378.0(react@19.1.0)
       next:
         specifier: 15.3.0
-        version: 15.3.0(@babel/core@7.26.10)(@playwright/test@1.51.1)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(sass@1.77.4)
+        version: 15.3.0(@playwright/test@1.51.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(sass@1.77.4)
       next-sitemap:
         specifier: ^4.2.3
         version: 4.2.3(next@15.3.0(@playwright/test@1.51.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(sass@1.77.4))
@@ -119,6 +119,9 @@ importers:
       sharp:
         specifier: 0.32.6
         version: 0.32.6
+      stripe:
+        specifier: ^17.7.0
+        version: 17.7.0
       tailwind-merge:
         specifier: ^2.3.0
         version: 2.6.0
@@ -644,6 +647,15 @@ importers:
       '@fastify/deepmerge':
         specifier: ^3.0.0
         version: 3.0.0
+      '@polar-sh/better-auth':
+        specifier: ^0.0.11
+        version: 0.0.11(@polar-sh/sdk@0.32.9(zod@3.24.2))(better-auth@1.2.7)
+      '@polar-sh/sdk':
+        specifier: ^0.32.9
+        version: 0.32.9(zod@3.24.2)
+      '@react-email/components':
+        specifier: ^0.0.25
+        version: 0.0.25(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       better-auth:
         specifier: 1.2.7
         version: 1.2.7
@@ -668,6 +680,9 @@ importers:
       qrcode:
         specifier: ^1.5.4
         version: 1.5.4
+      resend:
+        specifier: ^4.0.1
+        version: 4.1.2(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       stripe:
         specifier: ^17.7.0
         version: 17.7.0
@@ -681,6 +696,9 @@ importers:
       '@eslint/eslintrc':
         specifier: ^3.2.0
         version: 3.3.1
+      '@jest/globals':
+        specifier: ^29.7.0
+        version: 29.7.0
       '@payloadcms/db-mongodb':
         specifier: 3.34.0
         version: 3.34.0(@aws-sdk/credential-providers@3.787.0)(payload@3.34.0(graphql@16.10.0)(typescript@5.7.3))
@@ -717,9 +735,6 @@ importers:
       '@swc/jest':
         specifier: ^0.2.37
         version: 0.2.37(@swc/core@1.11.13(@swc/helpers@0.5.15))
-      '@types/jest':
-        specifier: 29.5.12
-        version: 29.5.12
       '@types/node':
         specifier: ^22.5.4
         version: 22.13.13
@@ -3048,6 +3063,23 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
+  '@polar-sh/better-auth@0.0.11':
+    resolution: {integrity: sha512-Oaok5AfpZRAVQ86uPb/OxxQPp/khHf2ZprCMnVyNNwdOIKlHrx8UxAcmiktpbi0NFl+IgoCFjXR2uoCuwTAPwQ==}
+    engines: {node: '>=16'}
+    peerDependencies:
+      '@polar-sh/sdk': ^0.32.0
+      better-auth: ^1.2.0
+
+  '@polar-sh/sdk@0.32.9':
+    resolution: {integrity: sha512-dqYVHbXJPq32hBtgInMGLUjgmZAzasFOWcmmY8S3MYKe1e1Pazm0IVa5dak/ngIbaQLVv1OAODHw+BtroBVdXw==}
+    hasBin: true
+    peerDependencies:
+      '@modelcontextprotocol/sdk': ^1.5.0
+      zod: '>= 3'
+    peerDependenciesMeta:
+      '@modelcontextprotocol/sdk':
+        optional: true
+
   '@prisma/adapter-libsql@5.22.0':
     resolution: {integrity: sha512-6Lox7JqNfMdnpb6CblZ/DcuU5OmP2lRBGIPkdnMq0wGqC7fq7DQURZGpDSAZL/mI9sbR/aUKyeo31FLqg97dsw==}
     peerDependencies:
@@ -4292,6 +4324,9 @@ packages:
   '@smithy/util-waiter@4.0.3':
     resolution: {integrity: sha512-JtaY3FxmD+te+KSI2FJuEcfNC9T/DGGVf551babM7fAaXhjJUt7oSYurH1Devxd2+BOSUACCgt3buinx4UnmEA==}
     engines: {node: '>=18.0.0'}
+
+  '@stablelib/base64@1.0.1':
+    resolution: {integrity: sha512-1bnPQqSxSuc3Ii6MhBysoWCg58j97aUjuCSZrGSmDxNqtytIi0k8utUenAwTZN4V5mXXYGsVUI9zeBqy+jBOSQ==}
 
   '@standard-schema/spec@1.0.0':
     resolution: {integrity: sha512-m2bOd0f2RT9k8QJx1JN85cZYyH1RqFBdlwtkSlf4tBDYLCiiZnv1fIIwacK6cqwXavOydf0NPToMQgpKq+dVlA==}
@@ -6341,6 +6376,9 @@ packages:
 
   fast-safe-stringify@2.1.1:
     resolution: {integrity: sha512-W+KJc2dmILlPplD/H4K9l9LcAHAfPtP6BY84uVLXQ6Evcz9Lcg33Y2z1IVblT6xdY54PXYVHEv+0Wpq8Io6zkA==}
+
+  fast-sha256@1.3.0:
+    resolution: {integrity: sha512-n11RGP/lrWEFI/bWdygLxhI+pVeo1ZYIVwvvPkW7azl/rOy+F3HYRZ2K5zeE9mmkhQppyv9sQFx0JM9UabnpPQ==}
 
   fast-uri@3.0.6:
     resolution: {integrity: sha512-Atfo14OibSv5wAp4VWNsFYE1AchQRTv9cBGWET4pZWHzYshFSS9NQI6I57rdKn9croWVMbYFbLhJ+yJvmZIIHw==}
@@ -9045,6 +9083,9 @@ packages:
   stack-utils@2.0.6:
     resolution: {integrity: sha512-XlkWvfIm6RmsWtNJx+uqtKLS8eqFbxUg0ZzLXqY0caEy9l7hruX8IpiDnjsLavoBgqCCR71TqWO8MaXYheJ3RQ==}
     engines: {node: '>=10'}
+
+  standardwebhooks@1.0.0:
+    resolution: {integrity: sha512-BbHGOQK9olHPMvQNHWul6MYlrRTAOKn03rOe4A8O3CLWhNf4YHBqq2HJKKC+sfqpxiBY52pNeesD6jIiLDz8jg==}
 
   state-local@1.0.7:
     resolution: {integrity: sha512-HTEHMNieakEnoe33shBYcZ7NX83ACUjCu8c40iOGEZsngj9zRnkqS9j1pqQPXwobB0ZcVTk27REb7COQ0UR59w==}
@@ -12759,7 +12800,7 @@ snapshots:
       graphql-http: 1.22.4(graphql@16.10.0)
       graphql-playground-html: 1.6.30
       http-status: 2.1.0
-      next: 15.3.0(@babel/core@7.26.10)(@playwright/test@1.51.1)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(sass@1.77.4)
+      next: 15.3.0(@playwright/test@1.51.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(sass@1.77.4)
       path-to-regexp: 6.3.0
       payload: 3.34.0(graphql@16.10.0)(typescript@5.7.3)
       qs-esm: 7.0.2
@@ -13051,7 +13092,7 @@ snapshots:
       date-fns: 4.1.0
       dequal: 2.0.3
       md5: 2.3.0
-      next: 15.3.0(@babel/core@7.26.10)(@playwright/test@1.51.1)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(sass@1.77.4)
+      next: 15.3.0(@playwright/test@1.51.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(sass@1.77.4)
       object-to-formdata: 4.5.1
       payload: 3.34.0(graphql@16.10.0)(typescript@5.7.3)
       qs-esm: 7.0.2
@@ -13110,6 +13151,17 @@ snapshots:
   '@playwright/test@1.51.1':
     dependencies:
       playwright: 1.51.1
+
+  '@polar-sh/better-auth@0.0.11(@polar-sh/sdk@0.32.9(zod@3.24.2))(better-auth@1.2.7)':
+    dependencies:
+      '@polar-sh/sdk': 0.32.9(zod@3.24.2)
+      better-auth: 1.2.7
+      zod: 3.24.2
+
+  '@polar-sh/sdk@0.32.9(zod@3.24.2)':
+    dependencies:
+      standardwebhooks: 1.0.0
+      zod: 3.24.2
 
   '@prisma/adapter-libsql@5.22.0(@libsql/client@0.12.0)':
     dependencies:
@@ -14532,26 +14584,73 @@ snapshots:
 
   '@radix-ui/rect@1.1.0': {}
 
+  '@react-email/body@0.0.10(react@19.0.0)':
+    dependencies:
+      react: 19.0.0
+
   '@react-email/body@0.0.10(react@19.1.0)':
     dependencies:
       react: 19.1.0
 
+  '@react-email/button@0.0.17(react@19.0.0)':
+    dependencies:
+      react: 19.0.0
+
   '@react-email/button@0.0.17(react@19.1.0)':
     dependencies:
       react: 19.1.0
+
+  '@react-email/code-block@0.0.9(react@19.0.0)':
+    dependencies:
+      prismjs: 1.29.0
+      react: 19.0.0
 
   '@react-email/code-block@0.0.9(react@19.1.0)':
     dependencies:
       prismjs: 1.29.0
       react: 19.1.0
 
+  '@react-email/code-inline@0.0.4(react@19.0.0)':
+    dependencies:
+      react: 19.0.0
+
   '@react-email/code-inline@0.0.4(react@19.1.0)':
     dependencies:
       react: 19.1.0
 
+  '@react-email/column@0.0.12(react@19.0.0)':
+    dependencies:
+      react: 19.0.0
+
   '@react-email/column@0.0.12(react@19.1.0)':
     dependencies:
       react: 19.1.0
+
+  '@react-email/components@0.0.25(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
+    dependencies:
+      '@react-email/body': 0.0.10(react@19.0.0)
+      '@react-email/button': 0.0.17(react@19.0.0)
+      '@react-email/code-block': 0.0.9(react@19.0.0)
+      '@react-email/code-inline': 0.0.4(react@19.0.0)
+      '@react-email/column': 0.0.12(react@19.0.0)
+      '@react-email/container': 0.0.14(react@19.0.0)
+      '@react-email/font': 0.0.8(react@19.0.0)
+      '@react-email/head': 0.0.11(react@19.0.0)
+      '@react-email/heading': 0.0.14(react@19.0.0)
+      '@react-email/hr': 0.0.10(react@19.0.0)
+      '@react-email/html': 0.0.10(react@19.0.0)
+      '@react-email/img': 0.0.10(react@19.0.0)
+      '@react-email/link': 0.0.10(react@19.0.0)
+      '@react-email/markdown': 0.0.12(react@19.0.0)
+      '@react-email/preview': 0.0.11(react@19.0.0)
+      '@react-email/render': 1.0.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@react-email/row': 0.0.10(react@19.0.0)
+      '@react-email/section': 0.0.14(react@19.0.0)
+      '@react-email/tailwind': 0.1.0(react@19.0.0)
+      '@react-email/text': 0.0.10(react@19.0.0)
+      react: 19.0.0
+    transitivePeerDependencies:
+      - react-dom
 
   '@react-email/components@0.0.25(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
@@ -14579,46 +14678,95 @@ snapshots:
     transitivePeerDependencies:
       - react-dom
 
+  '@react-email/container@0.0.14(react@19.0.0)':
+    dependencies:
+      react: 19.0.0
+
   '@react-email/container@0.0.14(react@19.1.0)':
     dependencies:
       react: 19.1.0
+
+  '@react-email/font@0.0.8(react@19.0.0)':
+    dependencies:
+      react: 19.0.0
 
   '@react-email/font@0.0.8(react@19.1.0)':
     dependencies:
       react: 19.1.0
 
+  '@react-email/head@0.0.11(react@19.0.0)':
+    dependencies:
+      react: 19.0.0
+
   '@react-email/head@0.0.11(react@19.1.0)':
     dependencies:
       react: 19.1.0
+
+  '@react-email/heading@0.0.14(react@19.0.0)':
+    dependencies:
+      react: 19.0.0
 
   '@react-email/heading@0.0.14(react@19.1.0)':
     dependencies:
       react: 19.1.0
 
+  '@react-email/hr@0.0.10(react@19.0.0)':
+    dependencies:
+      react: 19.0.0
+
   '@react-email/hr@0.0.10(react@19.1.0)':
     dependencies:
       react: 19.1.0
+
+  '@react-email/html@0.0.10(react@19.0.0)':
+    dependencies:
+      react: 19.0.0
 
   '@react-email/html@0.0.10(react@19.1.0)':
     dependencies:
       react: 19.1.0
 
+  '@react-email/img@0.0.10(react@19.0.0)':
+    dependencies:
+      react: 19.0.0
+
   '@react-email/img@0.0.10(react@19.1.0)':
     dependencies:
       react: 19.1.0
 
+  '@react-email/link@0.0.10(react@19.0.0)':
+    dependencies:
+      react: 19.0.0
+
   '@react-email/link@0.0.10(react@19.1.0)':
     dependencies:
       react: 19.1.0
+
+  '@react-email/markdown@0.0.12(react@19.0.0)':
+    dependencies:
+      md-to-react-email: 5.0.2(react@19.0.0)
+      react: 19.0.0
 
   '@react-email/markdown@0.0.12(react@19.1.0)':
     dependencies:
       md-to-react-email: 5.0.2(react@19.1.0)
       react: 19.1.0
 
+  '@react-email/preview@0.0.11(react@19.0.0)':
+    dependencies:
+      react: 19.0.0
+
   '@react-email/preview@0.0.11(react@19.1.0)':
     dependencies:
       react: 19.1.0
+
+  '@react-email/render@1.0.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
+    dependencies:
+      html-to-text: 9.0.5
+      js-beautify: 1.15.4
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
+      react-promise-suspense: 0.3.4
 
   '@react-email/render@1.0.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
@@ -14628,17 +14776,33 @@ snapshots:
       react-dom: 19.1.0(react@19.1.0)
       react-promise-suspense: 0.3.4
 
+  '@react-email/row@0.0.10(react@19.0.0)':
+    dependencies:
+      react: 19.0.0
+
   '@react-email/row@0.0.10(react@19.1.0)':
     dependencies:
       react: 19.1.0
+
+  '@react-email/section@0.0.14(react@19.0.0)':
+    dependencies:
+      react: 19.0.0
 
   '@react-email/section@0.0.14(react@19.1.0)':
     dependencies:
       react: 19.1.0
 
+  '@react-email/tailwind@0.1.0(react@19.0.0)':
+    dependencies:
+      react: 19.0.0
+
   '@react-email/tailwind@0.1.0(react@19.1.0)':
     dependencies:
       react: 19.1.0
+
+  '@react-email/text@0.0.10(react@19.0.0)':
+    dependencies:
+      react: 19.0.0
 
   '@react-email/text@0.0.10(react@19.1.0)':
     dependencies:
@@ -15109,6 +15273,8 @@ snapshots:
       '@smithy/abort-controller': 4.0.2
       '@smithy/types': 4.2.0
       tslib: 2.8.1
+
+  '@stablelib/base64@1.0.1': {}
 
   '@standard-schema/spec@1.0.0': {}
 
@@ -17645,6 +17811,8 @@ snapshots:
 
   fast-safe-stringify@2.1.1: {}
 
+  fast-sha256@1.3.0: {}
+
   fast-uri@3.0.6: {}
 
   fast-xml-parser@4.4.1:
@@ -17868,6 +18036,10 @@ snapshots:
   geist@1.3.1(next@15.3.0(@babel/core@7.26.10)(@playwright/test@1.51.1)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(sass@1.77.4)):
     dependencies:
       next: 15.3.0(@babel/core@7.26.10)(@playwright/test@1.51.1)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(sass@1.77.4)
+
+  geist@1.3.1(next@15.3.0(@playwright/test@1.51.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(sass@1.77.4)):
+    dependencies:
+      next: 15.3.0(@playwright/test@1.51.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(sass@1.77.4)
 
   generate-function@2.3.1:
     dependencies:
@@ -19066,6 +19238,11 @@ snapshots:
 
   math-intrinsics@1.1.0: {}
 
+  md-to-react-email@5.0.2(react@19.0.0):
+    dependencies:
+      marked: 7.0.4
+      react: 19.0.0
+
   md-to-react-email@5.0.2(react@19.1.0):
     dependencies:
       marked: 7.0.4
@@ -19694,7 +19871,7 @@ snapshots:
       '@next/env': 13.5.11
       fast-glob: 3.3.3
       minimist: 1.2.8
-      next: 15.3.0(@babel/core@7.26.10)(@playwright/test@1.51.1)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(sass@1.77.4)
+      next: 15.3.0(@playwright/test@1.51.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(sass@1.77.4)
 
   next-themes@0.3.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
     dependencies:
@@ -19744,6 +19921,33 @@ snapshots:
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
       styled-jsx: 5.1.6(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react@19.1.0)
+    optionalDependencies:
+      '@next/swc-darwin-arm64': 15.3.0
+      '@next/swc-darwin-x64': 15.3.0
+      '@next/swc-linux-arm64-gnu': 15.3.0
+      '@next/swc-linux-arm64-musl': 15.3.0
+      '@next/swc-linux-x64-gnu': 15.3.0
+      '@next/swc-linux-x64-musl': 15.3.0
+      '@next/swc-win32-arm64-msvc': 15.3.0
+      '@next/swc-win32-x64-msvc': 15.3.0
+      '@playwright/test': 1.51.1
+      sass: 1.77.4
+      sharp: 0.34.1
+    transitivePeerDependencies:
+      - '@babel/core'
+      - babel-plugin-macros
+
+  next@15.3.0(@playwright/test@1.51.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(sass@1.77.4):
+    dependencies:
+      '@next/env': 15.3.0
+      '@swc/counter': 0.1.3
+      '@swc/helpers': 0.5.15
+      busboy: 1.6.0
+      caniuse-lite: 1.0.30001707
+      postcss: 8.4.31
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
+      styled-jsx: 5.1.6(react@19.1.0)
     optionalDependencies:
       '@next/swc-darwin-arm64': 15.3.0
       '@next/swc-darwin-x64': 15.3.0
@@ -20864,6 +21068,13 @@ snapshots:
 
   requireindex@1.2.0: {}
 
+  resend@4.1.2(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
+    dependencies:
+      '@react-email/render': 1.0.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+    transitivePeerDependencies:
+      - react
+      - react-dom
+
   resend@4.1.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
     dependencies:
       '@react-email/render': 1.0.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -21264,6 +21475,11 @@ snapshots:
     dependencies:
       escape-string-regexp: 2.0.0
 
+  standardwebhooks@1.0.0:
+    dependencies:
+      '@stablelib/base64': 1.0.1
+      fast-sha256: 1.3.0
+
   state-local@1.0.7: {}
 
   stream-browserify@3.0.0:
@@ -21429,6 +21645,11 @@ snapshots:
     optionalDependencies:
       '@babel/core': 7.26.10
       babel-plugin-macros: 3.1.0
+
+  styled-jsx@5.1.6(react@19.1.0):
+    dependencies:
+      client-only: 0.0.1
+      react: 19.1.0
 
   stylis@4.2.0: {}
 
