@@ -4,6 +4,7 @@
  * They don't require running your Next.js so they are fast
  * Yet they still can test the Local API and custom endpoints using NextRESTClient helper.
  */
+import { describe, it, expect, beforeAll, afterAll } from '@jest/globals'
 import { beforeAllFixtures } from '../fixtures/beforeAll.fixtures'
 import { afterAllFixtures } from '../fixtures/afterAll.fixtures'
 import { getSuite } from '../fixtures/suite.ctx'
