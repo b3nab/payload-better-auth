@@ -4,7 +4,7 @@ import { devUser } from './helpers/credentials.js'
 
 export const seed = async (payload: Payload) => {
   const { totalDocs } = await payload.count({
-    collection: 'users',
+    collection: 'user',
     where: {
       email: {
         equals: devUser.email,
@@ -14,7 +14,7 @@ export const seed = async (payload: Payload) => {
 
   if (!totalDocs) {
     await payload.create({
-      collection: 'users',
+      collection: 'user',
       data: devUser,
     })
   }

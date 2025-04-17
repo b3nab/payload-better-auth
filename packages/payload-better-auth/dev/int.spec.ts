@@ -13,7 +13,7 @@ import path from 'path'
 import { getPayload } from 'payload'
 import { fileURLToPath } from 'url'
 
-import { NextRESTClient } from './helpers/NextRESTClient.js'
+import { NextRESTClient } from '../helpers/NextRESTClient.js'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -43,7 +43,7 @@ describe('Plugin tests', () => {
       process.env.DATABASE_URI = `${memoryDB.getUri()}&retryWrites=true`
     }
 
-    const { default: config } = await import('./payload.config.js')
+    const { default: config } = await import('../payload.config.js')
 
     payload = await getPayload({ config })
     restClient = new NextRESTClient(payload.config)

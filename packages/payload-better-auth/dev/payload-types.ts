@@ -73,11 +73,11 @@ export interface Config {
     session: Session;
     account: Account;
     verification: Verification;
+    twoFactor: TwoFactor;
+    passkey: Passkey;
     organization: Organization;
     member: Member;
     invitation: Invitation;
-    twoFactor: TwoFactor;
-    passkey: Passkey;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -90,11 +90,11 @@ export interface Config {
     session: SessionSelect<false> | SessionSelect<true>;
     account: AccountSelect<false> | AccountSelect<true>;
     verification: VerificationSelect<false> | VerificationSelect<true>;
+    twoFactor: TwoFactorSelect<false> | TwoFactorSelect<true>;
+    passkey: PasskeySelect<false> | PasskeySelect<true>;
     organization: OrganizationSelect<false> | OrganizationSelect<true>;
     member: MemberSelect<false> | MemberSelect<true>;
     invitation: InvitationSelect<false> | InvitationSelect<true>;
-    twoFactor: TwoFactorSelect<false> | TwoFactorSelect<true>;
-    passkey: PasskeySelect<false> | PasskeySelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -212,8 +212,8 @@ export interface Session {
   ipAddress?: string | null;
   userAgent?: string | null;
   userId: string | User;
-  activeOrganizationId?: string | null;
   impersonatedBy?: string | null;
+  activeOrganizationId?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -245,6 +245,35 @@ export interface Verification {
   identifier: string;
   value: string;
   expiresAt: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "twoFactor".
+ */
+export interface TwoFactor {
+  id: string;
+  secret: string;
+  backupCodes: string;
+  userId: string | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "passkey".
+ */
+export interface Passkey {
+  id: string;
+  name?: string | null;
+  publicKey: string;
+  userId: string | User;
+  credentialID: string;
+  counter: number;
+  deviceType: string;
+  backedUp: boolean;
+  transports?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -289,35 +318,6 @@ export interface Invitation {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "twoFactor".
- */
-export interface TwoFactor {
-  id: string;
-  secret: string;
-  backupCodes: string;
-  userId: string | User;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "passkey".
- */
-export interface Passkey {
-  id: string;
-  name?: string | null;
-  publicKey: string;
-  userId: string | User;
-  credentialID: string;
-  counter: number;
-  deviceType: string;
-  backedUp: boolean;
-  transports?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -348,6 +348,14 @@ export interface PayloadLockedDocument {
         value: string | Verification;
       } | null)
     | ({
+        relationTo: 'twoFactor';
+        value: string | TwoFactor;
+      } | null)
+    | ({
+        relationTo: 'passkey';
+        value: string | Passkey;
+      } | null)
+    | ({
         relationTo: 'organization';
         value: string | Organization;
       } | null)
@@ -358,14 +366,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'invitation';
         value: string | Invitation;
-      } | null)
-    | ({
-        relationTo: 'twoFactor';
-        value: string | TwoFactor;
-      } | null)
-    | ({
-        relationTo: 'passkey';
-        value: string | Passkey;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -471,8 +471,8 @@ export interface SessionSelect<T extends boolean = true> {
   ipAddress?: T;
   userAgent?: T;
   userId?: T;
-  activeOrganizationId?: T;
   impersonatedBy?: T;
+  activeOrganizationId?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -502,6 +502,33 @@ export interface VerificationSelect<T extends boolean = true> {
   identifier?: T;
   value?: T;
   expiresAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "twoFactor_select".
+ */
+export interface TwoFactorSelect<T extends boolean = true> {
+  secret?: T;
+  backupCodes?: T;
+  userId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "passkey_select".
+ */
+export interface PasskeySelect<T extends boolean = true> {
+  name?: T;
+  publicKey?: T;
+  userId?: T;
+  credentialID?: T;
+  counter?: T;
+  deviceType?: T;
+  backedUp?: T;
+  transports?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -538,33 +565,6 @@ export interface InvitationSelect<T extends boolean = true> {
   status?: T;
   expiresAt?: T;
   inviterId?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "twoFactor_select".
- */
-export interface TwoFactorSelect<T extends boolean = true> {
-  secret?: T;
-  backupCodes?: T;
-  userId?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "passkey_select".
- */
-export interface PasskeySelect<T extends boolean = true> {
-  name?: T;
-  publicKey?: T;
-  userId?: T;
-  credentialID?: T;
-  counter?: T;
-  deviceType?: T;
-  backedUp?: T;
-  transports?: T;
   updatedAt?: T;
   createdAt?: T;
 }

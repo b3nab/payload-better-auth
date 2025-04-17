@@ -1,5 +1,5 @@
 {
-  "extends": "../../../tsconfig.json",
+  "extends": "../tsconfig.json",
   "exclude": [],
   "include": [
     "**/*.js",
@@ -8,11 +8,10 @@
     "**/*.cjs",
     "**/*.ts",
     "**/*.tsx",
-    "../packages/payload-better-auth/src/**/*.ts",
-    "../packages/payload-better-auth/src/**/*.tsx",
+    "../src/**/*.ts",
+    "../src/**/*.tsx",
     "next.config.mjs",
-    ".next/types/**/*.ts",
-    "./dev/next-env.d.ts"
+    ".next/types/**/*.ts"
   ],
   "compilerOptions": {
     "baseUrl": "./",
@@ -20,22 +19,17 @@
       "@payload-config": [
         "./payload.config.ts"
       ],
-      "@/*": [
-        "./*"
-      ],
       "payload-better-auth": [
-        "../packages/payload-better-auth/src/index.ts"
+        "../src/index.ts"
       ],
       "payload-better-auth/client": [
-        "../packages/payload-better-auth/src/exports/client.ts"
+        "../src/exports/client.ts"
       ],
       "payload-better-auth/rsc": [
-        "../packages/payload-better-auth/src/exports/rsc.ts"
+        "../src/exports/rsc.ts"
       ]
     },
     "noEmit": true,
     "emitDeclarationOnly": false,
-    "declaration": false,
-    "composite": false
   }
 }

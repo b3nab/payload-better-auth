@@ -4,7 +4,7 @@ import { getBetterAuthSafe } from 'payload-better-auth/nextjs'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 // biome-ignore lint/style/useImportType: <explanation>
-import { betterAuthPluginConfig } from '@/payload.plugins'
+import { betterAuthPluginConfig } from '../payload.plugins'
 
 export const auth = getBetterAuthSafe<typeof betterAuthPluginConfig>(
   //          ^?

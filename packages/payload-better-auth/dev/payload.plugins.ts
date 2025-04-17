@@ -252,50 +252,46 @@ export const betterAuthOptions = {
 export const betterAuthPluginConfig = {
   betterAuth: betterAuthOptions,
   betterAuthPlugins: {
-    organization: [
-      {
-        async sendInvitationEmail(data) {
+    organization: {
+      async sendInvitationEmail(data) {
+        'use server'
+        await resend.emails.send({
+          from,
+          to: data.email,
+          subject: "You've been invited to join an organization",
+          react: reactInvitationEmail({
+            username: data.email,
+            invitedByUsername: data.inviter.user.name,
+            invitedByEmail: data.inviter.user.email,
+            teamName: data.organization.name,
+            inviteLink:
+              process.env.NODE_ENV === 'development'
+                ? `http://localhost:3000/accept-invitation/${data.id}`
+                : `${
+                    process.env.BETTER_AUTH_URL ||
+                    'https://demo.better-auth.com'
+                  }/accept-invitation/${data.id}`,
+          }),
+        })
+      },
+    },
+    twoFactor: {
+      otpOptions: {
+        async sendOTP({ user, otp }) {
           'use server'
           await resend.emails.send({
             from,
-            to: data.email,
-            subject: "You've been invited to join an organization",
-            react: reactInvitationEmail({
-              username: data.email,
-              invitedByUsername: data.inviter.user.name,
-              invitedByEmail: data.inviter.user.email,
-              teamName: data.organization.name,
-              inviteLink:
-                process.env.NODE_ENV === 'development'
-                  ? `http://localhost:3000/accept-invitation/${data.id}`
-                  : `${
-                      process.env.BETTER_AUTH_URL ||
-                      'https://demo.better-auth.com'
-                    }/accept-invitation/${data.id}`,
-            }),
+            to: user.email,
+            subject: 'Your OTP',
+            html: `Your OTP is ${otp}`,
           })
         },
       },
-    ],
-    twoFactor: [
-      {
-        otpOptions: {
-          async sendOTP({ user, otp }) {
-            'use server'
-            await resend.emails.send({
-              from,
-              to: user.email,
-              subject: 'Your OTP',
-              html: `Your OTP is ${otp}`,
-            })
-          },
-        },
-      },
-    ],
+    },
     passkey: true,
     openAPI: true,
     bearer: true,
-    admin: true,
+    // admin: true,
     //   admin({
     //     adminUserIds: ['EXD5zjob2SD6CBWcEQ6OpLRHcyoUbnaB'],
     //   }),
