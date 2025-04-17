@@ -1,13 +1,13 @@
+import type { Payload } from 'payload'
+import type { MongoMemoryReplSet } from 'mongodb-memory-server'
 import type {
   betterAuth,
   BetterAuthOptions,
   BetterAuthPlugin,
 } from 'better-auth'
-import type { Payload } from 'payload'
-import type { MongoMemoryReplSet } from 'mongodb-memory-server'
-import type { NextRESTClient } from '../../dev/helpers/NextRESTClient.ts'
 import type { getEndpoints } from 'better-auth/api'
 import type { getAuthTables } from 'better-auth/db'
+import type { NextRESTClient } from '../../dev/helpers/NextRESTClient'
 
 export type Suite = {
   memoryDB: MongoMemoryReplSet
