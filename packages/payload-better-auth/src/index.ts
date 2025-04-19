@@ -59,13 +59,19 @@ import { passkey } from 'better-auth/plugins/passkey'
 import { emailHarmony } from 'better-auth-harmony'
 // biome-ignore lint/style/useImportType: <explanation>
 import { stripe } from '@better-auth/stripe'
+// biome-ignore lint/style/useImportType: <explanation>
+import { polar } from '@polar-sh/better-auth'
+// biome-ignore lint/style/useImportType: <explanation>
+import { Polar } from '@polar-sh/sdk'
+// biome-ignore lint/style/useImportType: <explanation>
+import Stripe from 'stripe'
 
 export type CollectionConfigExtend<T extends CollectionSlug> = Pick<
   CollectionConfig<T>,
   'fields'
 >
 
-export type BetterAuthPluginOptions = {
+export type BetterAuthPluginOptions = Readonly<{
   /**
    * Better Auth Config. https://www.better-auth.com/docs/reference/options
    * This config will override the default ones from the plugin itself.
@@ -76,12 +82,12 @@ export type BetterAuthPluginOptions = {
    * This config will override the default ones from the plugin itself.
    * @default {
    *  twoFactor: true,
-   *  passkey: true,
    *  openAPI: true,
+   *  admin: true,
    */
   betterAuthPlugins?: {
     // core authentication
-    twoFactor?: boolean | Parameters<typeof twoFactor>[0]
+    twoFactor?: Parameters<typeof twoFactor>[0]
     username?: boolean | Parameters<typeof username>[0]
     anonymous?: boolean | Parameters<typeof anonymous>[0]
     phoneNumber?: boolean | Parameters<typeof phoneNumber>[0]
@@ -91,7 +97,7 @@ export type BetterAuthPluginOptions = {
     genericOAuth?: boolean | Parameters<typeof genericOAuth>[0]
     oneTap?: boolean | Parameters<typeof oneTap>[0]
     // core authorization
-    admin?: boolean | Parameters<typeof admin>[0]
+    admin?: Parameters<typeof admin>[0]
     organization?: boolean | Parameters<typeof organization>[0]
     // core enterprise
     oidcProvider?: boolean | Parameters<typeof oidcProvider>[0]
@@ -100,10 +106,19 @@ export type BetterAuthPluginOptions = {
     bearer?: boolean | Parameters<typeof bearer>[0]
     multiSession?: boolean | Parameters<typeof multiSession>[0]
     oAuthProxy?: boolean | Parameters<typeof oAuthProxy>[0]
-    openAPI?: boolean | Parameters<typeof openAPI>[0]
+    openAPI?: Parameters<typeof openAPI>[0]
     jwt?: boolean | Parameters<typeof jwt>[0]
     // payments
-    stripe?: boolean | Omit<Parameters<typeof stripe>[0], 'stripeClient'>
+    stripe?:
+      | boolean
+      | (Omit<Parameters<typeof stripe>[0], 'stripeClient'> & {
+          clientConfig?: ConstructorParameters<typeof Stripe>[0]
+        })
+    polar?:
+      | boolean
+      | (Omit<Parameters<typeof polar>[0], 'client'> & {
+          clientConfig?: ConstructorParameters<typeof Polar>[0]
+        })
     // third-party
     emailHarmony?: boolean | Parameters<typeof emailHarmony>[0]
     // validator?: boolean | Parameters<typeof validator>
@@ -124,7 +139,7 @@ export type BetterAuthPluginOptions = {
    * @default 'info'
    */
   logs?: false | LoggerConfig['level'] // 'debug' | 'info' | 'warn' | 'error'
-}
+}>
 /**
  * Better Auth Plugin for PayloadCMS
  * @type {BetterAuthPluginOptions} pluginOptions - Options for the plugin
