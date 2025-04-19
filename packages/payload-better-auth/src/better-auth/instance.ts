@@ -1,23 +1,66 @@
 import type { Payload } from 'payload'
-import { betterAuth, type BetterAuthOptions } from 'better-auth'
-import { admin } from 'better-auth/plugins'
-import { nextCookies } from 'better-auth/next-js'
+import { betterAuth } from 'better-auth'
+import type {
+  Auth,
+  // AuthContext,
+  BetterAuthOptions,
+  BetterAuthPlugin,
+  FilterActions,
+  InferAPI,
+} from 'better-auth'
 import { payloadAdapter } from './payload-adapter'
 import { getPayload } from '../singleton.payload'
-import { pluginsToLoad } from './plugins.server'
-import type { BetterAuthPluginOptions } from '../index'
-import { ac, roles } from './permissions'
+import { type EnabledPluginsArray, pluginsToLoad } from './plugins.server'
 import { betterAuthSingleton } from '../singleton.better-auth'
+import type { BetterAuthPluginOptions } from '../index'
+// biome-ignore lint/style/useImportType: <explanation>
+import { getEndpoints, router } from 'better-auth/api'
 
-// export type InferBetterAuthInstance<O extends BetterAuthPluginOptions> =
-//   ReturnType<typeof createBetterAuthInstance<O>>
+// type BART<O extends BetterAuthPluginOptions> = ReturnType<
+//   typeof betterAuth<BuildBetterAuthOptionsReturnType<O>>
+// >
+// type AuthContext<O extends BetterAuthPluginOptions> = BART<O>['$context']
+
+// type AuthEndpointsApi<O extends BetterAuthPluginOptions> = ReturnType<
+//   typeof getEndpoints<
+//     Awaited<AuthContext<O>>,
+//     BuildBetterAuthOptionsReturnType<O>
+//   >
+// >['api']
+
+// type ImprovedAuth<O extends BetterAuthPluginOptions> = {
+//   handler: (request: Request) => Promise<Response>
+//   api: // FilterActions<ReturnType<typeof router<Awaited<AuthContext<O>>, BuildBetterAuthOptionsReturnType<O>>>['endpoints']>
+//   // FilterActions<AuthEndpointsApi<O>>
+//   InferAPI<AuthEndpointsApi<O>>
+//   options: BuildBetterAuthOptionsReturnType<O> // BetterAuthOptions
+//   $ERROR_CODES: Auth['$ERROR_CODES']
+//   $context: AuthContext<O>
+// }
+
+// Helper type to ensure plugins are compatible with BetterAuthPlugin
+type EnsureBetterAuthPlugins<T> = T extends BetterAuthPlugin[] ? T : never
+
+// The type for the Better Auth instance with proper plugin inference
 export type InferBetterAuthInstance<O extends BetterAuthPluginOptions> =
-  ReturnType<typeof betterAuth<BuildBetterAuthOptions<O>>>
+  // & ImprovedAuth<O>
+  // ReturnType<typeof betterAuth<ReturnType<typeof buildBetterAuthOptions<O>>>> & {
+  ReturnType<typeof betterAuth<BuildBetterAuthOptionsReturnType<O>>> & {
+    //   // Add a type assertion to help TypeScript understand that the api object can contain any plugin's API methods
+    //   // HACK: this is a hack to make the api object contain any plugin's API methods and allow the code to compile.
+    //   // But for some issues on some plugins, those api endpoints are not correctly inferred.
+    //   // The issues are only on some plugins, not all.
+    //   // Like the stripe plugin: the `stripeWebhook`method is correctly inferred, but the `cancelSubscription` and all other methods are not.
+    //   // And the admin plugin: the `banUser` method is not correctly inferred (banUser is an example, all the other methods are not correctly inferred as well).
+    // api: Record<string, any>
+  }
 
 // The following error is due to the fact that the types of better-auth are not well designed.
 // The types should be improved to allow for a more type-safe usage of the library.
 // DO NOT TYPE THE RETURN TYPE OF THIS FUNCTION BECAUSE IT WILL BREAK THE TYPE INFERENCE OF THE PLUGIN.
-export const createBetterAuthInstance = <O extends BetterAuthPluginOptions>({
+export const createBetterAuthInstance = <
+  const O extends BetterAuthPluginOptions,
+>({
   pluginOptions,
   payload,
 }: {
@@ -35,14 +78,23 @@ export const createBetterAuthInstance = <O extends BetterAuthPluginOptions>({
   return instance
 }
 
-type BuildBetterAuthOptions<O extends BetterAuthPluginOptions> = ReturnType<
-  typeof buildBetterAuthOptions<O>
->
+export type BuildBetterAuthOptionsReturnType<
+  O extends BetterAuthPluginOptions,
+> = {
+  database: ReturnType<typeof payloadAdapter>
+  emailAndPassword: {
+    enabled: boolean
+  }
+  plugins: EnsureBetterAuthPlugins<EnabledPluginsArray<O>>
+  trustedOrigins: BetterAuthOptions['trustedOrigins']
+} & O['betterAuth']
+// type BuildBetterAuthOptionsReturnType<O extends BetterAuthPluginOptions> =
+//   ReturnType<typeof buildBetterAuthOptions<O>>
 
-const buildBetterAuthOptions = <O extends BetterAuthPluginOptions>(
+const buildBetterAuthOptions = <const O extends BetterAuthPluginOptions>(
   pluginOptions: O,
   payload?: Payload,
-) => {
+): BuildBetterAuthOptionsReturnType<O> => {
   // Load plugins based on configuration
   // const plugins = pluginsToLoad(pluginOptions)
 
@@ -72,7 +124,9 @@ const buildBetterAuthOptions = <O extends BetterAuthPluginOptions>(
     emailAndPassword: {
       enabled: true,
     },
-    plugins: pluginsToLoad(pluginOptions),
+    plugins: pluginsToLoad(pluginOptions) as EnsureBetterAuthPlugins<
+      EnabledPluginsArray<O>
+    >,
 
     // options from plugin
     ////////////////////////////
@@ -81,5 +135,5 @@ const buildBetterAuthOptions = <O extends BetterAuthPluginOptions>(
     // merge options (nested ones)
     //////////////////////////////////
     trustedOrigins,
-  } satisfies BetterAuthOptions
+  } as const
 }
