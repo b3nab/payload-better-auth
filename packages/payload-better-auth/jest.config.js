@@ -52,6 +52,15 @@ const customJestConfig = {
       '<rootDir>/helpers/mocks/fileMock.js',
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },
+  collectCoverage: true,
+  collectCoverageFrom: [
+    "src/**/*",
+    "!src/exports/**/*",
+    "!src/nextjs/**/*",
+    "!src/components/**/*",
+    "!src/payload-utilities/**/*",
+
+  ]
 }
 
 export default customJestConfig

@@ -39,6 +39,7 @@
     "test": "pnpm plugin-- test",
     "test:coverage": "pnpm plugin-- test:coverage",
     "build": "pnpm plugin-- build",
+    "bump": "pnpm plugin-- bump",
     "pub": "pnpm publish --filter payload-better-auth",
     "pub:local": "pnpm plugin-- publish:local"
   },
