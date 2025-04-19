@@ -1,17 +1,24 @@
 import type { Endpoint, PayloadHandler } from 'payload'
-import type { betterAuth } from 'better-auth'
-import type { getEndpoints } from 'better-auth/api'
+import type { AuthContext, betterAuth } from 'better-auth'
+// biome-ignore lint/style/useImportType: <explanation>
+import { getEndpoints } from 'better-auth/api'
 import { payloadSingleton } from './singleton.payload'
+import type { BetterAuthPluginOptions } from './index'
+import type {
+  BuildBetterAuthOptionsReturnType,
+  InferBetterAuthInstance,
+} from './better-auth/instance'
 
-type BetterAuthInstance = ReturnType<typeof betterAuth>
-type AuthEndpointsApi = ReturnType<typeof getEndpoints>['api']
+type AuthEndpointsApi<O extends BetterAuthPluginOptions> = ReturnType<
+  typeof getEndpoints<AuthContext, BuildBetterAuthOptionsReturnType<O>>
+>['api']
 
-export class EndpointFactory {
-  betterAuthInstance: BetterAuthInstance
-  betterAuthPaths: AuthEndpointsApi | undefined
+export class EndpointFactory<O extends BetterAuthPluginOptions> {
+  betterAuthInstance: InferBetterAuthInstance<O>
+  betterAuthPaths: AuthEndpointsApi<O> | undefined
   constructor(
-    betterAuthInstance: ReturnType<typeof betterAuth>,
-    betterAuthPaths: AuthEndpointsApi,
+    betterAuthInstance: InferBetterAuthInstance<O>,
+    betterAuthPaths: AuthEndpointsApi<O>,
   ) {
     // console.log('keys betterAuthPaths:', betterAuthPaths)
     this.betterAuthInstance = betterAuthInstance

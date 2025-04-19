@@ -2,18 +2,14 @@ import type { Payload } from 'payload'
 import type { BetterAuthPluginOptions } from './index'
 import { payloadSingleton } from './singleton.payload'
 import type { InferBetterAuthInstance } from './better-auth/instance'
-import type { betterAuth, BetterAuthOptions } from 'better-auth'
 
-// Create a type-safe singleton store with proper type inference
-let betterAuthInstance:
-  | InferBetterAuthInstance<BetterAuthPluginOptions>
-  | undefined
+let betterAuthInstance: any = undefined
 
 // Create a type-safe setter that preserves type information
 export const betterAuthSingleton = <O extends BetterAuthPluginOptions>(
   instance: InferBetterAuthInstance<O>,
 ): void => {
-  betterAuthInstance = instance as unknown as InferBetterAuthInstance<O>
+  betterAuthInstance = instance
 }
 
 // Create a type-safe getter with proper type inference
