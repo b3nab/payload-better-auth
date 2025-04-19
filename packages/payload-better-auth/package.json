@@ -1,6 +1,6 @@
 {
   "name": "payload-better-auth",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A Payload CMS 3 plugin for Better Auth",
   "author": {
     "name": "Benedetto Abbenanti",
@@ -62,6 +62,7 @@
     "lint": "eslint",
     "lint:fix": "eslint ./src --fix",
     "publish:local": "pnpm publish --registry http://0.0.0.0:4873 --no-git-checks",
+    "bump": "pnpx bumpp",
     "prepublishOnly": "pnpm clean && pnpm build",
     "test": "jest -w",
     "test:coverage": "jest --coverage --detectOpenHandles --verbose --forceExit",
