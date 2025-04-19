@@ -8,8 +8,14 @@ export const afterAllFixtures = () => async () => {
   }
 
   if (suite?.memoryDB) {
-    await suite.memoryDB.stop()
-    // await suite.memoryDB.client.close()
+    await suite.memoryDB.stop({
+      force: true,
+    })
+  }
+
+  if (suite?.betterAuth) {
+    // @ts-expect-error
+    suite.betterAuth = undefined
   }
 
   clearSuite()
