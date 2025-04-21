@@ -32,6 +32,11 @@
       "types": "./src/index.ts",
       "default": "./src/index.ts"
     },
+    "./better-auth": {
+      "import": "./src/better-auth/exports.ts",
+      "types": "./src/better-auth/exports.ts",
+      "default": "./src/better-auth/exports.ts"
+    },
     "./nextjs": {
       "import": "./src/nextjs/index.tsx",
       "types": "./src/nextjs/index.tsx",
@@ -104,6 +109,7 @@
     "eslint-config-next": "15.1.5",
     "graphql": "^16.8.1",
     "jest": "29.7.0",
+    "madge": "^8.0.0",
     "mongodb-memory-server": "^10.1.2",
     "nanostores": "0.11.3",
     "next": "15.2.3",
@@ -117,7 +123,7 @@
     "rimraf": "3.0.2",
     "sharp": "0.32.6",
     "sort-package-json": "^2.10.0",
-    "typescript": "5.7.3"
+    "typescript": "5.8.3"
   },
   "peerDependencies": {
     "payload": "^3"
