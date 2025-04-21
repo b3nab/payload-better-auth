@@ -65,6 +65,7 @@ import { polar } from '@polar-sh/better-auth'
 import { Polar } from '@polar-sh/sdk'
 // biome-ignore lint/style/useImportType: <explanation>
 import Stripe from 'stripe'
+// import { getBetterAuthSafe } from './singleton.better-auth'
 
 export type CollectionConfigExtend<T extends CollectionSlug> = Pick<
   CollectionConfig<T>,
@@ -170,7 +171,7 @@ export const betterAuthPlugin =
     // })
 
     // retrieve the api instance from the singleton
-    // const authApi = getBetterAuth()
+    // const authApi = getBetterAuthSafe<typeof pluginOptions>()
     // if (authApi) {
     //   authApi.api.verifyTOTP({
     //     body: {
