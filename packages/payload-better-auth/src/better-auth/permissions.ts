@@ -1,31 +1,31 @@
 import { createAccessControl } from 'better-auth/plugins/access'
 import {
-  adminAc,
-  defaultStatements,
-  userAc,
+  defaultStatements as defaultStatementsFromBetterAuth,
+  adminAc as adminAcFromBetterAuth,
+  userAc as userAcFromBetterAuth,
 } from 'better-auth/plugins/admin/access'
 
-const statement = {
-  ...defaultStatements,
+export const defaultStatements = {
+  ...defaultStatementsFromBetterAuth,
   payloadcms: ['access'],
   byRole: ['user', 'admin'],
-}
+} as const
 
-export const ac = createAccessControl(statement)
+export const ac = createAccessControl(defaultStatements)
 
-const user = ac.newRole({
+export const userAc = ac.newRole({
   payloadcms: [],
   byRole: ['user'],
-  ...userAc.statements,
+  ...userAcFromBetterAuth.statements,
 })
 
-const admin = ac.newRole({
+const adminAc = ac.newRole({
   payloadcms: ['access'],
   byRole: ['user', 'admin'],
-  ...adminAc.statements,
+  ...adminAcFromBetterAuth.statements,
 })
 
 export const roles = {
-  user,
-  admin,
+  user: userAc,
+  admin: adminAc,
 }
