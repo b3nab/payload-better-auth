@@ -1,10 +1,11 @@
 import { getPayload, type Payload, type SanitizedConfig } from 'payload'
-import { headers } from 'next/headers.js'
+import { headers } from 'next/headers'
 import invariant from 'tiny-invariant'
-import { getBetterAuth } from '../singleton.better-auth.js'
-import { getPayload as getPayloadSingleton } from '../singleton.payload.js'
+import { getBetterAuthSafe } from '../singleton.better-auth'
+import { getPayload as getPayloadSingleton } from '../singleton.payload'
+import type { BetterAuthPluginOptions } from '../index'
 
-export const guardBefore = async (configPromise: Promise<SanitizedConfig>) => {
+export const serverBefore = async (configPromise: Promise<SanitizedConfig>) => {
   let payload: Payload | undefined = undefined
   if (configPromise) {
     payload = await getPayload({
@@ -19,7 +20,7 @@ export const guardBefore = async (configPromise: Promise<SanitizedConfig>) => {
 
   invariant(payload, 'Payload instance NOT FOUND.')
 
-  const betterAuth = getBetterAuth(payload)
+  const betterAuth = getBetterAuthSafe<BetterAuthPluginOptions>(payload)
 
   invariant(betterAuth, 'betterAuth server instance NOT FOUND.')
 
@@ -28,3 +29,5 @@ export const guardBefore = async (configPromise: Promise<SanitizedConfig>) => {
     betterAuth,
   }
 }
+
+export type GuardServerBefore = typeof serverBefore
