@@ -8,7 +8,9 @@ let betterAuthInstance: any | undefined
 // Create a type-safe setter that preserves type information
 export const betterAuthSingleton = <O extends BetterAuthPluginOptions>(
   instance: InferBetterAuthInstance<O>,
-): void => {}
+): void => {
+  betterAuthInstance = instance
+}
 
 // Create a type-safe getter with proper type inference
 export const getBetterAuth = <O extends BetterAuthPluginOptions>(
@@ -19,7 +21,7 @@ export const getBetterAuth = <O extends BetterAuthPluginOptions>(
   if (throwError && !betterAuthInstance) {
     throw new Error('BetterAuth is not initialized')
   }
-  return betterAuthInstance as InferBetterAuthInstance<O>
+  return betterAuthInstance
 }
 
 export const getBetterAuthSafe = <O extends BetterAuthPluginOptions>(
