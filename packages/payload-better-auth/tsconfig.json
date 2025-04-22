@@ -17,12 +17,9 @@
     "resolveJsonModule": true,
     "jsx": "preserve",
     "incremental": true,
-    "declaration": true,
     "emitDeclarationOnly": true,
-    "declarationMap": true,
     "target": "ES2022",
-    "noEmit": false,
-    "composite": false,
+    "composite": true,
     "plugins": [
       {
         "name": "next"

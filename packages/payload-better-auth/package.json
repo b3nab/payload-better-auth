@@ -58,6 +58,38 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "registry": "https://registry.npm.abbenanti.com/",
+    "exports": {
+      ".": {
+        "import": "./dist/index.js",
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "./better-auth": {
+        "import": "./dist/better-auth/exports.js",
+        "types": "./dist/better-auth/exports.d.ts",
+        "default": "./dist/better-auth/exports.js"
+      },
+      "./nextjs": {
+        "import": "./dist/nextjs/index.js",
+        "types": "./dist/nextjs/index.d.ts",
+        "default": "./dist/nextjs/index.js"
+      },
+      "./client": {
+        "import": "./dist/exports/client.js",
+        "types": "./dist/exports/client.d.ts",
+        "default": "./dist/exports/client.js"
+      },
+      "./rsc": {
+        "import": "./dist/exports/rsc.js",
+        "types": "./dist/exports/rsc.d.ts",
+        "default": "./dist/exports/rsc.js"
+      }
+    },
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts"
+  },
   "scripts": {
     "build": "pnpm copyfiles && pnpm build:types && pnpm build:swc",
     "build:swc": "swc ./src -d ./dist --config-file .swcrc --strip-leading-paths",
@@ -131,33 +163,6 @@
   "engines": {
     "node": "^18.20.2 || >=20.9.0",
     "pnpm": "^9"
-  },
-  "publishConfig": {
-    "registry": "https://registry.npm.abbenanti.com/",
-    "exports": {
-      ".": {
-        "import": "./dist/index.js",
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
-      },
-      "./nextjs": {
-        "import": "./dist/nextjs/index.js",
-        "types": "./dist/nextjs/index.d.ts",
-        "default": "./dist/nextjs/index.js"
-      },
-      "./client": {
-        "import": "./dist/exports/client.js",
-        "types": "./dist/exports/client.d.ts",
-        "default": "./dist/exports/client.js"
-      },
-      "./rsc": {
-        "import": "./dist/exports/rsc.js",
-        "types": "./dist/exports/rsc.d.ts",
-        "default": "./dist/exports/rsc.js"
-      }
-    },
-    "main": "./dist/index.js",
-    "types": "./dist/index.d.ts"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
