@@ -19,6 +19,7 @@ import {
 import { reactInvitationEmail } from './lib/email/invitation'
 import { reactResetPasswordEmail } from './lib/email/reset-password'
 import { resend } from './lib/email/resend'
+import { ac, roles } from './lib/permissions'
 // import { nextCookies } from 'better-auth/next-js'
 // import { passkey } from 'better-auth/plugins/passkey'
 // import { stripe } from '@better-auth/stripe'
@@ -289,14 +290,15 @@ export const betterAuthPluginConfig = {
       },
     },
     passkey: true,
-    openAPI: true,
     bearer: true,
     // admin: true,
+    admin: { ac, roles },
     //   admin({
     //     adminUserIds: ['EXD5zjob2SD6CBWcEQ6OpLRHcyoUbnaB'],
     //   }),
     multiSession: true,
     oAuthProxy: true,
+    oidcProvider: true,
     //   oidcProvider({
     //     loginPage: '/sign-in',
     //   }),
@@ -310,31 +312,32 @@ export const betterAuthPluginConfig = {
     //       },
     //     }
     //   }),
-    //   stripe({
-    //     stripeClient: new Stripe(process.env.STRIPE_KEY || 'sk_test_'),
-    //     stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
-    //     subscription: {
-    //       enabled: true,
-    //       plans: [
-    //         {
-    //           name: 'Starter',
-    //           priceId: STARTER_PRICE_ID.default,
-    //           annualDiscountPriceId: STARTER_PRICE_ID.annual,
-    //           freeTrial: {
-    //             days: 7,
-    //           },
-    //         },
-    //         {
-    //           name: 'Professional',
-    //           priceId: PROFESSION_PRICE_ID.default,
-    //           annualDiscountPriceId: PROFESSION_PRICE_ID.annual,
-    //         },
-    //         {
-    //           name: 'Enterprise',
-    //         },
-    //       ],
-    //     },
-    //   }),
+    polar: true,
+    stripe: {
+      // stripeClient: new Stripe(process.env.STRIPE_KEY || 'sk_test_'),
+      stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
+      subscription: {
+        enabled: true,
+        plans: [
+          {
+            name: 'Starter',
+            priceId: STARTER_PRICE_ID.default,
+            annualDiscountPriceId: STARTER_PRICE_ID.annual,
+            freeTrial: {
+              days: 7,
+            },
+          },
+          {
+            name: 'Professional',
+            priceId: PROFESSION_PRICE_ID.default,
+            annualDiscountPriceId: PROFESSION_PRICE_ID.annual,
+          },
+          {
+            name: 'Enterprise',
+          },
+        ],
+      },
+    },
   },
   extendsCollections: {
     user: UserExtend,

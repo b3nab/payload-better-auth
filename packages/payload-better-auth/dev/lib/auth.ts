@@ -1,15 +1,32 @@
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
-import { getBetterAuthSafe } from 'payload-better-auth/nextjs'
+import { getBetterAuthSafe } from 'payload-better-auth'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 // biome-ignore lint/style/useImportType: <explanation>
 import { betterAuthPluginConfig } from '../payload.plugins'
+import { createAuthLayer } from '../../src/nextjs'
 
-export const auth = getBetterAuthSafe<typeof betterAuthPluginConfig>(
-  //          ^?
-  await getPayload({ config: configPromise }),
-)
+export const {
+  auth,
+  // checkers
+  isAuth,
+  isGuest,
+  isUser,
+  isAdmin,
+  isRole,
+  // guards
+  // guardAuth,
+  // guardGuest,
+  // guardUser,
+  // guardAdmin,
+  // guardRole,
+} = createAuthLayer(configPromise, betterAuthPluginConfig)
+
+// export const auth = getBetterAuthSafe<typeof betterAuthPluginConfig>(
+//   //          ^?
+//   await getPayload({ config: configPromise }),
+// )
 
 // Check if the type inference is working correctly for the better-auth instance
 const bool = false
@@ -80,6 +97,7 @@ if (bool) {
         permission: {
           //  ^?
           devarea: ['access'],
+          payloadcms: ['access'],
         },
       },
     }),
