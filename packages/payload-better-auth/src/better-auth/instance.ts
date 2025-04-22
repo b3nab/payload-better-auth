@@ -3,11 +3,7 @@ import { betterAuth } from 'better-auth'
 import type { BetterAuthOptions, BetterAuthPlugin } from 'better-auth'
 import { payloadAdapter } from './payload-adapter'
 import { getPayload } from '../singleton.payload'
-import {
-  type EnabledPluginsArray,
-  type PluginsToLoad,
-  pluginsToLoad,
-} from './plugins.server'
+import { type PluginsToLoad, pluginsToLoad } from './plugins.server'
 import { betterAuthSingleton } from '../singleton.better-auth'
 import type { BetterAuthPluginOptions } from '../index'
 
@@ -58,7 +54,8 @@ export type BuildBetterAuthOptionsReturnType<
   emailAndPassword: {
     enabled: boolean
   }
-  plugins: EnsureBetterAuthPlugins<EnabledPluginsArray<O>>
+  plugins: PluginsToLoad<O>
+  // EnsureBetterAuthPlugins<EnabledPluginsArray<O>>
   trustedOrigins: BetterAuthOptions['trustedOrigins']
 } & O['betterAuth']
 // type BuildBetterAuthOptionsReturnType<O extends BetterAuthPluginOptions> =
@@ -106,5 +103,5 @@ const buildBetterAuthOptions = <const O extends BetterAuthPluginOptions>(
     // merge options (nested ones)
     //////////////////////////////////
     trustedOrigins,
-  } as const as BuildBetterAuthOptionsReturnType<O>
+  } as BuildBetterAuthOptionsReturnType<O>
 }

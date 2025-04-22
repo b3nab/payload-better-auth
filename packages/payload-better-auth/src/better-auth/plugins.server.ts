@@ -37,23 +37,6 @@ import { emailHarmony } from 'better-auth-harmony'
 import type { BetterAuthPluginOptions } from '../index'
 import { ac, roles } from './permissions'
 
-// Helper to get the return type when plugin is enabled with configuration object
-// We infer the function's parameter and return types based on the plugin key
-type GetPluginReturnTypeWithConfig<
-  K extends keyof PluginTypeMap,
-  Config,
-> = PluginTypeMap[K] extends (...config: infer ConfigType) => infer R
-  ? Config extends ConfigType
-    ? EnsureBetterAuthPlugin<R>
-    : never
-  : never
-
-type BAPKeys = keyof BetterAuthPluginOptions['betterAuthPlugins']
-
-// type KeysOfPluginsFromConfig = Array<
-//   {}[]
-// >
-
 // Define a mapping type for plugin names to their types
 type PluginTypeMap = {
   twoFactor: typeof twoFactor
@@ -82,20 +65,13 @@ type PluginTypeMap = {
   polar: typeof polar
 }
 
-type Concrete<Type> = NonNullable<{
-  [Property in keyof Type]-?: Type[Property]
-}>
-
 type AllParams<T extends (...args: any) => any> = NonNullable<Parameters<T>[0]>
 
 // type twoFactorTyped<T extends AllParams<typeof twoFactor>> = ReturnType<typeof twoFactor<T>>
 type openAPITyped<T extends AllParams<typeof openAPI>> = ReturnType<
   typeof openAPI<T>
 >
-const defaultAdminConf = { ac, roles } as const
-type adminTyped<T extends AllParams<typeof admin> = typeof defaultAdminConf> =
-  ReturnType<typeof admin<T>>
-type adm = adminTyped<typeof defaultAdminConf>
+type adminTyped<T extends AllParams<typeof admin>> = ReturnType<typeof admin<T>>
 type organizationTyped<T extends AllParams<typeof organization>> = ReturnType<
   typeof organization<T>
 >
@@ -120,30 +96,30 @@ type organizationTyped<T extends AllParams<typeof organization>> = ReturnType<
 type stripeTyped<T extends AllParams<typeof stripe>> = ReturnType<
   typeof stripe<T>
 >
-type polarTyped<T extends AllParams<typeof polar>> = ReturnType<typeof polar<T>>
+// type polarTyped<T extends AllParams<typeof polar>> = ReturnType<typeof polar<T>>
 
 // Helper type to ensure plugin return types are compatible with BetterAuthPlugin
 type EnsureBetterAuthPlugin<T> = T extends BetterAuthPlugin ? T : never
 
-type Call<F extends (args: any) => any, A> = F extends (args: A) => infer R // “invoke” F with A; if it matches (args: A) ⇒ R, capture R
-  ? R
-  : never
+// type Call<F extends (args: any) => any, A> = F extends (args: A) => infer R // “invoke” F with A; if it matches (args: A) ⇒ R, capture R
+//   ? R
+//   : never
 
-type GetPluginReturnType1<
-  K extends keyof PluginTypeMap,
-  A = never,
-  // A extends Parameters<PluginTypeMap[K]> = [] & Parameters<PluginTypeMap[K]>,
-> = PluginTypeMap[K] extends (...config: infer A) => infer R
-  ? EnsureBetterAuthPlugin<R>
-  : never
+// type GetPluginReturnType1<
+//   K extends keyof PluginTypeMap,
+//   A = never,
+//   // A extends Parameters<PluginTypeMap[K]> = [] & Parameters<PluginTypeMap[K]>,
+// > = PluginTypeMap[K] extends (...config: infer A) => infer R
+//   ? EnsureBetterAuthPlugin<R>
+//   : never
 
-type GetPluginReturnType2<
-  K extends keyof PluginTypeMap,
-  // A = never,
-  Opts extends readonly any[] = Parameters<PluginTypeMap[K]>,
-> = PluginTypeMap[K] extends (...options: Opts) => infer R
-  ? EnsureBetterAuthPlugin<R>
-  : never
+// type GetPluginReturnType2<
+//   K extends keyof PluginTypeMap,
+//   // A = never,
+//   Opts extends readonly any[] = Parameters<PluginTypeMap[K]>,
+// > = PluginTypeMap[K] extends (...options: Opts) => infer R
+//   ? EnsureBetterAuthPlugin<R>
+//   : never
 
 type GetPluginReturnType<
   K extends keyof PluginTypeMap,
@@ -164,183 +140,227 @@ type GetPluginReturnType<
     //   Args[0] extends Config
     never
 
-type PluginIdMap = {
-  [K in keyof PluginTypeMap]: ReturnType<PluginTypeMap[K]>['id']
-}
+// type PluginIdMap = {
+//   [K in keyof PluginTypeMap]: ReturnType<PluginTypeMap[K]>['id']
+// }
 // export type EnabledPluginsArrayInternal<O extends BetterAuthPluginOptions> = PluginsToLoad<O>
 
-type FilteredById<
-  O extends BetterAuthPluginOptions,
-  K extends keyof PluginIdMap,
-> = Extract<PluginsToLoad<O>, PluginIdMap[K]>
+// type FilteredById<
+//   O extends BetterAuthPluginOptions,
+//   K extends keyof PluginIdMap,
+// > = Extract<PluginsToLoad<O>, PluginIdMap[K]>
 
-type EnabledPluginsKeys<O extends BetterAuthPluginOptions> = keyof PluginTypeMap
+// type EnabledPluginsKeys<O extends BetterAuthPluginOptions> = keyof PluginTypeMap
 
-type EnabledPluginsKeys2<O extends BetterAuthPluginOptions> = {
-  [K in keyof O['betterAuthPlugins'] &
-    keyof PluginTypeMap]: O['betterAuthPlugins'][K] extends true
-    ? // Plugins enabled using a boolean
-      K & keyof PluginTypeMap
-    : O['betterAuthPlugins'][K] extends object
-      ? // Plugins enabled using a configuration object
-        K & keyof PluginTypeMap
-      : never
-}[keyof O['betterAuthPlugins'] & keyof PluginTypeMap]
+// type EnabledPluginsKeys2<O extends BetterAuthPluginOptions> = {
+//   [K in keyof O['betterAuthPlugins'] &
+//     keyof PluginTypeMap]: O['betterAuthPlugins'][K] extends true
+//     ? // Plugins enabled using a boolean
+//       K & keyof PluginTypeMap
+//     : O['betterAuthPlugins'][K] extends object
+//       ? // Plugins enabled using a configuration object
+//         K & keyof PluginTypeMap
+//       : never
+// }[keyof O['betterAuthPlugins'] & keyof PluginTypeMap]
 
-const TBAPO = {
-  betterAuthPlugins: {
-    // twoFactor: true,
-    // openAPI: true
-    admin: { ac, roles },
-    // polar: true,
-    passkey: true,
-    stripe: {
-      // stripeClient: new Stripe(process.env.STRIPE_KEY || 'sk_test_'),
-      stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
-      subscription: {
-        enabled: true,
-        plans: [
-          {
-            name: 'Starter',
-            priceId: '',
-            annualDiscountPriceId: '',
-            freeTrial: {
-              days: 7,
-            },
-          },
-          {
-            name: 'Professional',
-            priceId: '',
-            annualDiscountPriceId: '',
-          },
-          {
-            name: 'Enterprise',
-          },
-        ],
-      },
-    },
-  },
-} satisfies BetterAuthPluginOptions
+// const TBAPO = {
+//   betterAuthPlugins: {
+//     // twoFactor: true,
+//     // openAPI: true
+//     admin: { ac, roles },
+//     // polar: true,
+//     passkey: true,
+//     stripe: {
+//       // stripeClient: new Stripe(process.env.STRIPE_KEY || 'sk_test_'),
+//       stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
+//       subscription: {
+//         enabled: true,
+//         plans: [
+//           {
+//             name: 'Starter',
+//             priceId: '',
+//             annualDiscountPriceId: '',
+//             freeTrial: {
+//               days: 7,
+//             },
+//           },
+//           {
+//             name: 'Professional',
+//             priceId: '',
+//             annualDiscountPriceId: '',
+//           },
+//           {
+//             name: 'Enterprise',
+//           },
+//         ],
+//       },
+//     },
+//   },
+// } satisfies BetterAuthPluginOptions
 
-type TBAPOKK<O extends BetterAuthPluginOptions> =
-  EnabledPluginsArray2<O>[number]['id']
+// type TBAPOKK<O extends BetterAuthPluginOptions> =
+//   EnabledPluginsArray2<O>[number]['id']
 
-type TBAPOKKTest = TBAPOKK<typeof TBAPO>
-//     ^?
-type NARROWTest = EnabledPluginsArray<typeof TBAPO>
-//     ^?
-type S = Extract<NARROWTest[number], { id: 'stripe' }>['endpoints']
-//   ^?
+// type TBAPOKKTest = TBAPOKK<typeof TBAPO>
+// //     ^?
+// type NARROWTest = EnabledPluginsArray<typeof TBAPO>
+// //     ^?
+// type S = Extract<NARROWTest[number], { id: 'stripe' }>['endpoints']
+// //   ^?
 
-const sws = {
-  stripeClient: new Stripe(process.env.STRIPE_KEY || 'sk_test_'),
-  stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
-  subscription: {
-    enabled: true,
-    plans: [
-      {
-        name: 'Starter',
-        priceId: '',
-        annualDiscountPriceId: '',
-        freeTrial: {
-          days: 7,
-        },
-      },
-      {
-        name: 'Professional',
-        priceId: '',
-        annualDiscountPriceId: '',
-      },
-      {
-        name: 'Enterprise',
-      },
-    ],
-  },
-} satisfies Parameters<typeof stripe>[0]
+// const sws = {
+//   stripeClient: new Stripe(process.env.STRIPE_KEY || 'sk_test_'),
+//   stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
+//   subscription: {
+//     enabled: true,
+//     plans: [
+//       {
+//         name: 'Starter',
+//         priceId: '',
+//         annualDiscountPriceId: '',
+//         freeTrial: {
+//           days: 7,
+//         },
+//       },
+//       {
+//         name: 'Professional',
+//         priceId: '',
+//         annualDiscountPriceId: '',
+//       },
+//       {
+//         name: 'Enterprise',
+//       },
+//     ],
+//   },
+// } satisfies Parameters<typeof stripe>[0]
 
-type StripeTypeSubscription = ReturnType<typeof stripe<typeof sws>>['endpoints']
-type PluginStripeTyped<T extends Parameters<typeof stripe>[0]> = ReturnType<
-  typeof stripe<T>
->
-type DynStripe = PluginStripeTyped<typeof sws>['endpoints']
-type StripeTypeDynamic = GetPluginReturnType<'stripe'>['endpoints']
-type StripeTypeDynamicSWS = GetPluginReturnType<
-  'stripe',
-  [typeof sws]
->['endpoints']
+// type StripeTypeSubscription = ReturnType<typeof stripe<typeof sws>>['endpoints']
+// type PluginStripeTyped<T extends Parameters<typeof stripe>[0]> = ReturnType<
+//   typeof stripe<T>
+// >
+// type DynStripe = PluginStripeTyped<typeof sws>['endpoints']
+// type StripeTypeDynamic = GetPluginReturnType<'stripe'>['endpoints']
+// type StripeTypeDynamicSWS = GetPluginReturnType<
+//   'stripe',
+//   [typeof sws]
+// >['endpoints']
 
 // export type EnabledPluginsArrayInternal<O extends BetterAuthPluginOptions> = Array<
 
 // >
 
-type GetParams<F extends (...args: any) => any> = Parameters<F>[0]
+// type GetParams<F extends (...args: any) => any> = Parameters<F>[0]
 
 // export type EnabledPluginsArrayInternal<O extends BetterAuthPluginOptions> = Extract<PluginsToLoad<O>, EnabledPluginsArray2<O>>
 // export type EnabledPluginsArrayInternal<O extends BetterAuthPluginOptions> = FilteredById<O, EnabledPluginsKeys2<O>>
 // EnabledPluginsKeys2<O>
 
-export type EnabledPluginsArray2<O extends BetterAuthPluginOptions> = Array<
-  // Explicitly add types for plugins always included or included by default logic if not in O['betterAuthPlugins']
-  | GetPluginReturnType<'nextCookies'>
-  | GetPluginReturnType<'twoFactor'>
-  | GetPluginReturnType<'openAPI'>
-  | GetPluginReturnType<
-      'admin',
-      [{ ac: Readonly<typeof ac>; roles: Readonly<typeof roles> }]
-    >
-  // Plugins enabled using the betterAuthPlugins
-  | {
-      [K in keyof O['betterAuthPlugins']]: O['betterAuthPlugins'][K] extends true
-        ? // Plugins enabled using a boolean
-          GetPluginReturnType<K & keyof PluginTypeMap>
-        : O['betterAuthPlugins'][K] extends object
-          ? // : O['betterAuthPlugins'][K] extends GetParams<PluginTypeMap[K & keyof PluginTypeMap]>
-            // : O['betterAuthPlugins'][K] extends Array<any>
-            // Plugins enabled using a configuration object
-            GetPluginReturnType<
-              K & keyof PluginTypeMap,
-              [O['betterAuthPlugins'][K]]
-            >
-          : never
-    }[keyof O['betterAuthPlugins']]
->
+// export type EnabledPluginsArray2<O extends BetterAuthPluginOptions> = Array<
+//   // Explicitly add types for plugins always included or included by default logic if not in O['betterAuthPlugins']
+//   | GetPluginReturnType<'nextCookies'>
+//   | GetPluginReturnType<'twoFactor'>
+//   | GetPluginReturnType<'openAPI'>
+//   | GetPluginReturnType<
+//       'admin',
+//       [{ ac: Readonly<typeof ac>; roles: Readonly<typeof roles> }]
+//     >
+//   // Plugins enabled using the betterAuthPlugins
+//   | {
+//       [K in keyof O['betterAuthPlugins']]: O['betterAuthPlugins'][K] extends true
+//         ? // Plugins enabled using a boolean
+//           GetPluginReturnType<K & keyof PluginTypeMap>
+//         : O['betterAuthPlugins'][K] extends object
+//           ? // : O['betterAuthPlugins'][K] extends GetParams<PluginTypeMap[K & keyof PluginTypeMap]>
+//             // : O['betterAuthPlugins'][K] extends Array<any>
+//             // Plugins enabled using a configuration object
+//             GetPluginReturnType<
+//               K & keyof PluginTypeMap,
+//               [O['betterAuthPlugins'][K]]
+//             >
+//           : never
+//     }[keyof O['betterAuthPlugins']]
+// >
 
-export type EnabledPluginsArray<O extends BetterAuthPluginOptions> =
-  // Array<
-  //   {
-  //     [K in keyof TBAPOKK<O> &
-  //       keyof O['betterAuthPlugins']]: O['betterAuthPlugins'][K] extends true
-  //       ? // Plugins enabled using a boolean
-  //         GetPluginReturnType<K & keyof PluginTypeMap>
-  //       : O['betterAuthPlugins'][K] extends object
-  //         ? // Plugins enabled using a configuration object
-  //           GetPluginReturnType<
-  //             K & keyof PluginTypeMap,
-  //             [O['betterAuthPlugins'][K]]
-  //           >
-  //         : never
-  //   }[keyof TBAPOKK<O> & keyof O['betterAuthPlugins']]
-  // >
-  Array<
-    Extract<
-      // PluginsToLoad<O>[number],
-      EnabledPluginsArray2<O>[number],
-      {
-        id: TBAPOKK<O>
-      }
-    >
-  >
+// export type EnabledPluginsArray<O extends BetterAuthPluginOptions> =
+//   // Array<
+//   //   {
+//   //     [K in keyof TBAPOKK<O> &
+//   //       keyof O['betterAuthPlugins']]: O['betterAuthPlugins'][K] extends true
+//   //       ? // Plugins enabled using a boolean
+//   //         GetPluginReturnType<K & keyof PluginTypeMap>
+//   //       : O['betterAuthPlugins'][K] extends object
+//   //         ? // Plugins enabled using a configuration object
+//   //           GetPluginReturnType<
+//   //             K & keyof PluginTypeMap,
+//   //             [O['betterAuthPlugins'][K]]
+//   //           >
+//   //         : never
+//   //   }[keyof TBAPOKK<O> & keyof O['betterAuthPlugins']]
+//   // >
+//   Array<
+//     Extract<
+//       // PluginsToLoad<O>[number],
+//       EnabledPluginsArray2<O>[number],
+//       {
+//         id: TBAPOKK<O>
+//       }
+//     >
+//   >
 
-// default plugins to load
-export const defaultPlugins = [twoFactor(), openAPI(), admin({ ac, roles })]
+// export type PluginsToLoad<O extends BetterAuthPluginOptions> = ReturnType<
+//   typeof pluginsToLoad<O>
+// >
+export type PluginsToLoad<
+  O extends BetterAuthPluginOptions,
+  // ExtO = O & {
+  //   betterAuthPlugins: {
+  //     openAPI: true
+  //     twoFactor: true
+  //     nextCookies: true
+  //     admin: { ac: typeof ac; roles: typeof roles }
+  //   }
+  // },
+> = Array<DefaultPlugins<O> | UserPlugins<O>>
 
-export type PluginsToLoad<O extends BetterAuthPluginOptions> = ReturnType<
-  typeof pluginsToLoad<O>
->
+type UserPlugins<O extends BetterAuthPluginOptions> = {
+  [K in keyof O['betterAuthPlugins'] &
+    keyof PluginTypeMap]: O['betterAuthPlugins'][K] extends true
+    ? GetPluginReturnType<K>
+    : O['betterAuthPlugins'][K] extends object
+      ? GetPluginReturnType<K, [O['betterAuthPlugins'][K]]>
+      : never
+}[keyof O['betterAuthPlugins'] & keyof PluginTypeMap]
+
+type DefaultPlugins<O extends BetterAuthPluginOptions> = ReturnType<
+  typeof defaultPlugins<O['betterAuthPlugins']>
+>[number]
+
+export const defaultPlugins = <
+  BAP extends BetterAuthPluginOptions['betterAuthPlugins'],
+>(
+  inputConfig: BAP,
+) => {
+  const config = {
+    twoFactor: inputConfig?.twoFactor ?? true,
+    openAPI: inputConfig?.openAPI ?? true,
+    admin: {
+      ...inputConfig,
+      ac: inputConfig?.admin?.ac ?? ac,
+      roles: inputConfig?.admin?.roles ?? roles,
+    },
+  }
+  return [
+    admin(config.admin),
+    typeof config.openAPI === 'boolean' ? openAPI() : openAPI(config.openAPI),
+    typeof config.twoFactor === 'boolean'
+      ? twoFactor()
+      : twoFactor(config.twoFactor),
+  ]
+}
 
 export const pluginsToLoad = <O extends BetterAuthPluginOptions>(
   pluginOptions: O,
-) => {
+): PluginsToLoad<O> => {
   // Build plugins array
   const plugins = []
 
@@ -354,13 +374,7 @@ export const pluginsToLoad = <O extends BetterAuthPluginOptions>(
   // Always add nextCookies
   plugins.push(nextCookies())
   // default plugins
-  plugins.push(
-    admin(config.admin),
-    typeof config.openAPI === 'boolean' ? openAPI() : openAPI(config.openAPI),
-    typeof config.twoFactor === 'boolean'
-      ? twoFactor()
-      : twoFactor(config.twoFactor),
-  )
+  plugins.push(...defaultPlugins(pluginOptions.betterAuthPlugins))
 
   // user defined plugins
   if (config.username) {
@@ -541,5 +555,5 @@ export const pluginsToLoad = <O extends BetterAuthPluginOptions>(
     )
   }
 
-  return plugins
+  return plugins as PluginsToLoad<O>
 }
