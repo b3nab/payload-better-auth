@@ -14,6 +14,10 @@
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+// exports
+export { getBetterAuth, getBetterAuthSafe } from './singleton.better-auth'
+
+// imports
 import type { CollectionConfig, CollectionSlug, Config } from 'payload'
 import type { BetterAuthOptions, BetterAuthPlugin } from 'better-auth'
 import { getEndpoints } from 'better-auth/api'
