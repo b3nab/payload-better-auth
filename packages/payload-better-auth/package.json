@@ -61,7 +61,7 @@
   "scripts": {
     "build": "pnpm copyfiles && pnpm build:types && pnpm build:swc",
     "build:swc": "swc ./src -d ./dist --config-file .swcrc --strip-leading-paths",
-    "build:types": "tsc --outDir dist --rootDir ./src --noCheck",
+    "build:types": "tsc --outDir dist --rootDir ./src --traceResolution --generateCpuProfile typescript-cpu.cpuprofile",
     "clean": "rimraf {dist,*.tsbuildinfo}",
     "copyfiles": "copyfiles -u 1 \"src/**/*.{html,css,scss,ttf,woff,woff2,eot,svg,jpg,png,json}\" dist/",
     "lint": "eslint",
