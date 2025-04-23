@@ -1,7 +1,5 @@
-export * from './check.is-auth'
-export * from './check.is-guest'
-export * from './check.is-user'
-export * from './check.is-admin'
-export * from './check.is-role'
-
-export * from './check.type'
+export * from './check.is-auth.js'
+export * from './check.is-guest.js'
+export * from './check.is-user.js'
+export * from './check.is-admin.js'
+export * from './check.is-role.js'

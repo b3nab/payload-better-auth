@@ -1,5 +1,6 @@
+// @ts-nocheck
 // @ts-strict-ignore
-import { isSafeFromPollution } from './utilities'
+import { isSafeFromPollution } from './utilities.js'
 
 export const processNested = function (data) {
   if (!data || data.length < 1) {

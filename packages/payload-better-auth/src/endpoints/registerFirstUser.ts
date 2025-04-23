@@ -6,8 +6,8 @@ import {
   generatePayloadCookie,
 } from 'payload'
 import { status as httpStatus } from 'http-status'
-import { getRequestCollection } from '../payload-utilities/getRequestEntity'
-import { getBetterAuth } from '../singleton.better-auth'
+import { getRequestCollection } from '../payload-utilities/getRequestEntity.js'
+import { getBetterAuth, getBetterAuthSafe } from '../singleton.better-auth.js'
 import invariant from 'tiny-invariant'
 
 export const registerFirstUserHandler: PayloadHandler = async (req) => {
@@ -84,10 +84,11 @@ export const registerFirstUserHandler: PayloadHandler = async (req) => {
   //   req,
   // })
 
-  const betterAuth = getBetterAuth()
+  const betterAuth = getBetterAuthSafe()
 
-  const response = await betterAuth?.api.signUpEmail({
+  const response = await betterAuth.api.signUpEmail({
     body: {
+      // @ts-ignore
       role: 'admin',
       name: authData.name,
       // username: authData.username,

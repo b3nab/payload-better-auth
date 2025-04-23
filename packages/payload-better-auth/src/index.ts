@@ -15,6 +15,15 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 // exports
-export * from './plugin'
-export * from './singleton.better-auth'
-export { createAuthLayer } from './nextjs'
+export * from './types.js'
+export * from './plugin.js'
+export * from './singleton.better-auth.js'
+export { createAuthLayer } from './nextjs/index.js'
+
+export {
+  defaultStatements,
+  ac,
+  userAc,
+  adminAc,
+  roles,
+} from './better-auth/permissions.js'

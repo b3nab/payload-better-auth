@@ -9,10 +9,10 @@ import {
   generateCookie,
 } from 'payload'
 
-import { getRequestCollection } from '../payload-utilities/getRequestEntity'
-import { getBetterAuth } from '../singleton.better-auth'
+import { getRequestCollection } from '../payload-utilities/getRequestEntity.js'
+import { getBetterAuth } from '../singleton.better-auth.js'
 import invariant from 'tiny-invariant'
-import { getLogger } from '../singleton.logger'
+import { getLogger } from '../singleton.logger.js'
 // import { logoutOperation } from '../payload-operations/logout'
 
 export const logoutHandler: PayloadHandler = async (req) => {
@@ -32,7 +32,7 @@ export const logoutHandler: PayloadHandler = async (req) => {
       headers: req.headers,
       asResponse: true,
     })
-    result = await response.json()
+    result = response ? await response.json() : undefined
   } catch (error) {
     logger.error(
       {

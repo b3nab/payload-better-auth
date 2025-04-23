@@ -19,7 +19,7 @@ export const userAc = ac.newRole({
   ...userAcFromBetterAuth.statements,
 })
 
-const adminAc = ac.newRole({
+export const adminAc = ac.newRole({
   payloadcms: ['access'],
   byRole: ['user', 'admin'],
   ...adminAcFromBetterAuth.statements,

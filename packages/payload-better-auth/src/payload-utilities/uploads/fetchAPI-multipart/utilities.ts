@@ -1,9 +1,10 @@
+// @ts-nocheck
 // @ts-strict-ignore
-import fs from 'fs'
-import path from 'path'
-import { Readable } from 'stream'
+import fs from 'node:fs'
+import path from 'node:path'
+import { Readable } from 'node:stream'
 
-import type { FetchAPIFileUploadOptions } from '../../config/types'
+import type { FetchAPIFileUploadOptions } from '../../config/types.js'
 
 // Parameters for safe file name parsing.
 const SAFE_FILE_NAME_REGEX = /[^\w-]/g

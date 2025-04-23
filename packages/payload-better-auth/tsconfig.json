@@ -6,20 +6,23 @@
       "DOM.Iterable",
       "ES2022"
     ],
-    "rootDir": "./",
+    "rootDir": "./src",
+    "outDir": "./dist",
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
     "esModuleInterop": true,
-    "moduleResolution": "bundler",
-    "module": "preserve",
+    "moduleResolution": "nodenext",
+    "module": "nodenext",
     "isolatedModules": true,
     "resolveJsonModule": true,
     "jsx": "preserve",
     "incremental": true,
+    "declaration": true,
     "emitDeclarationOnly": true,
+    "declarationMap": false,
     "target": "ES2022",
-    "composite": true,
+    "composite": false,
     "plugins": [
       {
         "name": "next"

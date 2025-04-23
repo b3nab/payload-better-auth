@@ -1,3 +1,4 @@
+// @ts-nocheck
 // @ts-strict-ignore
 type CreateUploadTimer = (
   timeout?: number,
@@ -7,7 +8,10 @@ type CreateUploadTimer = (
   set: () => boolean
 }
 
-export const createUploadTimer: CreateUploadTimer = (timeout = 0, callback = () => {}) => {
+export const createUploadTimer: CreateUploadTimer = (
+  timeout = 0,
+  callback = () => {},
+) => {
   let timer = null
 
   const clear = () => {

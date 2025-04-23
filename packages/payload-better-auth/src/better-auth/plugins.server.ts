@@ -34,8 +34,8 @@ import { Polar } from '@polar-sh/sdk'
 import { nextCookies } from 'better-auth/next-js'
 // biome-ignore lint/style/useImportType: <explanation>
 import { emailHarmony } from 'better-auth-harmony'
-import type { BetterAuthPluginOptions } from '../index'
-import { ac, roles } from './permissions'
+import type { BetterAuthPluginOptions } from '../types.js'
+import { ac, roles } from './permissions.js'
 
 // Define a mapping type for plugin names to their types
 type PluginTypeMap = {
@@ -99,7 +99,9 @@ type stripeTyped<T extends AllParams<typeof stripe>> = ReturnType<
 // type polarTyped<T extends AllParams<typeof polar>> = ReturnType<typeof polar<T>>
 
 // Helper type to ensure plugin return types are compatible with BetterAuthPlugin
-type EnsureBetterAuthPlugin<T> = T extends BetterAuthPlugin ? T : never
+type EnsureBetterAuthPlugin<T> = T extends BetterAuthPlugin
+  ? T
+  : BetterAuthPlugin
 
 // type Call<F extends (args: any) => any, A> = F extends (args: A) => infer R // “invoke” F with A; if it matches (args: A) ⇒ R, capture R
 //   ? R
@@ -126,19 +128,18 @@ type GetPluginReturnType<
   Args extends readonly any[] = Parameters<PluginTypeMap[K]>,
 > = PluginTypeMap[K] extends (...config: infer Config) => infer R
   ? Args extends never
-    ? null // EnsureBetterAuthPlugin<R>
+    ? EnsureBetterAuthPlugin<R>
     : K extends 'admin'
-      ? adminTyped<Args[0]>
+      ? EnsureBetterAuthPlugin<adminTyped<Args[0]>>
       : K extends 'stripe'
-        ? stripeTyped<Args[0]>
+        ? EnsureBetterAuthPlugin<stripeTyped<Args[0]>>
         : EnsureBetterAuthPlugin<R>
-  : // // ReturnType<`${K}Typed`<Args>>
-    // // Call<PluginTypeMap[K], Args>
-    // : never // EnsureBetterAuthPlugin<R>
-    // : // : Args extends []
-    //   //   ? EnsureBetterAuthPlugin<R>
-    //   Args[0] extends Config
-    never
+  : never
+
+// type GetPluginReturnType<
+//   K extends keyof PluginTypeMap,
+//   Args extends readonly any[] = Parameters<PluginTypeMap[K]>,
+// > = BetterAuthPlugin
 
 // type PluginIdMap = {
 //   [K in keyof PluginTypeMap]: ReturnType<PluginTypeMap[K]>['id']
@@ -307,30 +308,25 @@ type GetPluginReturnType<
 //     >
 //   >
 
-// export type PluginsToLoad<O extends BetterAuthPluginOptions> = ReturnType<
-//   typeof pluginsToLoad<O>
+export type PluginsToLoad<O extends BetterAuthPluginOptions> = ReturnType<
+  typeof pluginsToLoad<O>
+>
+// export type PluginsToLoad<O extends BetterAuthPluginOptions> = Array<
+//   DefaultPlugins<O> | UserPlugins<O>
 // >
-export type PluginsToLoad<
-  O extends BetterAuthPluginOptions,
-  // ExtO = O & {
-  //   betterAuthPlugins: {
-  //     openAPI: true
-  //     twoFactor: true
-  //     nextCookies: true
-  //     admin: { ac: typeof ac; roles: typeof roles }
-  //   }
-  // },
-> = Array<DefaultPlugins<O> | UserPlugins<O>>
 
-type UserPlugins<O extends BetterAuthPluginOptions> = {
-  [K in keyof O['betterAuthPlugins'] &
-    keyof PluginTypeMap]: O['betterAuthPlugins'][K] extends true
-    ? GetPluginReturnType<K>
-    : O['betterAuthPlugins'][K] extends object
-      ? GetPluginReturnType<K, [O['betterAuthPlugins'][K]]>
-      : never
-}[keyof O['betterAuthPlugins'] & keyof PluginTypeMap]
+// type UserPlugins<O extends BetterAuthPluginOptions> = {
+//   [K in keyof O['betterAuthPlugins'] &
+//     keyof PluginTypeMap]: O['betterAuthPlugins'][K] extends true
+//     ? GetPluginReturnType<K>
+//     : O['betterAuthPlugins'][K] extends object
+//       ? GetPluginReturnType<K, [O['betterAuthPlugins'][K]]>
+//       : BetterAuthPlugin
+// }[keyof O['betterAuthPlugins'] & keyof PluginTypeMap]
 
+type UserPlugins<O extends BetterAuthPluginOptions> = ReturnType<
+  typeof userPlugins<O['betterAuthPlugins']>
+>[number]
 type DefaultPlugins<O extends BetterAuthPluginOptions> = ReturnType<
   typeof defaultPlugins<O['betterAuthPlugins']>
 >[number]
@@ -350,6 +346,7 @@ export const defaultPlugins = <
     },
   }
   return [
+    nextCookies(),
     admin(config.admin),
     typeof config.openAPI === 'boolean' ? openAPI() : openAPI(config.openAPI),
     typeof config.twoFactor === 'boolean'
@@ -357,77 +354,85 @@ export const defaultPlugins = <
       : twoFactor(config.twoFactor),
   ]
 }
-
-export const pluginsToLoad = <O extends BetterAuthPluginOptions>(
-  pluginOptions: O,
-): PluginsToLoad<O> => {
-  // Build plugins array
-  const plugins = []
-
-  const config = {
-    twoFactor: true,
-    openAPI: true,
-    admin: {}, // { ac, roles },
-    ...pluginOptions.betterAuthPlugins,
+export const userPlugins = <
+  BAP extends BetterAuthPluginOptions['betterAuthPlugins'],
+>(
+  inputConfig: NonNullable<BAP>,
+) => {
+  const stripeConfig = {
+    stripeClient: new Stripe(process.env.STRIPE_KEY || 'sk_test_'),
+    stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
+    ...(typeof inputConfig.stripe === 'boolean'
+      ? {}
+      : (inputConfig.stripe ?? {})),
+    // subscription: {
+    //   enabled: true,
+    //   plans: [
+    //     {
+    //       name: 'Starter',
+    //       priceId: 'price_1QxWWtLUjnrYIrmleljPKszG', // STARTER_PRICE_ID.default,
+    //       annualDiscountPriceId: 'price_1QxWYqLUjnrYIrmlonqPThVF', // STARTER_PRICE_ID.annual,
+    //       freeTrial: {
+    //         days: 7,
+    //       },
+    //     },
+    //   ],
+    // },
   }
 
-  // Always add nextCookies
-  plugins.push(nextCookies())
-  // default plugins
-  plugins.push(...defaultPlugins(pluginOptions.betterAuthPlugins))
+  const polarConfig = {
+    client: new Polar({
+      accessToken: process.env.POLAR_ACCESS_TOKEN!,
+      // Use 'sandbox' if you're using the Polar Sandbox environment
+      // Remember that access tokens, products, etc. are completely separated between environments.
+      // Access tokens obtained in Production are for instance not usable in the Sandbox environment.
+      // server: 'production',
+      ...(typeof inputConfig.polar === 'object'
+        ? typeof inputConfig.polar.clientConfig === 'boolean'
+          ? {}
+          : (inputConfig.polar?.clientConfig ?? {})
+        : {}),
+    }),
+    ...(typeof inputConfig.polar === 'boolean'
+      ? {}
+      : (inputConfig.polar ?? {})),
+  }
 
-  // user defined plugins
-  if (config.username) {
-    plugins.push(
-      typeof config.username === 'boolean'
+  return [
+    inputConfig.username &&
+      (typeof inputConfig.username === 'boolean'
         ? username()
-        : username(config.username),
-    )
-  }
-  if (config.anonymous) {
-    plugins.push(
-      typeof config.anonymous === 'boolean'
+        : username(inputConfig.username)),
+    inputConfig.anonymous &&
+      (typeof inputConfig.anonymous === 'boolean'
         ? anonymous()
-        : anonymous(config.anonymous),
-    )
-  }
-  if (config.phoneNumber) {
-    plugins.push(
-      typeof config.phoneNumber === 'boolean'
+        : anonymous(inputConfig.anonymous)),
+    inputConfig.phoneNumber &&
+      (typeof inputConfig.phoneNumber === 'boolean'
         ? phoneNumber()
-        : phoneNumber(config.phoneNumber),
-    )
-  }
-  if (config.magicLink) {
-    plugins.push(
-      typeof config.magicLink === 'boolean'
+        : phoneNumber(inputConfig.phoneNumber)),
+    inputConfig.magicLink &&
+      (typeof inputConfig.magicLink === 'boolean'
         ? magicLink({
             sendMagicLink: async () => {
               console.warn('No sendMagicLink implementation provided')
             },
           })
-        : magicLink(config.magicLink),
-    )
-  }
-  if (config.emailOTP) {
-    plugins.push(
-      typeof config.emailOTP === 'boolean'
+        : magicLink(inputConfig.magicLink)),
+    inputConfig.emailOTP &&
+      (typeof inputConfig.emailOTP === 'boolean'
         ? emailOTP({
             sendVerificationOTP: async () => {
               console.warn('No sendVerificationOTP implementation provided')
             },
           })
-        : emailOTP(config.emailOTP),
-    )
-  }
-  if (config.passkey) {
-    plugins.push(
-      typeof config.passkey === 'boolean' ? passkey() : passkey(config.passkey),
-    )
-  }
-  if (config.genericOAuth) {
-    plugins.push(
-      typeof config.genericOAuth === 'boolean'
+        : emailOTP(inputConfig.emailOTP)),
+    inputConfig.passkey &&
+      (typeof inputConfig.passkey === 'boolean'
+        ? passkey()
+        : passkey(inputConfig.passkey)),
+    inputConfig.genericOAuth &&
+      (typeof inputConfig.genericOAuth === 'boolean'
         ? genericOAuth({
             config: [
               {
@@ -437,123 +442,57 @@ export const pluginsToLoad = <O extends BetterAuthPluginOptions>(
               },
             ],
           })
-        : genericOAuth(config.genericOAuth),
-    )
-  }
-  if (config.oneTap) {
-    plugins.push(
-      typeof config.oneTap === 'boolean' ? oneTap() : oneTap(config.oneTap),
-    )
-  }
-  if (config.organization) {
-    plugins.push(
-      typeof config.organization === 'boolean'
+        : genericOAuth(inputConfig.genericOAuth)),
+    inputConfig.oneTap &&
+      (typeof inputConfig.oneTap === 'boolean'
+        ? oneTap()
+        : oneTap(inputConfig.oneTap)),
+    inputConfig.organization &&
+      (typeof inputConfig.organization === 'boolean'
         ? organization()
-        : organization(config.organization),
-    )
-  }
-  if (config.oidcProvider) {
-    plugins.push(
-      typeof config.oidcProvider === 'boolean'
+        : organization(inputConfig.organization)),
+    inputConfig.oidcProvider &&
+      (typeof inputConfig.oidcProvider === 'boolean'
         ? oidcProvider({
             loginPage: '/login',
           })
-        : oidcProvider(config.oidcProvider),
-    )
-  }
-  if (config.bearer) {
-    plugins.push(
-      typeof config.bearer === 'boolean' ? bearer() : bearer(config.bearer),
-    )
-  }
-  if (config.sso) {
-    plugins.push(typeof config.sso === 'boolean' ? sso() : sso(config.sso))
-  }
-  if (config.multiSession) {
-    plugins.push(
-      typeof config.multiSession === 'boolean'
+        : oidcProvider(inputConfig.oidcProvider)),
+    inputConfig.bearer &&
+      (typeof inputConfig.bearer === 'boolean'
+        ? bearer()
+        : bearer(inputConfig.bearer)),
+    inputConfig.sso &&
+      (typeof inputConfig.sso === 'boolean' ? sso() : sso(inputConfig.sso)),
+    inputConfig.multiSession &&
+      (typeof inputConfig.multiSession === 'boolean'
         ? multiSession()
-        : multiSession(config.multiSession),
-    )
-  }
-  if (config.oAuthProxy) {
-    plugins.push(
-      typeof config.oAuthProxy === 'boolean'
+        : multiSession(inputConfig.multiSession)),
+    inputConfig.oAuthProxy &&
+      (typeof inputConfig.oAuthProxy === 'boolean'
         ? oAuthProxy()
-        : oAuthProxy(config.oAuthProxy),
-    )
-  }
-  if (config.jwt) {
-    plugins.push(typeof config.jwt === 'boolean' ? jwt() : jwt(config.jwt))
-  }
-  if (config.emailHarmony) {
-    plugins.push(
-      typeof config.emailHarmony === 'boolean'
+        : oAuthProxy(inputConfig.oAuthProxy)),
+    inputConfig.jwt &&
+      (typeof inputConfig.jwt === 'boolean' ? jwt() : jwt(inputConfig.jwt)),
+    inputConfig.emailHarmony &&
+      (typeof inputConfig.emailHarmony === 'boolean'
         ? emailHarmony()
-        : emailHarmony(config.emailHarmony),
-    )
-  }
-  if (config.jwt) {
-    plugins.push(typeof config.jwt === 'boolean' ? jwt() : jwt(config.jwt))
-  }
-  if (config.emailHarmony) {
-    plugins.push(
-      typeof config.emailHarmony === 'boolean'
-        ? emailHarmony()
-        : emailHarmony(config.emailHarmony),
-    )
-  }
+        : emailHarmony(inputConfig.emailHarmony)),
+    inputConfig.stripe && stripe(stripeConfig),
+    inputConfig.polar && polar(polarConfig),
+  ].filter((p) => !!p)
+}
 
-  // workaround for stripe plugin otherwise it will not create the correct instance of better-auth
-  if (config.stripe) {
-    const stripeConfig = {
-      stripeClient: new Stripe(process.env.STRIPE_KEY || 'sk_test_'),
-      stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
-      ...(typeof config.stripe === 'boolean' ? {} : (config.stripe ?? {})),
-      // subscription: {
-      //   enabled: true,
-      //   plans: [
-      //     {
-      //       name: 'Starter',
-      //       priceId: 'price_1QxWWtLUjnrYIrmleljPKszG', // STARTER_PRICE_ID.default,
-      //       annualDiscountPriceId: 'price_1QxWYqLUjnrYIrmlonqPThVF', // STARTER_PRICE_ID.annual,
-      //       freeTrial: {
-      //         days: 7,
-      //       },
-      //     },
-      //   ],
-      // },
-    }
-    plugins.push(stripe(stripeConfig))
-  }
+export const pluginsToLoad = <O extends BetterAuthPluginOptions>(
+  pluginOptions: O,
+) => {
+  // Build plugins array
+  const plugins = []
 
-  if (config.polar) {
-    plugins.push(
-      typeof config.polar === 'boolean'
-        ? polar({
-            client: new Polar({
-              accessToken: process.env.POLAR_ACCESS_TOKEN!,
-              // Use 'sandbox' if you're using the Polar Sandbox environment
-              // Remember that access tokens, products, etc. are completely separated between environments.
-              // Access tokens obtained in Production are for instance not usable in the Sandbox environment.
-              // server: 'production',
-            }),
-          })
-        : polar({
-            client: new Polar({
-              accessToken: process.env.POLAR_ACCESS_TOKEN!,
-              // Use 'sandbox' if you're using the Polar Sandbox environment
-              // Remember that access tokens, products, etc. are completely separated between environments.
-              // Access tokens obtained in Production are for instance not usable in the Sandbox environment.
-              // server: 'production',
-              ...(typeof config.polar.clientConfig === 'boolean'
-                ? {}
-                : (config.polar.clientConfig ?? {})),
-            }),
-            ...(typeof config.polar === 'boolean' ? {} : (config.polar ?? {})),
-          }),
-    )
-  }
+  // default plugins
+  plugins.push(...defaultPlugins(pluginOptions.betterAuthPlugins))
 
-  return plugins as PluginsToLoad<O>
+  // user plugins
+  plugins.push(...userPlugins(pluginOptions.betterAuthPlugins ?? {}))
+
+  return plugins
 }

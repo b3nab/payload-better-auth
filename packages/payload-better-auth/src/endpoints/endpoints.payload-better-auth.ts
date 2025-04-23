@@ -1,11 +1,11 @@
 import type { Endpoint } from 'payload'
-import { wrapInternalEndpoints } from '../payload-utilities/wrapInternalEndpoints'
-import { loginHandler } from './login'
-import { logoutHandler } from './logout'
-import { meHandler } from './me'
-import { refreshHandler } from './refresh'
-import { registerFirstUserHandler } from './registerFirstUser'
-import { verify2faHandler } from './verify-2fa'
+import { wrapInternalEndpoints } from '../payload-utilities/wrapInternalEndpoints.js'
+import { loginHandler } from './login.js'
+import { logoutHandler } from './logout.js'
+import { meHandler } from './me.js'
+import { refreshHandler } from './refresh.js'
+import { registerFirstUserHandler } from './registerFirstUser.js'
+import { verify2faHandler } from './verify-2fa.js'
 
 // TODO: add all endpoints
 // TODO: add all handlers

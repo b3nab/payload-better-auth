@@ -1,1 +1,2 @@
-export * from './schema-generator'
+export * from './schema-generator.js'
+export * from './endpoint-generator.js'

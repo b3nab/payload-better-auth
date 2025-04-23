@@ -5,12 +5,12 @@ import type { PayloadHandler } from 'payload'
 import { headersWithCors, generatePayloadCookie } from 'payload'
 import { formatAdminURL } from '@payloadcms/ui/shared'
 
-import { getRequestCollection } from '../payload-utilities/getRequestEntity'
-import { isNumber } from '../payload-utilities/isNumber'
-import { getBetterAuth } from '../singleton.better-auth'
+import { getRequestCollection } from '../payload-utilities/getRequestEntity.js'
+import { isNumber } from '../payload-utilities/isNumber.js'
+import { getBetterAuth } from '../singleton.better-auth.js'
 import invariant from 'tiny-invariant'
-import { redirect } from 'next/navigation'
-import { getLogger } from '../singleton.logger'
+import { redirect } from 'next/navigation.js'
+import { getLogger } from '../singleton.logger.js'
 // import { verify2faOperation } from '../payload-operations/verify2fa'
 
 export const verify2faHandler: PayloadHandler = async (req) => {

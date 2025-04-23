@@ -1,6 +1,6 @@
-import { headers } from 'next/headers'
-import { serverBefore } from '../server.before'
-import type { BetterAuthPluginOptions } from '../../index'
+import { headers } from 'next/headers.js'
+import { serverBefore } from '../server.before.js'
+import type { BetterAuthPluginOptions } from '../../types.js'
 import type { SanitizedConfig } from 'payload'
 
 export const isAdmin =

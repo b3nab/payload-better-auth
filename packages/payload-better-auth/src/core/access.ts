@@ -1,5 +1,5 @@
 import type { Access, CollectionConfig } from 'payload'
-import { getLogger } from '../singleton.logger'
+import { getLogger } from '../singleton.logger.js'
 // -----------------------------------
 // Access Control default functions
 // -----------------------------------

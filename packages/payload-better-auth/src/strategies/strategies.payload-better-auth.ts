@@ -1,9 +1,9 @@
-import type { AuthStrategy, AuthStrategyFunction, User } from 'payload'
+import type { AuthStrategy, AuthStrategyFunction } from 'payload'
 import type { betterAuth, BetterAuthOptions } from 'better-auth'
-import { getBetterAuth } from '../singleton.better-auth'
-import { payloadSingleton } from '../singleton.payload'
-import { emailAndPasswordStrategy } from './email-and-password'
-import { twoFactorStrategy } from './two-factor'
+import { getBetterAuth } from '../singleton.better-auth.js'
+import { payloadSingleton } from '../singleton.payload.js'
+import { emailAndPasswordStrategy } from './email-and-password.js'
+import { twoFactorStrategy } from './two-factor.js'
 
 const socialStrategy: AuthStrategyFunction = async ({
   headers,

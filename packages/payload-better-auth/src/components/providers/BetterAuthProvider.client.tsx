@@ -3,21 +3,15 @@ import type React from 'react'
 import { createContext, useContext, useEffect } from 'react'
 import type { Payload } from 'payload'
 import { formatAdminURL } from '@payloadcms/ui/shared'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation.js'
 import { useAuth } from '@payloadcms/ui'
 import { createAuthClient } from 'better-auth/react'
 import { twoFactorClient } from 'better-auth/plugins'
 import { passkeyClient } from 'better-auth/client/plugins'
 import type { BetterAuthClientPlugin } from 'better-auth/types'
-import type { BetterAuthPluginOptions } from '../../index'
+import type { BetterAuthPluginOptions } from '../../types.js'
 
-// Types imported just to make the types work
-import type * as nanostores from 'nanostores'
-import type * as simplewebauthn from '@simplewebauthn/server'
-import type * as betterauthserverplugins from 'better-auth/plugins'
-import type * as betterfetch from '@better-fetch/fetch'
-
-function generateBetterAuthClient(pluginOptions: BetterAuthPluginOptions) {
+function generateBetterAuthClient(pluginOptions: BetterAuthPluginOptions): any {
   const clientPlugins = []
   clientPlugins.push(twoFactorClient())
   if (pluginOptions.betterAuthPlugins?.passkey) {

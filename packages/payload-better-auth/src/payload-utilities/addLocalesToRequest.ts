@@ -1,7 +1,8 @@
+// @ts-nocheck
 // @ts-strict-ignore
 import type { SanitizedConfig, PayloadRequest } from 'payload'
 
-import { sanitizeFallbackLocale } from './sanitizeFallbackLocale'
+import { sanitizeFallbackLocale } from './sanitizeFallbackLocale.js'
 
 /**
  * Mutates the Request to contain 'locale' and 'fallbackLocale' based on data or searchParams

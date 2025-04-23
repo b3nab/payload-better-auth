@@ -1,28 +1,26 @@
 import type { Payload } from 'payload'
 import { betterAuth } from 'better-auth'
-import type { BetterAuthOptions, BetterAuthPlugin } from 'better-auth'
-import { payloadAdapter } from './payload-adapter'
-import { getPayload } from '../singleton.payload'
-import { type PluginsToLoad, pluginsToLoad } from './plugins.server'
-import { betterAuthSingleton } from '../singleton.better-auth'
-import type { BetterAuthPluginOptions } from '../index'
-
-// Helper type to ensure plugins are compatible with BetterAuthPlugin
-type EnsureBetterAuthPlugins<T> = T extends BetterAuthPlugin[] ? T : never
+import type { Adapter, BetterAuthOptions, BetterAuthPlugin } from 'better-auth'
+import { payloadAdapter } from './payload-adapter.js'
+import { getPayload } from '../singleton.payload.js'
+import { type PluginsToLoad, pluginsToLoad } from './plugins.server.js'
+import { betterAuthSingleton } from '../singleton.better-auth.js'
+import type { BetterAuthPluginOptions } from '../types.js'
 
 // The type for the Better Auth instance with proper plugin inference
 export type InferBetterAuthInstance<O extends BetterAuthPluginOptions> =
   // & ImprovedAuth<O>
   // ReturnType<typeof betterAuth<ReturnType<typeof buildBetterAuthOptions<O>>>> & {
-  ReturnType<typeof betterAuth<BuildBetterAuthOptionsReturnType<O>>> & {
-    // Add a type assertion to help TypeScript understand that the api object can contain any plugin's API methods
-    // HACK: this is a hack to make the api object contain any plugin's API methods and allow the code to compile.
-    // But for some issues on some plugins, those api endpoints are not correctly inferred.
-    // The issues are only on some plugins, not all.
-    // Like the stripe plugin: the `stripeWebhook`method is correctly inferred, but the `cancelSubscription` and all other methods are not.
-    // And the admin plugin: the `banUser` method is not correctly inferred (banUser is an example, all the other methods are not correctly inferred as well).
-    // api: Record<string, any>
-  }
+  ReturnType<typeof betterAuth<BuildBetterAuthOptionsReturnType<O>>>
+// & {
+//   // Add a type assertion to help TypeScript understand that the api object can contain any plugin's API methods
+//   // HACK: this is a hack to make the api object contain any plugin's API methods and allow the code to compile.
+//   // But for some issues on some plugins, those api endpoints are not correctly inferred.
+//   // The issues are only on some plugins, not all.
+//   // Like the stripe plugin: the `stripeWebhook`method is correctly inferred, but the `cancelSubscription` and all other methods are not.
+//   // And the admin plugin: the `banUser` method is not correctly inferred (banUser is an example, all the other methods are not correctly inferred as well).
+//   api: Record<string, any>
+// }
 
 // The following error is due to the fact that the types of better-auth are not well designed.
 // The types should be improved to allow for a more type-safe usage of the library.
@@ -50,14 +48,17 @@ export const createBetterAuthInstance = <
 export type BuildBetterAuthOptionsReturnType<
   O extends BetterAuthPluginOptions,
 > = {
-  database: ReturnType<typeof payloadAdapter>
+  database: (options: BetterAuthOptions) => Adapter
   emailAndPassword: {
     enabled: boolean
   }
+  // plugins: BetterAuthPlugin[]
   plugins: PluginsToLoad<O>
+  // plugins: any
   // EnsureBetterAuthPlugins<EnabledPluginsArray<O>>
   trustedOrigins: BetterAuthOptions['trustedOrigins']
 } & O['betterAuth']
+
 // type BuildBetterAuthOptionsReturnType<O extends BetterAuthPluginOptions> =
 //   ReturnType<typeof buildBetterAuthOptions<O>>
 
@@ -103,5 +104,5 @@ const buildBetterAuthOptions = <const O extends BetterAuthPluginOptions>(
     // merge options (nested ones)
     //////////////////////////////////
     trustedOrigins,
-  } as BuildBetterAuthOptionsReturnType<O>
+  }
 }

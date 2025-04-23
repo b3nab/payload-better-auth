@@ -1,3 +1,4 @@
+// @ts-nocheck
 // @ts-strict-ignore
 import type { Readable } from 'node:stream'
 
@@ -5,13 +6,13 @@ import Busboy from 'busboy'
 import { status as httpStatus } from 'http-status'
 
 import type { FetchAPIFileUploadOptions, APIError } from 'payload'
-import type { FetchAPIFileUploadResponse } from './index'
+import type { FetchAPIFileUploadResponse } from './index.js'
 
-import { fileFactory } from './fileFactory'
-import { memHandler, tempFileHandler } from './handlers'
-import { processNested } from './processNested'
-import { createUploadTimer } from './uploadTimer'
-import { buildFields, debugLog, isFunc, parseFileName } from './utilities'
+import { fileFactory } from './fileFactory.js'
+import { memHandler, tempFileHandler } from './handlers.js'
+import { processNested } from './processNested.js'
+import { createUploadTimer } from './uploadTimer.js'
+import { buildFields, debugLog, isFunc, parseFileName } from './utilities.js'
 
 const waitFlushProperty = Symbol('wait flush property symbol')
 

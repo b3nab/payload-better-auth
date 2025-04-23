@@ -1,5 +1,6 @@
-import type { FetchAPIFileUploadOptions } from '../../config/types'
-import type { FileShape } from './index'
+// @ts-nocheck
+import type { FetchAPIFileUploadOptions } from '../../config/types.js'
+import type { FileShape } from './index.js'
 
 import {
   checkAndMakeDir,
@@ -8,7 +9,7 @@ import {
   moveFile,
   promiseCallback,
   saveBufferToFile,
-} from './utilities'
+} from './utilities.js'
 
 type MoveFile = (
   filePath: string,

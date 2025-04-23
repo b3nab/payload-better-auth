@@ -1,9 +1,9 @@
 import { getPayload, type Payload, type SanitizedConfig } from 'payload'
-import { headers } from 'next/headers'
+import { headers } from 'next/headers.js'
 import invariant from 'tiny-invariant'
-import { getBetterAuthSafe } from '../singleton.better-auth'
-import { getPayload as getPayloadSingleton } from '../singleton.payload'
-import type { BetterAuthPluginOptions } from '../index'
+import { getBetterAuthSafe } from '../singleton.better-auth.js'
+import { getPayload as getPayloadSingleton } from '../singleton.payload.js'
+import type { BetterAuthPluginOptions } from '../types.js'
 
 export const serverBefore = async (configPromise: Promise<SanitizedConfig>) => {
   let payload: Payload | undefined = undefined

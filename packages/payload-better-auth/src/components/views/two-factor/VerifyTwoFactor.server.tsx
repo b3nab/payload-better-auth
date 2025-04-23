@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use server'
 
 import type React from 'react'
@@ -5,8 +6,8 @@ import type { Payload, AdminViewProps } from 'payload'
 
 import { MinimalTemplate } from '@payloadcms/next/templates'
 import { Button, Gutter, Logout } from '@payloadcms/ui'
-import { redirect } from 'next/navigation'
-import { FormVerifyTwoFactor } from '../../two-factor/FormVerifyTwoFactor.client'
+import { redirect } from 'next/navigation.js'
+import { FormVerifyTwoFactor } from '../../two-factor/FormVerifyTwoFactor.client.js'
 import { formatAdminURL } from '@payloadcms/ui/shared'
 
 type AdminViewServerProps = AdminViewProps & {

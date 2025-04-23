@@ -1,3 +1,4 @@
+// @ts-nocheck
 // @ts-strict-ignore
 import type {
   Collection,

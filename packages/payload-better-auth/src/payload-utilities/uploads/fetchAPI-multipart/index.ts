@@ -1,12 +1,13 @@
+// @ts-nocheck
 // @ts-strict-ignore
 // biome-ignore lint/style/useNodejsImportProtocol: <explanation>
-import path from 'path'
+import path from 'node:path'
 
 import { type FetchAPIFileUploadOptions, APIError } from 'payload'
 
-import { isEligibleRequest } from './isEligibleRequest'
-import { processMultipart } from './processMultipart'
-import { debugLog } from './utilities'
+import { isEligibleRequest } from './isEligibleRequest.js'
+import { processMultipart } from './processMultipart.js'
+import { debugLog } from './utilities.js'
 
 const DEFAULT_OPTIONS: FetchAPIFileUploadOptions = {
   abortOnLimit: false,

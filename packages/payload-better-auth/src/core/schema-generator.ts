@@ -10,9 +10,9 @@ import type {
   FieldTypes as PayloadFieldTypes,
 } from 'payload'
 import deepmerge from '@fastify/deepmerge'
-import type { BetterAuthPluginOptions } from '../index'
-import { getLogger } from '../singleton.logger'
-import { isAdmin, isUser } from './access'
+import type { BetterAuthPluginOptions } from '../types.js'
+import { getLogger } from '../singleton.logger.js'
+import { isAdmin, isUser } from './access.js'
 
 export const generatePayloadCollections = (
   authTables: BetterAuthDbSchema,

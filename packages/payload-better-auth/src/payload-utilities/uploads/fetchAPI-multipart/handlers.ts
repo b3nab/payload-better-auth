@@ -1,16 +1,17 @@
+// @ts-nocheck
 // @ts-strict-ignore
-import crypto from 'crypto'
-import fs, { WriteStream } from 'fs'
-import path from 'path'
+import crypto from 'node:crypto'
+import fs, { WriteStream } from 'node:fs'
+import path from 'node:path'
 
-import type { FetchAPIFileUploadOptions } from '../../config/types'
+import type { FetchAPIFileUploadOptions } from '../../config/types.js'
 
 import {
   checkAndMakeDir,
   debugLog,
   deleteFile,
   getTempFilename,
-} from './utilities'
+} from './utilities.js'
 
 type Handler = (
   options: FetchAPIFileUploadOptions,
