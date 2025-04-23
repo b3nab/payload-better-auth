@@ -484,15 +484,9 @@ export const userPlugins = <
 
 export const pluginsToLoad = <O extends BetterAuthPluginOptions>(
   pluginOptions: O,
-) => {
-  // Build plugins array
-  const plugins = []
-
+) => [
   // default plugins
-  plugins.push(...defaultPlugins(pluginOptions.betterAuthPlugins))
-
+  ...defaultPlugins(pluginOptions.betterAuthPlugins),
   // user plugins
-  plugins.push(...userPlugins(pluginOptions.betterAuthPlugins ?? {}))
-
-  return plugins
-}
+  ...userPlugins(pluginOptions.betterAuthPlugins ?? {}),
+]
