@@ -1,14 +1,13 @@
-import { getPayload } from 'payload'
-import configPromise from '@payload-config'
-import { getBetterAuthSafe } from 'payload-better-auth'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-// biome-ignore lint/style/useImportType: <explanation>
+import { getPayload } from 'payload'
+import configPromise from '@payload-config'
+import { getBetterAuthSafe, createAuthLayer } from '../../src'
 import { betterAuthPluginConfig } from '../payload.plugins'
-import { createAuthLayer } from '../../src/nextjs'
 
 export const {
   auth,
+  // ^?
   // checkers
   isAuth,
   isGuest,
@@ -23,7 +22,7 @@ export const {
   // guardRole,
 } = createAuthLayer(configPromise, betterAuthPluginConfig)
 
-// export const auth = getBetterAuthSafe<typeof betterAuthPluginConfig>(
+// export const baSafe = getBetterAuthSafe<typeof betterAuthPluginConfig>(
 //   //          ^?
 //   await getPayload({ config: configPromise }),
 // )

@@ -1,7 +1,4 @@
-import {
-  defaultStatements,
-  userAc as userAcPBA,
-} from 'payload-better-auth/better-auth'
+import { defaultStatements, userAc as userAcPBA } from '../../src'
 
 import { createAccessControl } from 'better-auth/plugins/access'
 import {

@@ -2,7 +2,7 @@ import {
   betterAuthPlugin,
   type CollectionConfigExtend,
   type BetterAuthPluginOptions,
-} from 'payload-better-auth'
+} from '../src'
 // import { betterAuth } from 'better-auth'
 // import {
 //   bearer,

@@ -15,6 +15,10 @@
   ],
   "compilerOptions": {
     "baseUrl": "./",
+    "rootDir": "../",
+    "moduleResolution": "bundler",
+    "module": "Preserve",
+    "composite": true,
     "paths": {
       "@payload-config": [
         "./payload.config.ts"
