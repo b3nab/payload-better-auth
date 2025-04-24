@@ -99,9 +99,7 @@ type stripeTyped<T extends AllParams<typeof stripe>> = ReturnType<
 // type polarTyped<T extends AllParams<typeof polar>> = ReturnType<typeof polar<T>>
 
 // Helper type to ensure plugin return types are compatible with BetterAuthPlugin
-type EnsureBetterAuthPlugin<T> = T extends BetterAuthPlugin
-  ? T
-  : BetterAuthPlugin
+type EnsureBetterAuthPlugin<T> = T extends BetterAuthPlugin ? T : never
 
 // type Call<F extends (args: any) => any, A> = F extends (args: A) => infer R // “invoke” F with A; if it matches (args: A) ⇒ R, capture R
 //   ? R
@@ -130,9 +128,9 @@ type GetPluginReturnType<
   ? Args extends never
     ? EnsureBetterAuthPlugin<R>
     : K extends 'admin'
-      ? EnsureBetterAuthPlugin<adminTyped<Args[0]>>
+      ? adminTyped<Args[0]>
       : K extends 'stripe'
-        ? EnsureBetterAuthPlugin<stripeTyped<Args[0]>>
+        ? stripeTyped<Args[0]>
         : EnsureBetterAuthPlugin<R>
   : never
 
@@ -308,25 +306,23 @@ type GetPluginReturnType<
 //     >
 //   >
 
-export type PluginsToLoad<O extends BetterAuthPluginOptions> = ReturnType<
-  typeof pluginsToLoad<O>
+// export type PluginsToLoad<O extends BetterAuthPluginOptions> = ReturnType<typeof pluginsToLoad<O>
+export type PluginsToLoad<O extends BetterAuthPluginOptions> = Array<
+  DefaultPlugins<O> | UserPlugins<O>
 >
-// export type PluginsToLoad<O extends BetterAuthPluginOptions> = Array<
-//   DefaultPlugins<O> | UserPlugins<O>
-// >
 
-// type UserPlugins<O extends BetterAuthPluginOptions> = {
-//   [K in keyof O['betterAuthPlugins'] &
-//     keyof PluginTypeMap]: O['betterAuthPlugins'][K] extends true
-//     ? GetPluginReturnType<K>
-//     : O['betterAuthPlugins'][K] extends object
-//       ? GetPluginReturnType<K, [O['betterAuthPlugins'][K]]>
-//       : BetterAuthPlugin
-// }[keyof O['betterAuthPlugins'] & keyof PluginTypeMap]
+type UserPlugins<O extends BetterAuthPluginOptions> = {
+  [K in keyof O['betterAuthPlugins'] &
+    keyof PluginTypeMap]: O['betterAuthPlugins'][K] extends true
+    ? GetPluginReturnType<K>
+    : O['betterAuthPlugins'][K] extends object
+      ? GetPluginReturnType<K, [O['betterAuthPlugins'][K]]>
+      : never
+}[keyof O['betterAuthPlugins'] & keyof PluginTypeMap]
 
-type UserPlugins<O extends BetterAuthPluginOptions> = ReturnType<
-  typeof userPlugins<O['betterAuthPlugins']>
->[number]
+// type UserPlugins<O extends BetterAuthPluginOptions> = ReturnType<
+//   typeof userPlugins<O['betterAuthPlugins']>
+// >[number]
 type DefaultPlugins<O extends BetterAuthPluginOptions> = ReturnType<
   typeof defaultPlugins<O['betterAuthPlugins']>
 >[number]

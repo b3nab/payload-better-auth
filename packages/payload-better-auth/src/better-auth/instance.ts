@@ -45,6 +45,15 @@ export const createBetterAuthInstance = <
   return instance
 }
 
+type SafePlugins<T extends any[]> = T extends BetterAuthPlugin ? T[] : never
+
+// Type to ensure all plugins in an array are BetterAuthPlugin instances
+type EnsureBetterAuthPlugins<T extends any[]> = T extends (infer U)[]
+  ? U extends BetterAuthPlugin
+    ? T
+    : never
+  : never
+
 export type BuildBetterAuthOptionsReturnType<
   O extends BetterAuthPluginOptions,
 > = {
@@ -54,13 +63,16 @@ export type BuildBetterAuthOptionsReturnType<
   }
   // plugins: BetterAuthPlugin[]
   plugins: PluginsToLoad<O>
+  // plugins: EnsureBetterAuthPlugins<PluginsToLoad<O>>
+  // plugins: SafePlugins<PluginsToLoad<O>>
   // plugins: any
   // EnsureBetterAuthPlugins<EnabledPluginsArray<O>>
   trustedOrigins: BetterAuthOptions['trustedOrigins']
 } & O['betterAuth']
 
-// type BuildBetterAuthOptionsReturnType<O extends BetterAuthPluginOptions> =
-//   ReturnType<typeof buildBetterAuthOptions<O>>
+// export type BuildBetterAuthOptionsReturnType<
+//   O extends BetterAuthPluginOptions,
+// > = ReturnType<typeof buildBetterAuthOptions<O>>
 
 const buildBetterAuthOptions = <const O extends BetterAuthPluginOptions>(
   pluginOptions: O,
@@ -104,5 +116,5 @@ const buildBetterAuthOptions = <const O extends BetterAuthPluginOptions>(
     // merge options (nested ones)
     //////////////////////////////////
     trustedOrigins,
-  }
+  } as BuildBetterAuthOptionsReturnType<O>
 }

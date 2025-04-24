@@ -5,12 +5,13 @@ import type {
   BetterAuthOptions,
   Where,
 } from 'better-auth'
+import { createAdapter, type AdapterDebugLogs } from 'better-auth/adapters'
 import { generateId, BetterAuthError } from 'better-auth'
 import { getAuthTables } from 'better-auth/db'
 import { getPayload } from '../singleton.payload.js'
 import { getLogger } from '../singleton.logger.js'
 
-export interface PayloadAdapterConfig {
+interface PayloadAdapterConfig {
   payload?: Payload
 }
 
