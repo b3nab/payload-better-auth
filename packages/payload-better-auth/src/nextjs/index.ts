@@ -2,6 +2,10 @@ import type { SanitizedConfig } from 'payload'
 import type { BetterAuthPluginOptions } from '../types.js'
 import { getBetterAuthSafe } from '../singleton.better-auth.js'
 import {
+  createBetterAuthInstance,
+  type InferBetterAuthInstance,
+} from '../better-auth/instance.js'
+import {
   isAuth,
   isGuest,
   isUser,
@@ -9,17 +13,14 @@ import {
   isRole,
   type IsRoleArgs,
 } from './checkers/index.js'
-// import {
-//   guardAuth,
-//   guardGuest,
-//   guardUser,
-//   guardAdmin,
-//   guardRole,
-// } from './guards/index.js'
 import {
-  createBetterAuthInstance,
-  type InferBetterAuthInstance,
-} from '../better-auth/instance.js'
+  type Guard,
+  guardAuth,
+  //   guardGuest,
+  //   guardUser,
+  //   guardAdmin,
+  //   guardRole,
+} from './guards/index.js'
 
 type Checker<Args = void> = Args extends void
   ? () => Promise<boolean>
@@ -32,6 +33,7 @@ type AuthLayer<O extends BetterAuthPluginOptions> = {
   isUser: Checker
   isAdmin: Checker
   isRole: Checker<IsRoleArgs<O>>
+  guardAuth: Guard
 }
 
 export function createAuthLayer<O extends BetterAuthPluginOptions>(
@@ -51,7 +53,7 @@ export function createAuthLayer<O extends BetterAuthPluginOptions>(
     isRole: isRole(configPromise, pluginOptions),
 
     // guards
-    // guardAuth: guardAuth(configPromise, pluginOptions),
+    guardAuth: guardAuth(configPromise, pluginOptions),
     // guardGuest: guardGuest(configPromise, pluginOptions),
     // guarUser: guarUser(configPromise, pluginOptions),
     // guarAdmin: guarAdmin(configPromise, pluginOptions),
