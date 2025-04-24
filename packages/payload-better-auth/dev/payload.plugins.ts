@@ -3,27 +3,10 @@ import {
   type CollectionConfigExtend,
   type BetterAuthPluginOptions,
 } from '../src'
-// import { betterAuth } from 'better-auth'
-// import {
-//   bearer,
-//   admin,
-//   multiSession,
-//   organization,
-//   twoFactor,
-//   oneTap,
-//   oAuthProxy,
-//   openAPI,
-//   oidcProvider,
-//   customSession,
-// } from 'better-auth/plugins'
 import { reactInvitationEmail } from './lib/email/invitation'
 import { reactResetPasswordEmail } from './lib/email/reset-password'
 import { resend } from './lib/email/resend'
 import { ac, roles } from './lib/permissions'
-// import { nextCookies } from 'better-auth/next-js'
-// import { passkey } from 'better-auth/plugins/passkey'
-// import { stripe } from '@better-auth/stripe'
-// import { Stripe } from 'stripe'
 
 const UserExtend: CollectionConfigExtend<'user'> = {
   fields: [
@@ -53,10 +36,6 @@ const STARTER_PRICE_ID = {
 
 export const betterAuthOptions = {
   appName: 'Better Auth Demo',
-  // database: {
-  //   dialect,
-  //   type: process.env.USE_MYSQL ? 'mysql' : 'sqlite',
-  // },
   emailVerification: {
     async sendVerificationEmail({ user, url }) {
       'use server'
@@ -119,135 +98,6 @@ export const betterAuthOptions = {
       clientSecret: process.env.TWITTER_CLIENT_SECRET || '',
     },
   },
-  // plugins: [
-  //   //   organization({
-  //   //     async sendInvitationEmail(data) {
-  //   //       'use server'
-  //   //       await resend.emails.send({
-  //   //         from,
-  //   //         to: data.email,
-  //   //         subject: "You've been invited to join an organization",
-  //   //         react: reactInvitationEmail({
-  //   //           username: data.email,
-  //   //           invitedByUsername: data.inviter.user.name,
-  //   //           invitedByEmail: data.inviter.user.email,
-  //   //           teamName: data.organization.name,
-  //   //           inviteLink:
-  //   //             process.env.NODE_ENV === 'development'
-  //   //               ? `http://localhost:3000/accept-invitation/${data.id}`
-  //   //               : `${
-  //   //                   process.env.BETTER_AUTH_URL ||
-  //   //                   'https://demo.better-auth.com'
-  //   //                 }/accept-invitation/${data.id}`,
-  //   //         }),
-  //   //       })
-  //   //     },
-  //   //   }),
-  //   //   twoFactor({
-  //   //     otpOptions: {
-  //   //       async sendOTP({ user, otp }) {
-  //   //         'use server'
-  //   //         await resend.emails.send({
-  //   //           from,
-  //   //           to: user.email,
-  //   //           subject: 'Your OTP',
-  //   //           html: `Your OTP is ${otp}`,
-  //   //         })
-  //   //       },
-  //   //     },
-  //   //   }),
-  //   //   passkey(),
-  //   // openAPI(),
-  //   // await (async () => {
-  //   //   'use server'
-  //   //   const openAPIOutput = openAPI()
-  //   //   return {
-  //   //     ...openAPIOutput,
-  //   //     endpoints: ((finalEndpoints) => {
-  //   //       console.log('finalEndpoints ===== ', finalEndpoints)
-  //   //       return finalEndpoints
-  //   //     })(
-  //   //       Object.entries(openAPIOutput.endpoints)
-  //   //         .map((e) => {
-  //   //           console.log('working on ENDPOINT == ', e)
-  //   //           return e
-  //   //         })
-  //   //         .reduce(
-  //   //           (acc, [k, endpoint]) => ({
-  //   //             // biome-ignore lint/performance/noAccumulatingSpread: <explanation>
-  //   //             ...acc,
-  //   //             [k]: async (arg: any) => {
-  //   //               'use server'
-  //   //               return endpoint(arg)
-  //   //             },
-  //   //           }),
-  //   //           {},
-  //   //         ),
-  //   //     ),
-  //   //   }
-  //   // })(),
-  //   ((openAPIOutput) => ({
-  //     ...openAPIOutput,
-  //     endpoints: ((finalEndpoints) => {
-  //       console.log('finalEndpoints ===== ', finalEndpoints)
-  //       return finalEndpoints
-  //     })(
-  //       Object.entries(openAPIOutput.endpoints).reduce((acc, [k, endpoint]) => {
-  //         console.log('working on ENDPOINT == ', k, endpoint)
-  //         return {
-  //           // biome-ignore lint/performance/noAccumulatingSpread: <explanation>
-  //           ...acc,
-  //           [k]: createServerAction(endpoint),
-  //         }
-  //       }, {}),
-  //     ),
-  //   }))(openAPI()),
-  //   //   bearer(),
-  //   //   admin({
-  //   //     adminUserIds: ['EXD5zjob2SD6CBWcEQ6OpLRHcyoUbnaB'],
-  //   //   }),
-  //   //   multiSession(),
-  //   //   oAuthProxy(),
-  //   //   nextCookies(),
-  //   //   oidcProvider({
-  //   //     loginPage: '/sign-in',
-  //   //   }),
-  //   //   oneTap(),
-  //   //   customSession(async (session) => {
-  //   //     return {
-  //   //       ...session,
-  //   //       user: {
-  //   //         ...session.user,
-  //   //         dd: 'test',
-  //   //       },
-  //   //     }
-  //   //   }),
-  //   //   stripe({
-  //   //     stripeClient: new Stripe(process.env.STRIPE_KEY || 'sk_test_'),
-  //   //     stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
-  //   //     subscription: {
-  //   //       enabled: true,
-  //   //       plans: [
-  //   //         {
-  //   //           name: 'Starter',
-  //   //           priceId: STARTER_PRICE_ID.default,
-  //   //           annualDiscountPriceId: STARTER_PRICE_ID.annual,
-  //   //           freeTrial: {
-  //   //             days: 7,
-  //   //           },
-  //   //         },
-  //   //         {
-  //   //           name: 'Professional',
-  //   //           priceId: PROFESSION_PRICE_ID.default,
-  //   //           annualDiscountPriceId: PROFESSION_PRICE_ID.annual,
-  //   //         },
-  //   //         {
-  //   //           name: 'Enterprise',
-  //   //         },
-  //   //       ],
-  //   //     },
-  //   //   }),
-  // ],
 } satisfies BetterAuthPluginOptions['betterAuth']
 
 export const betterAuthPluginConfig = {
@@ -303,6 +153,7 @@ export const betterAuthPluginConfig = {
     //     loginPage: '/sign-in',
     //   }),
     oneTap: true,
+    // #TODO: need to add customSession to plugins.server.ts
     //   customSession(async (session) => {
     //     return {
     //       ...session,
@@ -314,6 +165,7 @@ export const betterAuthPluginConfig = {
     //   }),
     polar: true,
     stripe: {
+      clientConfig: process.env.STRIPE_KEY || 'sk_test_',
       // stripeClient: new Stripe(process.env.STRIPE_KEY || 'sk_test_'),
       stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
       subscription: {

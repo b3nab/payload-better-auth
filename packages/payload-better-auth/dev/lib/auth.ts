@@ -93,7 +93,7 @@ if (bool) {
       headers: await headers(),
       body: {
         role: 'admin',
-        permission: {
+        permissions: {
           //  ^?
           devarea: ['access'],
           payloadcms: ['access'],
