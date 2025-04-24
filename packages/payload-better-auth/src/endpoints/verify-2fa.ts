@@ -7,7 +7,7 @@ import { formatAdminURL } from '@payloadcms/ui/shared'
 
 import { getRequestCollection } from '../payload-utilities/getRequestEntity.js'
 import { isNumber } from '../payload-utilities/isNumber.js'
-import { getBetterAuth } from '../singleton.better-auth.js'
+import { getBetterAuthSafeInternal } from '../singleton.better-auth.js'
 import invariant from 'tiny-invariant'
 import { redirect } from 'next/navigation.js'
 import { getLogger } from '../singleton.logger.js'
@@ -19,6 +19,12 @@ export const verify2faHandler: PayloadHandler = async (req) => {
   const { searchParams, t, data } = req
 
   logger.debug({ data, searchParams }, '[server] [verify-2fa] debug')
+
+  if (!data)
+    return Response.json({
+      message: 'missing data parameters',
+      status: 400,
+    })
 
   // const authData = new FormData()
   // authData.append('code', data?.password)
@@ -47,7 +53,7 @@ export const verify2faHandler: PayloadHandler = async (req) => {
   //   req,
   // })
 
-  const betterAuth = getBetterAuth()
+  const betterAuth = getBetterAuthSafeInternal()
   invariant(betterAuth, 'BetterAuth not initialized')
 
   // const response = await betterAuth.api.({
@@ -66,8 +72,10 @@ export const verify2faHandler: PayloadHandler = async (req) => {
   //   headers: req.headers,
   // })
 
+  const jsonData = await data.json()
+
   const response = await betterAuth.api.verifyTOTP({
-    body: data,
+    body: jsonData,
     headers: req.headers,
     asResponse: true,
   })
