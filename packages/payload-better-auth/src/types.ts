@@ -40,9 +40,9 @@ import { Polar } from '@polar-sh/sdk'
 import Stripe from 'stripe'
 import type { LoggerConfig } from './singleton.logger.js'
 
-export type CollectionConfigExtend<T extends CollectionSlug> = Pick<
+export type CollectionConfigExtend<T extends CollectionSlug> = Omit<
   CollectionConfig<T>,
-  'fields'
+  'slug'
 >
 
 export type BetterAuthPluginOptions = Readonly<{
