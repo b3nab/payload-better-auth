@@ -1,0 +1,287 @@
+---
+title: Troubleshooting
+description: Common issues and solutions for Better Auth
+---
+
+# Troubleshooting
+
+This guide covers common issues you might encounter when using Better Auth and how to resolve them.
+
+## Installation Issues
+
+### Plugin Not Loading
+
+**Symptoms:**
+- Plugin not appearing in PayloadCMS
+- Configuration errors
+- Missing dependencies
+
+**Solutions:**
+1. Verify installation:
+   ```bash
+   npm list @payload-better-auth
+   ```
+
+2. Check PayloadCMS version compatibility:
+   ```bash
+   npm list payload
+   ```
+
+3. Verify configuration:
+   ```typescript
+   import { betterAuthPlugin } from '@payload-better-auth'
+
+   export default buildConfig({
+     plugins: [
+       betterAuthPlugin({
+         // Configuration
+       })
+     ]
+   })
+   ```
+
+### Dependency Conflicts
+
+**Symptoms:**
+- Version conflicts
+- Missing peer dependencies
+- Type errors
+
+**Solutions:**
+1. Clear node_modules and reinstall:
+   ```bash
+   rm -rf node_modules
+   npm install
+   ```
+
+2. Check peer dependencies:
+   ```bash
+   npm ls
+   ```
+
+3. Update package.json:
+   ```json
+   {
+     "dependencies": {
+       "@payload-better-auth": "^latest",
+       "payload": "^3.x"
+     }
+   }
+   ```
+
+## Authentication Issues
+
+### Login Failures
+
+**Symptoms:**
+- Invalid credentials
+- Account locked
+- Session errors
+
+**Solutions:**
+1. Check rate limiting:
+   ```typescript
+   betterAuth: {
+     security: {
+       rateLimit: {
+         max: 5,
+         windowMs: 15 * 60 * 1000
+       }
+     }
+   }
+   ```
+
+2. Verify session configuration:
+   ```typescript
+   session: {
+     maxAge: 30 * 24 * 60 * 60,
+     secure: process.env.NODE_ENV === 'production'
+   }
+   ```
+
+3. Check authentication strategy:
+   ```typescript
+   betterAuthPlugins: {
+     twoFactor: {
+       issuer: 'Your App'
+     }
+   }
+   ```
+
+### Two-Factor Authentication Issues
+
+**Symptoms:**
+- Invalid TOTP codes
+- QR code not scanning
+- Backup codes not working
+
+**Solutions:**
+1. Verify TOTP configuration:
+   ```typescript
+   twoFactor: {
+     issuer: 'Your App',
+     window: 1
+   }
+   ```
+
+2. Check time synchronization:
+   - Ensure server time is accurate
+   - Verify client device time
+   - Consider NTP synchronization
+
+3. Test backup codes:
+   - Verify backup code storage
+   - Check backup code format
+   - Test code redemption
+
+## Role and Permission Issues
+
+### Access Denied
+
+**Symptoms:**
+- Permission errors
+- Role not recognized
+- Access control failures
+
+**Solutions:**
+1. Verify role configuration:
+   ```typescript
+   admin: {
+     roles: ['user', 'admin'],
+     permissions: {
+       payloadcms: ['read', 'write'],
+       byRole: {
+         admin: ['read', 'write', 'delete']
+       }
+     }
+   }
+   ```
+
+2. Check user assignments:
+   - Verify role assignments
+   - Check permission inheritance
+   - Review access logs
+
+3. Test permissions:
+   - Use admin panel
+   - Check API endpoints
+   - Verify collection access
+
+## Session Issues
+
+### Session Expiration
+
+**Symptoms:**
+- Unexpected logouts
+- Session timeouts
+- Cookie issues
+
+**Solutions:**
+1. Check session configuration:
+   ```typescript
+   session: {
+     maxAge: 30 * 24 * 60 * 60,
+     secure: true,
+     httpOnly: true
+   }
+   ```
+
+2. Verify cookie settings:
+   - Check SameSite policy
+   - Verify secure flag
+   - Test cookie domain
+
+3. Monitor session events:
+   - Check session logs
+   - Review timeout settings
+   - Test session renewal
+
+## API Issues
+
+### Endpoint Errors
+
+**Symptoms:**
+- 404 errors
+- Authentication failures
+- Rate limiting
+
+**Solutions:**
+1. Verify endpoint configuration:
+   ```typescript
+   endpoints: [
+     // Authentication endpoints
+   ]
+   ```
+
+2. Check API documentation:
+   - Review OpenAPI spec
+   - Test endpoints
+   - Verify parameters
+
+3. Monitor API usage:
+   - Check rate limits
+   - Review error logs
+   - Test authentication
+
+## Performance Issues
+
+### Slow Authentication
+
+**Symptoms:**
+- Long login times
+- Slow 2FA verification
+- Performance degradation
+
+**Solutions:**
+1. Check database performance:
+   - Review indexes
+   - Monitor queries
+   - Optimize schema
+
+2. Verify caching:
+   - Check session storage
+   - Review cache configuration
+   - Monitor memory usage
+
+3. Profile authentication:
+   - Measure response times
+   - Check network latency
+   - Review server load
+
+## Debugging Tips
+
+### Logging
+
+Enable detailed logging:
+```typescript
+logs: 'debug'
+```
+
+### Monitoring
+
+1. Check error logs
+2. Monitor authentication attempts
+3. Review session activity
+4. Track permission changes
+
+### Testing
+
+1. Test authentication flows
+2. Verify role assignments
+3. Check session management
+4. Monitor API endpoints
+
+## Getting Help
+
+If you're still experiencing issues:
+
+1. Check the [GitHub Issues](https://github.com/your-repo/issues)
+2. Review the [Documentation](/docs)
+3. Join the [Community Discord](https://discord.gg/your-server)
+4. Contact [Support](mailto:support@example.com)
+
+## Next Steps
+
+- [Configuration Guide](/docs/configuration/plugin-options)
+- [Security Best Practices](/docs/advanced/security)
+- [API Reference](/docs/api/plugin-options)

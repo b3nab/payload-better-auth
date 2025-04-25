@@ -1,0 +1,129 @@
+---
+title: Checkers
+description: Learn about the authentication checkers available in Better Auth
+icon: CheckCircle
+---
+
+# Checkers ✅
+
+Checkers are functions that verify authentication state in your Next.js application. They are returned by the `createAuthLayer` function and can be used in both server and client components.
+
+## Available Checkers 🎯
+
+### isAuth
+
+Check if a user is authenticated:
+
+```ts
+const isAuthenticated = await isAuth()
+```
+
+### isGuest
+
+Check if a user is a guest (not authenticated):
+
+```ts
+const isGuestUser = await isGuest()
+```
+
+### isUser
+
+Check if a user is logged in:
+
+```ts
+const isLoggedIn = await isUser()
+```
+
+### isAdmin
+
+Check if a user is an admin:
+
+```ts
+const isAdminUser = await isAdmin()
+```
+
+### isRole
+
+Check if a user has a specific role:
+
+```ts
+const hasRole = await isRole({ role: 'editor' })
+```
+
+## Usage Examples 📝
+
+### Server Components
+
+```tsx
+// app/protected/page.tsx
+import { isAdmin } from '@/lib/auth'
+
+export default async function ProtectedPage() {
+  const isAdminUser = await isAdmin()
+
+  if (!isAdminUser) {
+    return <div>Access denied</div>
+  }
+
+  return <div>Admin content</div>
+}
+```
+
+### API Routes
+
+```ts
+// pages/api/protected.ts
+import { isAuth } from '@/lib/auth'
+
+export default async function handler(req, res) {
+  const isAuthenticated = await isAuth()
+
+  if (!isAuthenticated) {
+    return res.status(401).json({ error: 'Unauthorized' })
+  }
+
+  return res.status(200).json({ data: 'Protected data' })
+}
+```
+
+### Client Components
+
+```tsx
+// components/ProtectedComponent.tsx
+'use client'
+
+import { useEffect, useState } from 'react'
+import { isAuth } from '@/lib/auth'
+
+export default function ProtectedComponent() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const auth = await isAuth()
+      setIsAuthenticated(auth)
+    }
+    checkAuth()
+  }, [])
+
+  if (!isAuthenticated) {
+    return <div>Please log in</div>
+  }
+
+  return <div>Protected content</div>
+}
+```
+
+## Best Practices 📚
+
+1. Use checkers for conditional rendering
+2. Cache authentication state when possible
+3. Handle loading states appropriately
+4. Consider using guards for route protection
+5. Use appropriate error handling
+
+## Next Steps 🚀
+
+- [Guards](/docs/auth-layer/guards)
+- [createAuthLayer](/docs/auth-layer/create-auth-layer)
+- [Configuration](/docs/configuration/plugin-options)

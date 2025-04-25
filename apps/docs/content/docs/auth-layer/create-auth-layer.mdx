@@ -1,0 +1,92 @@
+---
+title: createAuthLayer
+description: Learn how to use the createAuthLayer function to set up authentication in your Next.js application
+icon: Layers
+---
+
+# createAuthLayer 🛠️
+
+The `createAuthLayer` function is the core of Better Auth's Next.js integration. It provides a set of pre-built helpers that make it easy to implement authentication checks and guards in your Next.js routes and components.
+
+## Setup 🔧
+
+First, create an auth layer in your Next.js project:
+
+```ts
+// lib/auth.ts
+import { createAuthLayer } from '@payload-better-auth/nextjs'
+import { config } from '@/payload.config'
+
+export const { auth, isAuth, isGuest, isUser, isAdmin, isRole, guardAuth } = createAuthLayer(
+  config,
+  {
+    // Your plugin options
+  }
+)
+```
+
+## Available Helpers 🎯
+
+The `createAuthLayer` function returns several helpers:
+
+### Checkers ✅
+- `isAuth`: Check if user is authenticated
+- `isGuest`: Check if user is a guest (not authenticated)
+- `isUser`: Check if user is logged in
+- `isAdmin`: Check if user is an admin
+- `isRole`: Check if user has specific role
+
+### Guards 🛡️
+- `guardAuth`: Protect routes and components
+
+## Usage Examples 📝
+
+### Basic Setup
+
+```ts
+// lib/auth.ts
+import { createAuthLayer } from '@payload-better-auth/nextjs'
+import { config } from '@/payload.config'
+
+export const { auth, isAuth, isGuest, isUser, isAdmin, isRole, guardAuth } = createAuthLayer(
+  config,
+  {
+    betterAuth: {
+      session: {
+        maxAge: 30 * 24 * 60 * 60, // 30 days
+      },
+    },
+  }
+)
+```
+
+### Using in Components
+
+```tsx
+// app/protected/page.tsx
+import { isAdmin } from '@/lib/auth'
+
+export default async function ProtectedPage() {
+  const isAdminUser = await isAdmin()
+
+  if (!isAdminUser) {
+    return <div>Access denied</div>
+  }
+
+  return <div>Admin content</div>
+}
+```
+
+## Best Practices 📚
+
+1. Create a single auth layer instance and export it
+2. Use guards for route protection
+3. Use checkers for conditional rendering
+4. Handle errors appropriately
+5. Cache authentication state when possible
+
+## Next Steps 🚀
+
+- [Checkers](/docs/auth-layer/checkers)
+- [Guards](/docs/auth-layer/guards)
+- [Configuration](/docs/configuration/plugin-options)

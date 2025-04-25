@@ -1,0 +1,200 @@
+---
+title: API Reference
+description: Complete API reference for Better Auth plugin options and types
+---
+
+# API Reference
+
+This document provides a complete reference for all Better Auth plugin options and types.
+
+## Plugin Options
+
+### `BetterAuthPluginOptions`
+
+The main configuration type for the Better Auth plugin.
+
+```typescript
+type BetterAuthPluginOptions = {
+  betterAuth?: Omit<BetterAuthOptions, 'database' | 'plugins'>
+  betterAuthPlugins?: {
+    // Core authentication
+    twoFactor?: Parameters<typeof twoFactor>[0]
+    username?: boolean | Parameters<typeof username>[0]
+    anonymous?: boolean | Parameters<typeof anonymous>[0]
+    phoneNumber?: boolean | Parameters<typeof phoneNumber>[0]
+    magicLink?: boolean | Parameters<typeof magicLink>[0]
+    emailOTP?: boolean | Parameters<typeof emailOTP>[0]
+    passkey?: boolean | Parameters<typeof passkey>[0]
+    genericOAuth?: boolean | Parameters<typeof genericOAuth>[0]
+    oneTap?: boolean | Parameters<typeof oneTap>[0]
+    // Core authorization
+    admin?: Parameters<typeof admin>[0]
+    organization?: boolean | Parameters<typeof organization>[0]
+    // Core enterprise
+    oidcProvider?: boolean | Parameters<typeof oidcProvider>[0]
+    sso?: boolean | Parameters<typeof sso>[0]
+    // Core utility
+    bearer?: boolean | Parameters<typeof bearer>[0]
+    multiSession?: boolean | Parameters<typeof multiSession>[0]
+    oAuthProxy?: boolean | Parameters<typeof oAuthProxy>[0]
+    openAPI?: Parameters<typeof openAPI>[0]
+    jwt?: boolean | Parameters<typeof jwt>[0]
+    // Payments
+    stripe?: boolean | (Omit<Parameters<typeof stripe>[0], 'stripeClient'> & {
+      clientConfig?: ConstructorParameters<typeof Stripe>[0]
+    })
+    polar?: boolean | (Omit<Parameters<typeof polar>[0], 'client'> & {
+      clientConfig?: ConstructorParameters<typeof Polar>[0]
+    })
+    // Third-party
+    emailHarmony?: boolean | Parameters<typeof emailHarmony>[0]
+  }
+  extendsCollections?: {
+    [K in CollectionSlug]?: CollectionConfigExtend<K>
+  }
+  logs?: false | LoggerConfig['level']
+}
+```
+
+## Core Types
+
+### `CollectionConfigExtend`
+
+Extends a PayloadCMS collection configuration.
+
+```typescript
+type CollectionConfigExtend<T extends CollectionSlug> = Omit<
+  CollectionConfig<T>,
+  'slug'
+>
+```
+
+### `LoggerConfig`
+
+Configuration for logging.
+
+```typescript
+type LoggerConfig = {
+  level: 'debug' | 'info' | 'warn' | 'error'
+}
+```
+
+## Plugin-Specific Types
+
+### Two-Factor Authentication
+
+```typescript
+type TwoFactorOptions = {
+  issuer: string
+  window?: number
+  // Additional TOTP options
+}
+```
+
+### Admin Plugin
+
+```typescript
+type AdminOptions = {
+  roles?: string[]
+  permissions?: {
+    payloadcms?: string[]
+    byRole?: Record<string, string[]>
+  }
+}
+```
+
+### OpenAPI
+
+```typescript
+type OpenAPIOptions = {
+  enabled?: boolean
+  path?: string
+}
+```
+
+## Collection Extension Types
+
+### User Collection Extension
+
+```typescript
+type UserCollectionExtension = {
+  fields?: Field[]
+  hooks?: {
+    beforeChange?: Hook[]
+    afterChange?: Hook[]
+    // Additional hooks
+  }
+  // Additional collection options
+}
+```
+
+## Utility Types
+
+### `Hook`
+
+```typescript
+type Hook = (args: HookArgs) => Promise<void> | void
+```
+
+### `Field`
+
+```typescript
+type Field = {
+  name: string
+  type: string
+  // Additional field options
+}
+```
+
+## Example Usage
+
+```typescript
+import { betterAuthPlugin } from '@payload-better-auth'
+import type { BetterAuthPluginOptions } from '@payload-better-auth'
+
+const options: BetterAuthPluginOptions = {
+  betterAuth: {
+    session: {
+      maxAge: 30 * 24 * 60 * 60
+    }
+  },
+  betterAuthPlugins: {
+    twoFactor: {
+      issuer: 'My App'
+    },
+    admin: {
+      roles: ['user', 'admin']
+    }
+  },
+  extendsCollections: {
+    users: {
+      fields: [
+        {
+          name: 'customField',
+          type: 'text'
+        }
+      ]
+    }
+  },
+  logs: 'info'
+}
+
+export default buildConfig({
+  plugins: [betterAuthPlugin(options)]
+})
+```
+
+## Type Safety
+
+All types are fully compatible with TypeScript and provide:
+
+- Autocompletion
+- Type checking
+- Documentation hints
+- Error prevention
+
+## Next Steps
+
+- [Configuration Guide](/docs/configuration/plugin-options)
+- [Authentication Strategies](/docs/features/authentication-strategies)
+- [Collection Configuration](/docs/configuration/collections)

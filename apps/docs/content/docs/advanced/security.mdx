@@ -1,0 +1,231 @@
+---
+title: Security Best Practices
+description: Security guidelines and best practices for Better Auth
+---
+
+# Security Best Practices
+
+This guide covers security best practices for implementing and configuring Better Auth in your PayloadCMS application.
+
+## Authentication Security
+
+### Password Policies
+
+1. **Strong Password Requirements**
+   - Minimum length of 12 characters
+   - Mix of uppercase, lowercase, numbers, and special characters
+   - No common passwords or patterns
+   - Regular password rotation
+
+2. **Password Storage**
+   - Use secure hashing algorithms (bcrypt, Argon2)
+   - Salt passwords uniquely
+   - Never store plain text passwords
+   - Implement secure password reset flows
+
+### Two-Factor Authentication
+
+1. **TOTP Implementation**
+   - Use secure TOTP algorithms
+   - Implement proper window size
+   - Store backup codes securely
+   - Provide recovery options
+
+2. **2FA Best Practices**
+   - Require 2FA for admin users
+   - Support multiple authenticator apps
+   - Implement rate limiting for 2FA attempts
+   - Handle 2FA recovery securely
+
+## Session Management
+
+### Secure Session Configuration
+
+```typescript
+betterAuth: {
+  session: {
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    sameSite: 'strict'
+  }
+}
+```
+
+### Session Security
+
+1. **Cookie Security**
+   - Use secure cookies in production
+   - Enable HttpOnly flag
+   - Set appropriate SameSite policy
+   - Implement CSRF protection
+
+2. **Session Handling**
+   - Implement session timeouts
+   - Handle session revocation
+   - Monitor for suspicious activity
+   - Log session events
+
+## Rate Limiting
+
+### Configuration
+
+```typescript
+betterAuth: {
+  security: {
+    rateLimit: {
+      max: 5, // Maximum attempts
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      message: 'Too many attempts, please try again later'
+    }
+  }
+}
+```
+
+### Best Practices
+
+1. **Implementation**
+   - Limit login attempts
+   - Rate limit password reset requests
+   - Monitor for brute force attacks
+   - Implement progressive delays
+
+2. **Monitoring**
+   - Log failed attempts
+   - Alert on suspicious activity
+   - Track IP addresses
+   - Implement IP blocking
+
+## Role-Based Access Control
+
+### Permission Management
+
+```typescript
+admin: {
+  permissions: {
+    payloadcms: ['read', 'write'],
+    byRole: {
+      admin: ['read', 'write', 'delete'],
+      user: ['read']
+    }
+  }
+}
+```
+
+### Security Principles
+
+1. **Access Control**
+   - Follow principle of least privilege
+   - Implement role hierarchy
+   - Regular permission audits
+   - Document access policies
+
+2. **Role Management**
+   - Clear role definitions
+   - Regular role reviews
+   - Separation of duties
+   - Temporary access grants
+
+## Data Protection
+
+### Sensitive Data
+
+1. **Storage**
+   - Encrypt sensitive data
+   - Use secure key management
+   - Implement data retention policies
+   - Regular security audits
+
+2. **Transmission**
+   - Use HTTPS/TLS
+   - Implement secure headers
+   - Validate input data
+   - Sanitize output data
+
+## Security Headers
+
+### Recommended Headers
+
+```typescript
+// In your Next.js config
+{
+  headers: [
+    {
+      key: 'X-Content-Type-Options',
+      value: 'nosniff'
+    },
+    {
+      key: 'X-Frame-Options',
+      value: 'DENY'
+    },
+    {
+      key: 'X-XSS-Protection',
+      value: '1; mode=block'
+    },
+    {
+      key: 'Content-Security-Policy',
+      value: "default-src 'self'"
+    }
+  ]
+}
+```
+
+## Monitoring and Logging
+
+### Security Logging
+
+```typescript
+logs: 'info' // Configure appropriate logging level
+```
+
+### Best Practices
+
+1. **Logging**
+   - Log security events
+   - Monitor authentication attempts
+   - Track permission changes
+   - Alert on suspicious activity
+
+2. **Monitoring**
+   - Implement security monitoring
+   - Set up alerts
+   - Regular security reviews
+   - Incident response plan
+
+## Regular Maintenance
+
+### Security Updates
+
+1. **Dependencies**
+   - Regular dependency updates
+   - Security patch management
+   - Vulnerability scanning
+   - Dependency auditing
+
+2. **Configuration**
+   - Regular security reviews
+   - Configuration audits
+   - Policy updates
+   - Security training
+
+## Incident Response
+
+### Preparation
+
+1. **Planning**
+   - Incident response plan
+   - Communication procedures
+   - Recovery procedures
+   - Documentation
+
+2. **Response**
+   - Quick incident detection
+   - Effective communication
+   - Proper documentation
+   - Post-incident review
+
+## Next Steps
+
+- [Authentication Strategies](/docs/features/authentication-strategies)
+- [Configuration Guide](/docs/configuration/plugin-options)
+- [API Reference](/docs/api/plugin-options)

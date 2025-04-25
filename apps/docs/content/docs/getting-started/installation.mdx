@@ -1,0 +1,161 @@
+---
+title: Installation
+description: Learn how to install and configure Better Auth in your PayloadCMS project
+icon: Download
+---
+
+# Installation 🚀
+
+This guide will walk you through installing and configuring Better Auth in your PayloadCMS project.
+
+## Prerequisites 📋
+
+- Node.js 18 or later
+- PayloadCMS v3 or later
+- A running database (all PayloadCMS supported databases)
+
+## Installation 💻
+
+1. Install the package using your preferred package manager:
+
+```package-install
+payload-better-auth
+```
+
+2. Import and configure the plugin in your PayloadCMS config:
+
+
+<Tabs items={["Minimal"]}>
+  <Tab value="minimal" title="Minimal">
+  By default if you pass an empty object (`as const` is important!) you will have the following features:
+
+  - PayloadCMS Admin with email and password authentication
+  - PayloadCMS Admin with Two Factor Authentication (2FA for admins)
+  - OpenAPI auto documentation at `/api/auth/reference`
+  - `admin` and `user` Roles and default RBAC (from better-auth's admin plugin)
+
+    ```ts title="@/lib/payload-better-auth.conf.ts"
+    export const payloadBetterAuthConfig = {} as const
+    ```
+  </Tab>
+</Tabs>
+
+```ts
+import { buildConfig } from 'payload/config'
+import { betterAuthPlugin } from '@payload-better-auth'
+
+export default buildConfig({
+  // ... your existing config
+  plugins: [
+    betterAuthPlugin({
+      // Plugin options
+      betterAuth: {
+        // Better Auth specific options
+      },
+      betterAuthPlugins: {
+        // Enable/configure specific plugins
+        twoFactor: true,
+        admin: true,
+        openAPI: true,
+      },
+    }),
+  ],
+})
+```
+
+## Basic Configuration ⚙️
+
+The plugin comes with sensible defaults, but you can customize it to your needs. Here's a basic configuration example:
+
+```ts
+betterAuthPlugin({
+  betterAuth: {
+    // Customize Better Auth options
+    session: {
+      maxAge: 30 * 24 * 60 * 60, // 30 days
+    },
+  },
+  betterAuthPlugins: {
+    // Enable specific plugins
+    twoFactor: {
+      // TOTP configuration
+      issuer: 'Your App Name',
+    },
+    admin: {
+      // Admin plugin configuration
+      roles: ['user', 'admin'],
+    },
+  },
+  // Extend collections if needed
+  extendsCollections: {
+    users: {
+      // Add custom fields to the user collection
+      fields: [
+        {
+          name: 'customField',
+          type: 'text',
+        },
+      ],
+    },
+  },
+})
+```
+
+## Next Steps 📝
+
+After installation, you should:
+
+1. Set up your authentication strategies
+2. Configure user roles and permissions
+3. Test the authentication flow
+4. Extend the user collection as needed
+
+<Cards>
+  <Card
+    title="Configuration Guide"
+    href="/docs/configuration/plugin-options"
+    description="Learn about all available configuration options"
+  />
+  <Card
+    title="Authentication Strategies"
+    href="/docs/features/authentication-strategies"
+    description="Explore available authentication methods"
+  />
+  <Card
+    title="Security Best Practices"
+    href="/docs/advanced/security"
+    description="Follow security guidelines for your implementation"
+  />
+</Cards>
+
+## Troubleshooting 🛠️
+
+If you encounter any issues during installation:
+
+1. Ensure all dependencies are properly installed
+2. Check your PayloadCMS version compatibility
+3. Verify your database connection
+4. Review the plugin configuration
+
+For additional help, check the [Troubleshooting Guide](/docs/advanced/troubleshooting) or open an issue on GitHub.
+
+## Environment Variables 🔑
+
+Create or update your `.env` file:
+
+```env
+BETTER_AUTH_SECRET=your_generated_secret
+```
+
+You can generate a secure secret using:
+```bash
+openssl rand -base64 32
+```
+
+## Support 🆘
+
+If you need help:
+
+- Check the [GitHub Issues](https://github.com/b3nab/payload-better-auth/issues)
+- Join our [Discord Community](https://discord.gg/your-server)
+- Contact [Support](mailto:support@example.com)
