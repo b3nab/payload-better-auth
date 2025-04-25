@@ -1,3 +1,4 @@
+// import { GithubInfo } from 'fumadocs-ui/components/github-info'
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared'
 import { DiffIcon, HomeIcon } from 'lucide-react'
 
@@ -33,6 +34,16 @@ export const baseOptions: BaseLayoutProps = {
       active: 'nested-url',
       on: 'nav',
     },
+    // {
+    //   type: 'custom',
+    //   children: (
+    //     <GithubInfo
+    //       owner="b3nab"
+    //       repo="payload-better-auth"
+    //       className="lg:-mx-2"
+    //     />
+    //   ),
+    // },
     // {
     //   type: 'main',
     //   text: '♥️ Support',

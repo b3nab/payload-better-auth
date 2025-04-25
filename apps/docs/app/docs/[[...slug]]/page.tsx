@@ -6,9 +6,18 @@ import {
   DocsTitle,
 } from 'fumadocs-ui/page'
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs'
+import { Step, Steps } from 'fumadocs-ui/components/steps'
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion'
+import { Banner } from 'fumadocs-ui/components/banner'
+import { GithubInfo } from 'fumadocs-ui/components/github-info'
 import { notFound } from 'next/navigation'
 import defaultMdxComponents, { createRelativeLink } from 'fumadocs-ui/mdx'
 import { ImageZoom } from 'fumadocs-ui/components/image-zoom'
+// import { Accordion, Accordions } from '@/components/accordion'
+// import { Banner } from '@/components/banner'
+// import { GithubInfo } from '@/components/github-info'
+import Link from 'next/link'
+// import { Step, Steps } from '@/components/steps'
 
 export default async function Page(props: {
   params: Promise<{ slug?: string[] }>
@@ -33,6 +42,13 @@ export default async function Page(props: {
             // you can add other MDX components here
             Tab,
             Tabs,
+            Accordion,
+            Accordions,
+            Banner,
+            GithubInfo,
+            Link,
+            Step,
+            Steps,
           }}
         />
       </DocsBody>
