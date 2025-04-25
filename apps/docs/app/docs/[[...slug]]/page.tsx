@@ -8,6 +8,7 @@ import {
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs'
 import { notFound } from 'next/navigation'
 import defaultMdxComponents, { createRelativeLink } from 'fumadocs-ui/mdx'
+import { ImageZoom } from 'fumadocs-ui/components/image-zoom'
 
 export default async function Page(props: {
   params: Promise<{ slug?: string[] }>
@@ -26,6 +27,7 @@ export default async function Page(props: {
         <MDXContent
           components={{
             ...defaultMdxComponents,
+            img: (props) => <ImageZoom {...(props as any)} />,
             // this allows you to link to other pages with relative file paths
             a: createRelativeLink(source, page),
             // you can add other MDX components here
