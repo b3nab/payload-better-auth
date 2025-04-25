@@ -24,6 +24,10 @@ export const BetterAuthServerWrapper = async (
   const headers = await nextHeaders()
 
   // logger.debug(
+  //   pluginOptions,
+  //   '[server] [BetterAuthServerWrapper] [pluginOptions]',
+  // )
+  // logger.debug(
   //   {
   //     cookies,
   //     headers,
@@ -96,7 +100,9 @@ export const BetterAuthServerWrapper = async (
 
   return (
     <BetterAuthProvider
-      pluginOptions={pluginOptions}
+      // pluginOptions={pluginOptions}
+      // TODO: sanitaze pluginOptions, because cannot be passed to client components as is - functions are not serializable
+      pluginOptions={{}}
       // payloadConfig={payload}
       authFlows={{
         twoFactor: {
