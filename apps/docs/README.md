@@ -2,6 +2,8 @@
 
 Docs website for `payload-better-auth`.
 
+[payload-better-auth.abbenanti.com](https://payload-better-auth.abbenanti.com)
+
 ---
 
 Run development server:
@@ -14,7 +16,7 @@ pnpm dev
 yarn dev
 ```
 
-Open http://localhost:3000 with your browser to see the result.
+Open <http://localhost:3000> with your browser to see the result.
 
 ## Learn More
 
