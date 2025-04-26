@@ -1,0 +1,106 @@
+---
+title: Guards
+description: Learn about the authentication guards available in Better Auth
+icon: ShieldAlert
+---
+
+# Guards 🛡️
+
+Guards are functions that protect your routes and components from unauthorized access. They are returned by the `createAuthLayer` function and can be used in various parts of your Next.js application.
+
+## Available Guards 🎯
+
+### guardAuth
+
+The `guardAuth` guard protects routes and components by verifying authentication:
+
+```ts
+try {
+  await guardAuth(request)
+  // Protected logic here
+} catch (error) {
+  // Handle unauthorized access
+}
+```
+
+## Usage Examples 📝
+
+### API Routes
+
+```ts
+// pages/api/protected.ts
+import { guardAuth } from '@/lib/auth'
+
+export default async function handler(req, res) {
+  try {
+    await guardAuth(req)
+    // Protected route logic
+    res.status(200).json({ data: 'Protected data' })
+  } catch (error) {
+    res.status(401).json({ error: 'Unauthorized' })
+  }
+}
+```
+
+### Middleware
+
+```ts
+// middleware.ts
+import { guardAuth } from '@/lib/auth'
+
+export async function middleware(request) {
+  try {
+    await guardAuth(request)
+    return NextResponse.next()
+  } catch (error) {
+    return NextResponse.redirect(new URL('/login', request.url))
+  }
+}
+```
+
+### Route Handlers
+
+```ts
+// app/api/protected/route.ts
+import { guardAuth } from '@/lib/auth'
+import { NextResponse } from 'next/server'
+
+export async function GET(request: Request) {
+  try {
+    await guardAuth(request)
+    return NextResponse.json({ data: 'Protected data' })
+  } catch (error) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+}
+```
+
+## Error Handling 🚨
+
+Guards throw errors when authentication fails. You should handle these errors appropriately:
+
+```ts
+try {
+  await guardAuth(request)
+} catch (error) {
+  if (error instanceof AuthenticationError) {
+    // Handle authentication error
+  } else {
+    // Handle other errors
+  }
+}
+```
+
+## Best Practices 📚
+
+1. Use guards for route protection
+2. Implement proper error handling
+3. Consider using middleware for global protection
+4. Cache authentication state when possible
+5. Use appropriate HTTP status codes
+
+## Next Steps 🚀
+
+- [Checkers](/docs/auth-layer/checkers)
+- [createAuthLayer](/docs/auth-layer/create-auth-layer)
+- [Configuration](/docs/configuration/plugin-options)

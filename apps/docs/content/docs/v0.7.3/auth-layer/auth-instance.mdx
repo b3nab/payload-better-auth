@@ -1,0 +1,91 @@
+---
+title: Better Auth Instance
+description: Learn how to use the Better Auth instance in your Next.js application
+# icon: Fingerprint
+# icon: LandPlot
+icon: ScanFace
+---
+
+# Auth Instance
+
+The auth instance is a core concept in Better Auth that provides all the authentication functionality. In payload-better-auth, we create a typed wrapper around this instance to ensure type safety and seamless integration with Payload CMS.
+
+## Overview
+
+The auth instance is created during the initialization of the Better Auth plugin within your Payload configuration. This process sets up the core authentication functionality, making it available for use throughout your application.
+
+## Features
+
+The auth instance provides:
+
+- Authentication methods (signIn, signOut, etc.)
+- Session management
+- User management
+- Provider-specific functionality
+- Type-safe API endpoints
+- Middleware support
+
+## Usage in Next.js
+
+The auth instance is available through the `createAuthLayer` function. Here's how to use it:
+
+```typescript title="lib/auth.ts"
+import { createAuthLayer } from '@payload-better-auth'
+import { config } from '@/payload.config'
+import { payloadBetterAuthConfig } from '@/payload-better-auth.config.ts'
+
+export const {
+  auth,
+  isAuth,
+  isGuest,
+  isUser,
+  isAdmin,
+  isRole,
+  guardAuth
+} = createAuthLayer(config, payloadBetterAuthConfig)
+```
+
+Once created, you can use the auth instance in your components and API routes:
+
+```typescript
+import { auth } from '@/lib/auth.ts'
+
+// ...
+const session = await auth.api.getSession({
+  headers: req.headers
+})
+// ...
+const user = await auth.api.getUser({
+  headers: await headers()
+})
+// ...
+```
+
+For more details on setting up and using the auth layer, see the [createAuthLayer documentation](./create-auth-layer).
+
+## Type Safety
+
+The auth instance is fully typed based on your Better Auth configuration. This provides:
+- Autocomplete for all available methods
+- Type checking for method parameters
+- Type inference for return values
+- Compile-time error checking
+
+## Integration with Auth Layer
+
+The auth instance works seamlessly with other auth layer features. Learn more about:
+
+- [Auth Checkers](./checkers) - Functions to check authentication state
+- [Auth Guards](./guards) - Functions to protect routes and actions
+
+## Configuration
+
+The auth instance is configured through your Better Auth options. Learn more about configuration in the [Configuration section](../configuration/plugin-options).
+
+## Best Practices
+
+1. **Single Instance**: Create the auth layer once and reuse it across your application
+2. **Type Safety**: Leverage TypeScript to catch errors at compile time
+3. **Configuration**: Keep your Better Auth options in a separate configuration file
+4. **Error Handling**: Always handle potential errors from auth instance methods
+5. **Session Management**: Use the auth instance's session methods for consistent session handling

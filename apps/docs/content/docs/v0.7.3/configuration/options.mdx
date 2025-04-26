@@ -1,0 +1,90 @@
+---
+title: Configuration Options
+description: Configure the Payload Better Auth Plugin
+---
+
+# Configuration Options
+
+The plugin accepts the following configuration options:
+
+## BetterAuthPluginOptions
+
+```ts
+type BetterAuthPluginOptions = {
+  betterAuth?: Omit<BetterAuthOptions, 'database'>;
+  betterAuthPlugins?: {
+    twoFactor?: boolean;
+    username?: boolean;
+    anonymous?: boolean;
+    phoneNumber?: boolean;
+    magicLink?: boolean;
+    // ... other plugins
+  };
+  extendsCollections?: {
+    [K in CollectionSlug]?: CollectionConfigExtend<K>;
+  };
+  logs?: false | 'debug' | 'info' | 'warn' | 'error';
+}
+```
+
+### Better Auth Config
+
+The `betterAuth` object configures core Better Auth settings:
+
+```ts
+{
+  appName: 'My App',  // Used for 2FA and other features
+  baseURL: 'https://myapp.com',  // Optional - defaults to the server url
+  basePath: '/api/auth',  // Optional - defaults to  '/api/auth'
+  secret: process.env.BETTER_AUTH_SECRET, // Optional - defaults to process.env.BETTER_AUTH_SECRET
+}
+```
+
+### Plugin Options
+
+Enable/disable specific authentication features:
+
+```ts
+{
+  betterAuthPlugins: {
+    twoFactor: true,  // Enable 2FA TOTP
+    passkey: true,    // Enable passkey support
+    openAPI: true,    // Enable OpenAPI documentation
+  }
+}
+```
+
+### Extending Collections
+
+You can extend the default collections with additional fields:
+
+```ts
+{
+  extendsCollections: {
+    user: {
+      fields: [
+        {
+          name: 'nickname',
+          type: 'text',
+        },
+        {
+          name: 'posts',
+          type: 'relationship',
+          relationTo: 'posts',
+          hasMany: true,
+        },
+      ],
+    },
+  },
+}
+```
+
+### Logging
+
+Configure logging levels for debugging:
+
+```ts
+{
+  logs: 'debug' // Options: false | 'trace' | 'debug' | 'info' | 'warn' | 'error'
+}
+```

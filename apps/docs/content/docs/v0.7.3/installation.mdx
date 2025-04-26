@@ -1,0 +1,115 @@
+---
+title: Installation
+description: Learn how to install and configure Better Auth in your PayloadCMS project
+icon: Download
+---
+
+# Installation 🚀
+
+This guide will walk you through installing and configuring Better Auth in your PayloadCMS project.
+
+## Prerequisites 📋
+
+- Node.js 18 or later
+- PayloadCMS v3 or later
+- A running database (all PayloadCMS supported databases)
+
+## Installation 💻
+
+#### 1. Install the package using your preferred package manager:
+
+```package-install
+payload-better-auth
+```
+
+#### 2. Create the plugin/better-auth config:
+
+<Tabs items={["Minimal"]}>
+  <Tab value="minimal" title="Minimal">
+
+    ```ts title="@/lib/payload-better-auth.config.ts"
+    export const payloadBetterAuthConfig = {} as const
+    ```
+  </Tab>
+</Tabs>
+
+<Cards>
+  <Card
+    title="Configuration Guide"
+    href="../configuration/plugin-options"
+    description="Learn about all available configuration options"
+  />
+  {/* <Card
+    title="Authentication Strategies"
+    href="../features/authentication-strategies"
+    description="Explore available authentication methods"
+  /> */}
+  {/* <Card
+    title="Security Best Practices"
+    href="../advanced/security"
+    description="Follow security guidelines for your implementation"
+  /> */}
+</Cards>
+
+By default if you pass an empty object (`as const` is important) you will have out-of-the-box the following features:
+
+- PayloadCMS Admin with email and password authentication
+- PayloadCMS Admin with Two Factor Authentication (2FA for admins)
+- OpenAPI auto documentation at `/api/auth/reference`
+- `admin` and `user` Roles and default RBAC (from better-auth's admin plugin)
+
+#### 3. Import and configure the plugin in your PayloadCMS config:
+
+```ts title="@/payload.config.ts"
+import { buildConfig } from 'payload/config'
+import { betterAuthPlugin } from '@payload-better-auth'
+import { payloadBetterAuthConfig } from '@/lib/payload-better-auth.config'
+
+export default buildConfig({
+  // ... your existing config
+  plugins: [
+    betterAuthPlugin(payloadBetterAuthConfig),
+  ],
+})
+```
+
+## Environment Variables 🔑
+
+Create or update your `.env` file:
+
+```
+BETTER_AUTH_SECRET=your_generated_secret
+```
+
+You can generate a secure secret using:
+```bash
+openssl rand -base64 32
+```
+
+### Best Practices 📚
+
+1. Create a single auth layer instance and export it
+2. Use guards for route protection
+3. Use checkers for conditional rendering
+4. Handle errors appropriately
+5. Cache authentication state when possible
+
+
+## Troubleshooting 🛠️
+
+If you encounter any issues during installation:
+
+1. Ensure all dependencies are properly installed
+2. Check your PayloadCMS version compatibility
+3. Verify your database connection
+4. Review the plugin configuration
+
+For additional help, check the [Troubleshooting Guide](../advanced/troubleshooting) or open an issue on GitHub.
+
+## Support 🆘
+
+If you need help:
+
+- Check the [GitHub Issues](https://github.com/b3nab/payload-better-auth/issues)
+- Join our [Discord Community](https://discord.gg/your-server)
+- Contact [Support](mailto:support@example.com)
