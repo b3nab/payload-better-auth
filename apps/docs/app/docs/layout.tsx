@@ -6,10 +6,11 @@ import { source } from '@/lib/source'
 const docsOptions: DocsLayoutProps = {
   ...baseOptions,
   tree: source.pageTree,
-  links: baseOptions.links,
-  // ?.filter((link) =>
-  //   link.on ? link.on !== 'nav' : true,
-  // ),
+  nav: {
+    ...baseOptions.nav,
+    mode: 'top',
+  },
+  // links: [baseOptions.links],
 }
 
 export default function Layout({ children }: { children: ReactNode }) {

@@ -8,28 +8,28 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-background to-background/80">
+      <section className="relative px-4 py-20 sm:px-6 lg:px-8 bg-gradient-to-b from-background to-background/80">
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute inset-0 bg-grid-white/10 bg-[size:40px_40px] [mask-image:radial-gradient(white,transparent_70%)]" />
         </div>
 
-        <div className="relative max-w-7xl mx-auto text-center">
+        <div className="relative mx-auto text-center max-w-7xl">
           <Badge variant="outline" className="mb-4">
             🚧 Developer Preview
           </Badge>
-          <h1 className="text-4xl sm:text-6xl font-bold tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-r from-gray-200/90 to-gray-400/90">
+          <h1 className="mb-6 text-4xl font-bold tracking-tight text-transparent sm:text-6xl bg-clip-text bg-gradient-to-r from-gray-200/90 to-gray-400/90">
             Better Auth for Payload CMS
           </h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
+          <p className="max-w-3xl mx-auto mb-8 text-xl text-muted-foreground">
             Revolutionize your Payload CMS authentication with advanced
             features, enhanced security, and a seamless developer experience.
           </p>
-          <div className="flex gap-4 justify-center">
+          <div className="flex justify-center gap-4">
             <Link href="/docs">
               <Button size="lg">
                 Get Started
                 <svg
-                  className="ml-2 h-4 w-4"
+                  className="w-4 h-4 ml-2"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -47,7 +47,7 @@ export default function Home() {
             <Link href="https://github.com/b3nab/payload-better-auth">
               <Button variant="outline" size="lg">
                 <svg
-                  className="mr-2 h-5 w-5"
+                  className="w-5 h-5 mr-2"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
@@ -62,12 +62,12 @@ export default function Home() {
       </section>
 
       {/* Features Grid */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12">
+      <section className="px-4 py-20 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <h2 className="mb-12 text-3xl font-bold text-center">
             Core Features
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
             <FeatureCard
               icon="🔐"
               title="Two-Factor Auth"
@@ -103,12 +103,12 @@ export default function Home() {
       </section>
 
       {/* Code Preview */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-black/5">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12">
+      <section className="px-4 py-20 sm:px-6 lg:px-8 bg-black/5">
+        <div className="mx-auto max-w-7xl">
+          <h2 className="mb-12 text-3xl font-bold text-center">
             Simple Integration
           </h2>
-          <div className="rounded-lg overflow-hidden bg-zinc-900 p-6">
+          <div className="p-6 overflow-hidden rounded-lg bg-zinc-900">
             <pre className="text-sm text-gray-300">
               <code>{`import { betterAuthPlugin } from "payload-better-auth";
 
@@ -131,15 +131,15 @@ export default buildConfig({
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
+      <section className="px-4 py-20 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-6">Ready to Get Started?</h2>
-          <p className="text-xl text-muted-foreground mb-8">
+          <h2 className="mb-6 text-3xl font-bold">Ready to Get Started?</h2>
+          <p className="mb-8 text-xl text-muted-foreground">
             Join the community of developers enhancing their Payload CMS
             authentication.
           </p>
-          <div className="flex gap-4 justify-center">
-            <Link href="/docs/getting-started/installation">
+          <div className="flex justify-center gap-4">
+            <Link href="/docs">
               <Button size="lg" variant="default">
                 Read the Docs
               </Button>
@@ -162,9 +162,9 @@ function FeatureCard({
   description,
 }: { icon: string; title: string; description: string }) {
   return (
-    <Card className="p-6 hover:shadow-lg transition-shadow">
-      <div className="text-4xl mb-4">{icon}</div>
-      <h3 className="text-xl font-semibold mb-2">{title}</h3>
+    <Card className="p-6 transition-shadow hover:shadow-lg">
+      <div className="mb-4 text-4xl">{icon}</div>
+      <h3 className="mb-2 text-xl font-semibold">{title}</h3>
       <p className="text-muted-foreground">{description}</p>
     </Card>
   )
