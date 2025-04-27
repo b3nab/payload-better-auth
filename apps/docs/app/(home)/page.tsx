@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import Image from 'next/image'
 import Link from 'next/link'
+import { Code } from '@/components/code'
 
 export default function Home() {
   return (
@@ -69,29 +70,34 @@ export default function Home() {
           </h2>
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
             <FeatureCard
-              icon="🔐"
-              title="Two-Factor Auth"
-              description="Enhance security with TOTP-based two-factor authentication for your admin panel."
-            />
-            <FeatureCard
               icon="⚡️"
               title="Automatic Collections"
               description="Pre-configured collections for seamless auth management and user data."
             />
             <FeatureCard
+              icon="🔗"
+              title="Automatic Endpoints"
+              description="Ready-to-use authentication endpoints for login, registration, 2FA, and more."
+            />
+            <FeatureCard
               icon="🛠"
               title="Extensible Architecture"
-              description="Extend collections and auth flows using familiar Payload-like configurations."
+              description="Extend collections, roles and auth flows using familiar Payload-like configurations."
             />
             <FeatureCard
-              icon="🚀"
-              title="Developer Experience"
-              description="Comprehensive logging, debugging, and developer-friendly APIs."
+              icon="🔐"
+              title="Admin 2FA"
+              description="Enhance security with TOTP-based Two Factor authentication for your admin panel."
             />
+            {/* <FeatureCard
+              icon="🧩"
+              title="Customizable Workflows"
+              description="Adapt authentication flows and permissions to fit your unique requirements."
+            /> */}
             <FeatureCard
-              icon="🔒"
-              title="Security First"
-              description="Rate limiting, encrypted storage, and robust session management built-in."
+              icon="⚙️"
+              title="Next.js Helpers"
+              description="Pre-built helpers for seamless Next.js integration and route protection."
             />
             <FeatureCard
               icon="📚"
@@ -103,30 +109,32 @@ export default function Home() {
       </section>
 
       {/* Code Preview */}
-      <section className="px-4 py-20 sm:px-6 lg:px-8 bg-black/5">
+      <section className="px-4 py-20 sm:px-6 lg:px-8 bg-black/5 dark:bg-white/5">
         <div className="mx-auto max-w-7xl">
           <h2 className="mb-12 text-3xl font-bold text-center">
             Simple Integration
           </h2>
-          <div className="p-6 overflow-hidden rounded-lg bg-zinc-900">
-            <pre className="text-sm text-gray-300">
-              <code>{`import { betterAuthPlugin } from "payload-better-auth";
+          <Code
+            lang="ts"
+            wrapper={{
+              title: '@/payload.config.ts',
+            }}
+            code={`import { buildConfig } from 'payload'
+import { betterAuthPlugin } from "payload-better-auth"
 
 export default buildConfig({
+  // ... your payload configuration
   plugins: [
     betterAuthPlugin({
       betterAuth: {
         appName: "My App",
-        secret: process.env.BETTER_AUTH_SECRET,
-      },
-      betterAuthPlugins: {
-        twoFactor: true,
-      },
-    }),
-  ],
-});`}</code>
-            </pre>
-          </div>
+        secret: process.env.BETTER_AUTH_SECRET
+      }
+    })
+    // ... other payload plugins
+  ]
+})`}
+          />
         </div>
       </section>
 
