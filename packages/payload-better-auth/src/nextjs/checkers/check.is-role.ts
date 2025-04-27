@@ -36,30 +36,6 @@ export type DefaultRoles = 'user' | 'admin'
 //   { id: 'admin' }
 // >
 
-type AdminPlugin<O extends BetterAuthPluginOptions> =
-  GetPlugin<O> extends infer P ? (P extends { id: 'admin' } ? P : never) : never
-
-type AdminRoles<O extends BetterAuthPluginOptions> = AdminPlugin<O> extends {
-  endpoints: {
-    setRole: {
-      options: { metadata: { $Infer: { body: { role: infer R } } } }
-    }
-  }
-}
-  ? Exclude<R, string[]>
-  : 'DEF_ADM'
-
-type RolesFromOptions<O extends BetterAuthPluginOptions> =
-  AdminPlugin<O> extends {
-    endpoints: {
-      setRole: {
-        options: { metadata: { $Infer: { body: { role: infer R } } } }
-      }
-    }
-  }
-    ? Exclude<R, string[]>
-    : 'DEF_OPT'
-
 // type GetPlugin<O extends BetterAuthPluginOptions> = NonNullable<
 //   O['betterAuth']
 // >['plugins'] extends Array<infer P>
@@ -135,19 +111,32 @@ type GetADM<O extends BetterAuthPluginOptions> = GetPLUGbyID<O, 'admin'>
 // ....................
 export type InferRoles<
   O extends BetterAuthPluginOptions,
-  RC extends RoleConfig = never,
-> = [GetADM<O>] extends [never]
-  ? DefaultRoles
-  : GetADM<O> extends { id: 'admin' }
-    ? keyof RC extends never
-      ? RolesFromOptions<O> extends never
-        ? DefaultRoles
-        : RolesFromOptions<O>
+  RC = never,
+> = GetADM<O> extends never
+  ? DefaultRoles // "DefaultRoles-NO-admin()"
+  : // : GetADM<O> extends { id: 'admin' }
+    RolesFromOptions<O> extends never
+    ? RC extends never
+      ? DefaultRoles // "DefaultRoles-nothing"
       : RolesFromPermissions<RC>
-    : DefaultRoles
+    : RolesFromOptions<O>
+// : "DefaultRoles-no-admin()--2"
 // ....................
 // ....................
 // ....................
+
+type NEV = never
+type isnever_keyof = keyof NEV extends never ? 'NEVER' : 'something'
+
+type adm = GetADM<DEFFF_PLUG>
+//   ^?
+
+// type rolesOPT = InferRoles<DEFFF_PLUG>
+// //    ^?
+// type rolesOPT = [GetADM<DEFFF_PLUG>] extends [never] ? 'never' : 'ok'
+// //    ^?
+type rolesOPT = GetADM<DEFFF_PLUG> extends never ? 'never' : 'admin'
+//    ^?
 
 // export type InferRoles<
 //   O extends BetterAuthPluginOptions,
@@ -179,6 +168,29 @@ export type InferRoles<
 //       // : RolesFromPermissions<RC>
 //       'DefaultRoles3'
 
+type AdminPlugin<O extends BetterAuthPluginOptions> =
+  GetPlugin<O> extends infer P ? (P extends { id: 'admin' } ? P : never) : never
+
+type AdminRoles<O extends BetterAuthPluginOptions> = AdminPlugin<O> extends {
+  endpoints: {
+    setRole: {
+      options: { metadata: { $Infer: { body: { role: infer R } } } }
+    }
+  }
+}
+  ? Exclude<R, string[]>
+  : 'DEF_ADM'
+
+type RolesFromOptions<O extends BetterAuthPluginOptions> = GetADM<O> extends {
+  endpoints: {
+    setRole: {
+      options: { metadata: { $Infer: { body: { role: infer R } } } }
+    }
+  }
+}
+  ? Exclude<R, string[]>
+  : 'DEF_OPT'
+
 const rs = {
   admin: undefined,
   user: undefined,
@@ -198,6 +210,9 @@ const defaultConf_PLUG = {
   },
 }
 type DEFFF_PLUG = typeof defaultConf_PLUG
+
+type _FROM_DEFF = RolesFromOptions<DEFFF_PLUG>
+//    ^?
 
 type GETPLUGS = GetPlugin<DEFFF_PLUG>
 //      ^?
@@ -224,23 +239,23 @@ type ISADM = _ISADM
 
 type ROLES = InferRoles<never>
 //      ^?
-// "DefaultRoles1"
+// "DefaultRoles"
 
 type ROLES_EMPTY = InferRoles<object>
 //      ^?
-// "DefaultRoles1"
+// "DefaultRoles"
 
 type ROLES_PLUG = InferRoles<DEFFF_PLUG>
 //      ^?
-// "DefaultRoles1"
+// "RolesFromOptions"
 
 type ROLES_PERMISS = InferRoles<object, typeof rs>
 //      ^?
-// "DefaultRoles1"
+// "DefaultRoles"
 
 type ROLES_FULL = InferRoles<DEFFF_PLUG, typeof rs>
 //      ^?
-// "DefaultRoles1"
+// "RolesFromPermissions"
 
 // biome-ignore lint/complexity/noBannedTypes: <explanation>
 // type EXInternalRoles = ExtractInferRoles<{}>
