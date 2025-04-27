@@ -110,34 +110,34 @@ export const baseOptions: BaseLayoutProps = {
             className: 'lg:col-start-2',
           },
         },
-        {
-          // icon: <Server />,
-          text: 'OpenAPI',
-          description:
-            'Generate interactive playgrounds and docs for your OpenAPI schema.',
-          url: '/docs/ui/openapi',
-          menu: {
-            className: 'lg:col-start-2',
-          },
-        },
-        {
-          // icon: <Pencil />,
-          text: 'Markdown',
-          description: 'Learn the writing format/syntax of Fumadocs.',
-          url: '/docs/ui/markdown',
-          menu: {
-            className: 'lg:col-start-3 lg:row-start-1',
-          },
-        },
-        {
-          // icon: <Layout />,
-          text: 'Layouts',
-          description: 'See the available layouts of Fumadocs UI.',
-          url: '/docs/ui/layouts/docs',
-          menu: {
-            className: 'lg:col-start-3',
-          },
-        },
+        // {
+        //   // icon: <Server />,
+        //   text: 'OpenAPI',
+        //   description:
+        //     'Generate interactive playgrounds and docs for your OpenAPI schema.',
+        //   url: '/docs/ui/openapi',
+        //   menu: {
+        //     className: 'lg:col-start-2',
+        //   },
+        // },
+        // {
+        //   // icon: <Pencil />,
+        //   text: 'Markdown',
+        //   description: 'Learn the writing format/syntax of Fumadocs.',
+        //   url: '/docs/ui/markdown',
+        //   menu: {
+        //     className: 'lg:col-start-3 lg:row-start-1',
+        //   },
+        // },
+        // {
+        //   // icon: <Layout />,
+        //   text: 'Layouts',
+        //   description: 'See the available layouts of Fumadocs UI.',
+        //   url: '/docs/ui/layouts/docs',
+        //   menu: {
+        //     className: 'lg:col-start-3',
+        //   },
+        // },
       ],
     },
     // {
