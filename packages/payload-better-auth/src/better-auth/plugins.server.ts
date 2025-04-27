@@ -306,10 +306,35 @@ type GetPluginReturnType<
 //     >
 //   >
 
-// export type PluginsToLoad<O extends BetterAuthPluginOptions> = ReturnType<typeof pluginsToLoad<O>
+// type MergeWithMissingDefaults<
+//   O extends BetterAuthPluginOptions,
+//   PluginsArray extends BetterAuthPlugin[],
+// > = Array<
+//   PluginsArray[number] | Exclude<DefaultPlugins<O>, PluginsArray[number]>
+// >
+// export type PluginsToLoad<O extends BetterAuthPluginOptions> = MergeWithMissingDefaults<O, NonNullable<NonNullable<O["betterAuth"]>["plugins"]>>
+
 export type PluginsToLoad<O extends BetterAuthPluginOptions> = Array<
-  DefaultPlugins<O> | UserPlugins<O>
+  // | ReturnType<typeof pluginsToLoad<O>>[number]
+  //
+  | DefaultPlugins<O>
+  //
+  | (O['betterAuth'] extends { plugins: infer BAPlugins }
+      ? BAPlugins extends BetterAuthPlugin[]
+        ? BAPlugins[number]
+        : never
+      : never)
+  //
+  // | (O['betterAuth'] extends { plugins: infer BAPlugins }
+  //     ? BAPlugins extends never[]
+  //       ? DefaultPlugins<O>
+  //       : BAPlugins
+  //     : DefaultPlugins<O>)
 >
+
+// export type PluginsToLoad<O extends BetterAuthPluginOptions> = Array<
+//   DefaultPlugins<O> | UserPlugins<O>
+// >
 
 type UserPlugins<O extends BetterAuthPluginOptions> = {
   [K in keyof O['betterAuthPlugins'] &
@@ -324,7 +349,7 @@ type UserPlugins<O extends BetterAuthPluginOptions> = {
 //   typeof userPlugins<O['betterAuthPlugins']>
 // >[number]
 type DefaultPlugins<O extends BetterAuthPluginOptions> = ReturnType<
-  typeof defaultPlugins<O['betterAuthPlugins']>
+  typeof defaultPluginsNew<O['betterAuth']>
 >[number]
 
 export const defaultPlugins = <
@@ -350,6 +375,40 @@ export const defaultPlugins = <
       : twoFactor(config.twoFactor),
   ]
 }
+
+export const defaultPluginsNew = <
+  BAP extends BetterAuthPluginOptions['betterAuth'],
+>(
+  inputConfig: NonNullable<BAP>['plugins'],
+) => {
+  const ids = {
+    admin: {
+      key: 'admin',
+      plugin: admin({ ac, roles }),
+    },
+    'next-cookies': {
+      key: 'nextCookies',
+      plugin: nextCookies(),
+    },
+    'open-api': {
+      key: 'openAPI',
+      plugin: openAPI(),
+    },
+    'two-factor': {
+      key: 'twoFactor',
+      plugin: twoFactor(),
+    },
+  }
+
+  const pluginsDefault = Object.values(ids).map((id) => id.plugin)
+
+  const configuredPluginKeys = Object.values(inputConfig ?? {}).map((p) => p.id)
+
+  return !inputConfig
+    ? pluginsDefault
+    : pluginsDefault.filter((p) => configuredPluginKeys.includes(p.id))
+}
+
 export const userPlugins = <
   BAP extends BetterAuthPluginOptions['betterAuthPlugins'],
 >(
@@ -482,7 +541,9 @@ export const pluginsToLoad = <O extends BetterAuthPluginOptions>(
   pluginOptions: O,
 ) => [
   // default plugins
-  ...defaultPlugins(pluginOptions.betterAuthPlugins),
+  // ...defaultPlugins(pluginOptions.betterAuthPlugins),
+  ...defaultPluginsNew(pluginOptions.betterAuth?.plugins ?? []),
   // user plugins
-  ...userPlugins(pluginOptions.betterAuthPlugins ?? {}),
+  // ...userPlugins(pluginOptions.betterAuthPlugins ?? {}),
+  ...(pluginOptions.betterAuth?.plugins ?? []),
 ]

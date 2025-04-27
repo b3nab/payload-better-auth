@@ -11,8 +11,9 @@ import type { BetterAuthPluginOptions } from '../types.js'
 export type InferBetterAuthInstance<O extends BetterAuthPluginOptions> =
   // & ImprovedAuth<O>
   // ReturnType<typeof betterAuth<ReturnType<typeof buildBetterAuthOptions<O>>>> & {
-  // @ts-ignore
-  ReturnType<typeof betterAuth<BuildBetterAuthOptionsReturnType<O>>>
+  ReturnType<typeof betterAuth<BuildOptions<O>>>
+// @ts-ignore
+// ReturnType<typeof betterAuth<BuildBetterAuthOptionsReturnType<O>>>
 // & {
 //   // Add a type assertion to help TypeScript understand that the api object can contain any plugin's API methods
 //   // HACK: this is a hack to make the api object contain any plugin's API methods and allow the code to compile.
@@ -22,6 +23,9 @@ export type InferBetterAuthInstance<O extends BetterAuthPluginOptions> =
 //   // And the admin plugin: the `banUser` method is not correctly inferred (banUser is an example, all the other methods are not correctly inferred as well).
 //   api: Record<string, any>
 // }
+
+export type InferPlugins<O extends BetterAuthPluginOptions> =
+  InferBetterAuthInstance<O>['options']['plugins'][number]
 
 // The following error is due to the fact that the types of better-auth are not well designed.
 // The types should be improved to allow for a more type-safe usage of the library.
@@ -38,7 +42,7 @@ export const createBetterAuthInstance = <
   const betterAuthOptions = buildBetterAuthOptions(pluginOptions, payload)
 
   // Create Better Auth instance
-  const instance = betterAuth(betterAuthOptions as BetterAuthOptions)
+  const instance = betterAuth(betterAuthOptions)
 
   // Store instance in singleton
   betterAuthSingleton(instance)
@@ -55,9 +59,13 @@ type EnsureBetterAuthPlugins<T extends any[]> = T extends (infer U)[]
     : never
   : never
 
+// export type BuildOptions<O extends BetterAuthPluginOptions> = ReturnType<typeof buildBetterAuthOptions<O>>
+export type BuildOptions<O extends BetterAuthPluginOptions> =
+  BuildBetterAuthOptionsReturnType<O>
+
 export type BuildBetterAuthOptionsReturnType<
   O extends BetterAuthPluginOptions,
-> = {
+> = O['betterAuth'] & {
   database: (options: BetterAuthOptions) => Adapter
   emailAndPassword: {
     enabled: boolean
@@ -69,7 +77,7 @@ export type BuildBetterAuthOptionsReturnType<
   // plugins: any
   // EnsureBetterAuthPlugins<EnabledPluginsArray<O>>
   trustedOrigins: BetterAuthOptions['trustedOrigins']
-} & O['betterAuth']
+}
 
 // export type BuildBetterAuthOptionsReturnType<
 //   O extends BetterAuthPluginOptions,
