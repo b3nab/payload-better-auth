@@ -4,6 +4,7 @@ import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { getBetterAuthSafe, createAuthLayer } from '../../src'
 import { betterAuthPluginConfig } from '../payload.plugins'
+import { roles } from './permissions'
 
 export const {
   auth,
@@ -20,7 +21,48 @@ export const {
   // guardUser,
   // guardAdmin,
   // guardRole,
-} = createAuthLayer(configPromise, betterAuthPluginConfig)
+} = createAuthLayer(configPromise, betterAuthPluginConfig, roles)
+
+type AUTH = typeof auth
+type $INFER = AUTH['$Infer']
+type Session = $INFER['Session']
+type User = Session['user']
+type Roles = User['role']
+//    ^?
+
+type $CONTEXT = Awaited<AUTH['$context']>
+//   ^?
+
+// type Tables = $CONTEXT["tables"]
+// //   ^?
+// type Options = $CONTEXT["options"]
+// //   ^?
+// type Plugins = Options["plugins"]
+// //   ^?
+// type ee = Plugins extends undefined
+// //   ^?
+//  ? "VABBE"
+//  : Plugins extends infer PLUGIN
+//   ? PLUGIN extends {
+//     id: "admin"
+//   }
+//   ? PLUGIN
+//   : "CCA"
+//   : "SUCA"
+
+// type Plugins = AUTH['options']['plugins']
+// type BO = Plugins extends {
+//   id: 'admin'
+// } ? Plugins[number] extends infer ADM
+//     ? ADM
+//     : never
+//   :"SUCA"
+
+// type IDK = BO['endpoints']['setRole']['options']['metadata']['$Infer']['body']['role']
+// //   ^?
+
+isRole({ role: 'dev' })
+//        ^?
 
 // export const baSafe = getBetterAuthSafe<typeof betterAuthPluginConfig>(
 //   //          ^?
@@ -92,7 +134,7 @@ if (bool) {
       //      ^?
       headers: await headers(),
       body: {
-        role: 'admin',
+        role: 'dev',
         permissions: {
           //  ^?
           devarea: ['access'],
@@ -101,33 +143,33 @@ if (bool) {
       },
     }),
   ]).catch((e) => {
-    const organizationEnabled =
-      betterAuthPluginConfig.betterAuthPlugins.organization
-    //      ^?
-    const twoFactorEnabled = betterAuthPluginConfig.betterAuthPlugins.twoFactor
-    //      ^?
-    const passkeyEnabled = betterAuthPluginConfig.betterAuthPlugins.passkey
-    //      ^?
-    // const openAPIEnabled = betterAuthPluginConfig.betterAuthPlugins.openAPI
-    //      ^?
-    const bearerEnabled = betterAuthPluginConfig.betterAuthPlugins.bearer
-    //      ^?
-    // const adminEnabled = betterAuthPluginConfig.betterAuthPlugins.admin
-    //      ^?
-    const multiSessionEnabled =
-      betterAuthPluginConfig.betterAuthPlugins.multiSession
-    //      ^?
-    const oAuthProxyEnabled =
-      betterAuthPluginConfig.betterAuthPlugins.oAuthProxy
-    //      ^?
-    const oidcProviderEnabled =
-      betterAuthPluginConfig.betterAuthPlugins.oidcProvider
-    //      ^?
-    const oneTapEnabled = betterAuthPluginConfig.betterAuthPlugins.oneTap
-    //      ^?
-    const stripeEnabled = betterAuthPluginConfig.betterAuthPlugins.stripe
-    //      ^?
-    const polarEnabled = betterAuthPluginConfig.betterAuthPlugins.polar
+    // const organizationEnabled =
+    //   betterAuthPluginConfig.betterAuthPlugins.organization
+    // //      ^?
+    // const twoFactorEnabled = betterAuthPluginConfig.betterAuthPlugins.twoFactor
+    // //      ^?
+    // const passkeyEnabled = betterAuthPluginConfig.betterAuthPlugins.passkey
+    // //      ^?
+    // // const openAPIEnabled = betterAuthPluginConfig.betterAuthPlugins.openAPI
+    // //      ^?
+    // const bearerEnabled = betterAuthPluginConfig.betterAuthPlugins.bearer
+    // //      ^?
+    // // const adminEnabled = betterAuthPluginConfig.betterAuthPlugins.admin
+    // //      ^?
+    // const multiSessionEnabled =
+    //   betterAuthPluginConfig.betterAuthPlugins.multiSession
+    // //      ^?
+    // const oAuthProxyEnabled =
+    //   betterAuthPluginConfig.betterAuthPlugins.oAuthProxy
+    // //      ^?
+    // const oidcProviderEnabled =
+    //   betterAuthPluginConfig.betterAuthPlugins.oidcProvider
+    // //      ^?
+    // const oneTapEnabled = betterAuthPluginConfig.betterAuthPlugins.oneTap
+    // //      ^?
+    // const stripeEnabled = betterAuthPluginConfig.betterAuthPlugins.stripe
+    // //      ^?
+    // const polarEnabled = betterAuthPluginConfig.betterAuthPlugins.polar
     //      ^?
     console.log(e)
     throw redirect('/sign-in')

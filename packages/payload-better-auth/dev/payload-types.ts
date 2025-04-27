@@ -78,6 +78,10 @@ export interface Config {
     organization: Organization;
     member: Member;
     invitation: Invitation;
+    oauthApplication: OauthApplication;
+    oauthAccessToken: OauthAccessToken;
+    oauthConsent: OauthConsent;
+    subscription: Subscription;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -95,6 +99,10 @@ export interface Config {
     organization: OrganizationSelect<false> | OrganizationSelect<true>;
     member: MemberSelect<false> | MemberSelect<true>;
     invitation: InvitationSelect<false> | InvitationSelect<true>;
+    oauthApplication: OauthApplicationSelect<false> | OauthApplicationSelect<true>;
+    oauthAccessToken: OauthAccessTokenSelect<false> | OauthAccessTokenSelect<true>;
+    oauthConsent: OauthConsentSelect<false> | OauthConsentSelect<true>;
+    subscription: SubscriptionSelect<false> | SubscriptionSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -183,11 +191,12 @@ export interface User {
   name: string;
   emailVerified: boolean;
   image?: string | null;
-  twoFactorEnabled?: boolean | null;
   role?: string | null;
   banned?: boolean | null;
   banReason?: string | null;
   banExpires?: string | null;
+  twoFactorEnabled?: boolean | null;
+  stripeCustomerId?: string | null;
   nickname?: string | null;
   posts?: (string | Post)[] | null;
   updatedAt: string;
@@ -318,6 +327,71 @@ export interface Invitation {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "oauthApplication".
+ */
+export interface OauthApplication {
+  id: string;
+  name?: string | null;
+  icon?: string | null;
+  metadata?: string | null;
+  clientId?: string | null;
+  clientSecret?: string | null;
+  redirectURLs?: string | null;
+  type?: string | null;
+  disabled?: boolean | null;
+  userId?: (string | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "oauthAccessToken".
+ */
+export interface OauthAccessToken {
+  id: string;
+  accessToken?: string | null;
+  refreshToken?: string | null;
+  accessTokenExpiresAt?: string | null;
+  refreshTokenExpiresAt?: string | null;
+  clientId?: string | null;
+  userId?: (string | null) | User;
+  scopes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "oauthConsent".
+ */
+export interface OauthConsent {
+  id: string;
+  clientId?: string | null;
+  userId?: (string | null) | User;
+  scopes?: string | null;
+  consentGiven?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscription".
+ */
+export interface Subscription {
+  id: string;
+  plan: string;
+  referenceId: string;
+  stripeCustomerId?: string | null;
+  stripeSubscriptionId?: string | null;
+  status?: string | null;
+  periodStart?: string | null;
+  periodEnd?: string | null;
+  cancelAtPeriodEnd?: boolean | null;
+  seats?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -366,6 +440,22 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'invitation';
         value: string | Invitation;
+      } | null)
+    | ({
+        relationTo: 'oauthApplication';
+        value: string | OauthApplication;
+      } | null)
+    | ({
+        relationTo: 'oauthAccessToken';
+        value: string | OauthAccessToken;
+      } | null)
+    | ({
+        relationTo: 'oauthConsent';
+        value: string | OauthConsent;
+      } | null)
+    | ({
+        relationTo: 'subscription';
+        value: string | Subscription;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -444,11 +534,12 @@ export interface UserSelect<T extends boolean = true> {
   name?: T;
   emailVerified?: T;
   image?: T;
-  twoFactorEnabled?: T;
   role?: T;
   banned?: T;
   banReason?: T;
   banExpires?: T;
+  twoFactorEnabled?: T;
+  stripeCustomerId?: T;
   nickname?: T;
   posts?: T;
   updatedAt?: T;
@@ -565,6 +656,67 @@ export interface InvitationSelect<T extends boolean = true> {
   status?: T;
   expiresAt?: T;
   inviterId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "oauthApplication_select".
+ */
+export interface OauthApplicationSelect<T extends boolean = true> {
+  name?: T;
+  icon?: T;
+  metadata?: T;
+  clientId?: T;
+  clientSecret?: T;
+  redirectURLs?: T;
+  type?: T;
+  disabled?: T;
+  userId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "oauthAccessToken_select".
+ */
+export interface OauthAccessTokenSelect<T extends boolean = true> {
+  accessToken?: T;
+  refreshToken?: T;
+  accessTokenExpiresAt?: T;
+  refreshTokenExpiresAt?: T;
+  clientId?: T;
+  userId?: T;
+  scopes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "oauthConsent_select".
+ */
+export interface OauthConsentSelect<T extends boolean = true> {
+  clientId?: T;
+  userId?: T;
+  scopes?: T;
+  consentGiven?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscription_select".
+ */
+export interface SubscriptionSelect<T extends boolean = true> {
+  plan?: T;
+  referenceId?: T;
+  stripeCustomerId?: T;
+  stripeSubscriptionId?: T;
+  status?: T;
+  periodStart?: T;
+  periodEnd?: T;
+  cancelAtPeriodEnd?: T;
+  seats?: T;
   updatedAt?: T;
   createdAt?: T;
 }

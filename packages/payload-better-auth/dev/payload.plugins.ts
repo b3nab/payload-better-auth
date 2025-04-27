@@ -7,6 +7,22 @@ import { reactInvitationEmail } from './lib/email/invitation'
 import { reactResetPasswordEmail } from './lib/email/reset-password'
 import { resend } from './lib/email/resend'
 import { ac, roles } from './lib/permissions'
+import {
+  admin,
+  bearer,
+  customSession,
+  multiSession,
+  oAuthProxy,
+  oidcProvider,
+  oneTap,
+  organization,
+  twoFactor,
+} from 'better-auth/plugins'
+import { passkey } from 'better-auth/plugins/passkey'
+import { stripe } from '@better-auth/stripe'
+import Stripe from 'stripe'
+import { polar } from '@polar-sh/better-auth'
+import { Polar } from '@polar-sh/sdk'
 
 const UserExtend: CollectionConfigExtend<'user'> = {
   fields: [
@@ -98,12 +114,39 @@ export const betterAuthOptions = {
       clientSecret: process.env.TWITTER_CLIENT_SECRET || '',
     },
   },
-} satisfies BetterAuthPluginOptions['betterAuth']
-
-export const betterAuthPluginConfig = {
-  betterAuth: betterAuthOptions,
-  betterAuthPlugins: {
-    organization: {
+  plugins: [
+    admin({ ac, roles }),
+    twoFactor({
+      otpOptions: {
+        async sendOTP({ user, otp }) {
+          'use server'
+          await resend.emails.send({
+            from,
+            to: user.email,
+            subject: 'Your OTP',
+            html: `Your OTP is ${otp}`,
+          })
+        },
+      },
+    }),
+    passkey(),
+    bearer(),
+    multiSession(),
+    oAuthProxy(),
+    oidcProvider({
+      loginPage: '/sign-in',
+    }),
+    oneTap(),
+    customSession(async (session) => {
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          dd: 'test',
+        },
+      }
+    }),
+    organization({
       async sendInvitationEmail(data) {
         'use server'
         await resend.emails.send({
@@ -125,48 +168,19 @@ export const betterAuthPluginConfig = {
           }),
         })
       },
-    },
-    twoFactor: {
-      otpOptions: {
-        async sendOTP({ user, otp }) {
-          'use server'
-          await resend.emails.send({
-            from,
-            to: user.email,
-            subject: 'Your OTP',
-            html: `Your OTP is ${otp}`,
-          })
-        },
-      },
-    },
-    passkey: true,
-    bearer: true,
-    // admin: true,
-    admin: { ac, roles },
-    //   admin({
-    //     adminUserIds: ['EXD5zjob2SD6CBWcEQ6OpLRHcyoUbnaB'],
-    //   }),
-    multiSession: true,
-    oAuthProxy: true,
-    oidcProvider: true,
-    //   oidcProvider({
-    //     loginPage: '/sign-in',
-    //   }),
-    oneTap: true,
-    // #TODO: need to add customSession to plugins.server.ts
-    //   customSession(async (session) => {
-    //     return {
-    //       ...session,
-    //       user: {
-    //         ...session.user,
-    //         dd: 'test',
-    //       },
-    //     }
-    //   }),
-    polar: true,
-    stripe: {
-      clientConfig: process.env.STRIPE_KEY || 'sk_test_',
-      // stripeClient: new Stripe(process.env.STRIPE_KEY || 'sk_test_'),
+    }),
+    polar({
+      client: new Polar({
+        accessToken: process.env.POLAR_ACCESS_TOKEN!,
+        // Use 'sandbox' if you're using the Polar Sandbox environment
+        // Remember that access tokens, products, etc. are completely separated between environments.
+        // Access tokens obtained in Production are for instance not usable in the Sandbox environment.
+        // server: 'production',
+      }),
+    }),
+    stripe({
+      // clientConfig: process.env.STRIPE_KEY || 'sk_test_',
+      stripeClient: new Stripe(process.env.STRIPE_KEY || 'sk_test_'),
       stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
       subscription: {
         enabled: true,
@@ -189,8 +203,12 @@ export const betterAuthPluginConfig = {
           },
         ],
       },
-    },
-  },
+    }),
+  ],
+} satisfies BetterAuthPluginOptions['betterAuth']
+
+export const betterAuthPluginConfig = {
+  betterAuth: betterAuthOptions,
   extendsCollections: {
     user: UserExtend,
   },
