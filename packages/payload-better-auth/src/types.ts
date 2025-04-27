@@ -50,10 +50,11 @@ export type BetterAuthPluginOptions = Readonly<{
    * Better Auth Config. https://www.better-auth.com/docs/reference/options
    * This config will override the default ones from the plugin itself.
    */
-  betterAuth?: Omit<BetterAuthOptions, 'database' | 'plugins'>
+  betterAuth?: Omit<BetterAuthOptions, 'database'>
   /**
    * Better Auth Plugins Config. https://www.better-auth.com/docs/concepts/plugins
    * This config will override the default ones from the plugin itself.
+   * @deprecated
    * @default {
    *  twoFactor: true,
    *  openAPI: true,
