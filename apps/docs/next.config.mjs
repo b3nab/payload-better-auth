@@ -21,7 +21,7 @@ const config = {
       {
         source: '/docs',
         destination: '/docs/latest/introduction',
-        permanent: true,
+        permanent: false,
       },
     ]
   },
