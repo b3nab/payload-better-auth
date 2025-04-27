@@ -21,7 +21,7 @@ export const {
   // guardUser,
   // guardAdmin,
   // guardRole,
-} = createAuthLayer(configPromise, betterAuthPluginConfig, roles)
+} = createAuthLayer(configPromise, betterAuthPluginConfig) //, roles)
 
 type AUTH = typeof auth
 type $INFER = AUTH['$Infer']
@@ -61,6 +61,7 @@ type $CONTEXT = Awaited<AUTH['$context']>
 // type IDK = BO['endpoints']['setRole']['options']['metadata']['$Infer']['body']['role']
 // //   ^?
 
+// if you (v) hover on role you should see (property) role: "user" | "admin" | "dev"
 isRole({ role: 'dev' })
 //        ^?
 
