@@ -12,14 +12,6 @@ The plugin accepts the following configuration options:
 ```ts
 type BetterAuthPluginOptions = {
   betterAuth?: Omit<BetterAuthOptions, 'database'>;
-  betterAuthPlugins?: {
-    twoFactor?: boolean;
-    username?: boolean;
-    anonymous?: boolean;
-    phoneNumber?: boolean;
-    magicLink?: boolean;
-    // ... other plugins
-  };
   extendsCollections?: {
     [K in CollectionSlug]?: CollectionConfigExtend<K>;
   };
@@ -34,23 +26,9 @@ The `betterAuth` object configures core Better Auth settings:
 ```ts
 {
   appName: 'My App',  // Used for 2FA and other features
-  baseURL: 'https://myapp.com',  // Optional
-  basePath: '/api/auth',  // Default API path
-  secret: process.env.BETTER_AUTH_SECRET,
-}
-```
-
-### Plugin Options
-
-Enable/disable specific authentication features:
-
-```ts
-{
-  betterAuthPlugins: {
-    twoFactor: true,  // Enable 2FA TOTP
-    passkey: true,    // Enable passkey support
-    openAPI: true,    // Enable OpenAPI documentation
-  }
+  baseURL: 'https://myapp.com',  // Optional - defaults to the server url
+  basePath: '/api/auth',  // Optional - defaults to  '/api/auth'
+  secret: process.env.BETTER_AUTH_SECRET, // Optional - defaults to process.env.BETTER_AUTH_SECRET
 }
 ```
 
@@ -85,6 +63,6 @@ Configure logging levels for debugging:
 
 ```ts
 {
-  logs: 'debug' // Options: false | 'debug' | 'info' | 'warn' | 'error'
+  logs: 'debug' // Options: false | 'trace' | 'debug' | 'info' | 'warn' | 'error'
 }
 ```

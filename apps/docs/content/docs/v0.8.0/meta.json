@@ -1,5 +1,5 @@
 {
-  "title": "v0.8.0 (development)",
+  "title": "v0.8.0",
   "description": "Docs for payload-better-auth v0.8.0",
   "root": true,
   "pages": [
@@ -7,103 +7,21 @@
     "introduction",
     "what-is-payload-better-auth",
     "installation",
-    "---Auth Layer---",
-    "auth-layer/create-auth-layer",
-    "auth-layer/checkers",
-    "auth-layer/guards",
     "---Features---",
     "features/authentication-strategies",
     "features/two-factor",
     "features/rbac",
+    "---Auth Layer---",
+    "auth-layer/create-auth-layer",
+    "auth-layer/auth-instance",
+    "auth-layer/checkers",
+    "auth-layer/guards",
     "---Configuration---",
     "configuration/plugin-options",
     "configuration/collections",
     "---API Reference---",
     "api/plugin-options",
     "api/authentication",
-    "api/collections",
-    "---Advanced---",
-    "advanced/security",
-    "advanced/troubleshooting",
-    "advanced/performance"
-  ],
-  "navigation": [
-    {
-      "title": "Getting Started",
-      "items": [
-        {
-          "title": "Introduction",
-          "path": "/docs/introduction"
-        },
-        {
-          "title": "Installation",
-          "path": "/docs/getting-started/installation"
-        }
-      ]
-    },
-    {
-      "title": "Configuration",
-      "items": [
-        {
-          "title": "Plugin Options",
-          "path": "/docs/configuration/plugin-options"
-        },
-        {
-          "title": "Collections",
-          "path": "/docs/configuration/collections"
-        }
-      ]
-    },
-    {
-      "title": "Features",
-      "items": [
-        {
-          "title": "Authentication Strategies",
-          "path": "/docs/features/authentication-strategies"
-        },
-        {
-          "title": "Two-Factor Authentication",
-          "path": "/docs/features/two-factor"
-        },
-        {
-          "title": "Role-Based Access Control",
-          "path": "/docs/features/rbac"
-        }
-      ]
-    },
-    {
-      "title": "API Reference",
-      "items": [
-        {
-          "title": "Plugin Options",
-          "path": "/docs/api/plugin-options"
-        },
-        {
-          "title": "Authentication",
-          "path": "/docs/api/authentication"
-        },
-        {
-          "title": "Collections",
-          "path": "/docs/api/collections"
-        }
-      ]
-    },
-    {
-      "title": "Advanced",
-      "items": [
-        {
-          "title": "Security Best Practices",
-          "path": "/docs/advanced/security"
-        },
-        {
-          "title": "Troubleshooting",
-          "path": "/docs/advanced/troubleshooting"
-        },
-        {
-          "title": "Performance Optimization",
-          "path": "/docs/advanced/performance"
-        }
-      ]
-    }
+    "api/collections"
   ]
 }

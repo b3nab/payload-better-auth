@@ -1,69 +1,79 @@
 ---
 title: createAuthLayer
 description: Learn how to use the createAuthLayer function to set up authentication in your Next.js application
-icon: Layers
+icon: LandPlot
+# icon: Layers
 ---
 
 # createAuthLayer 🛠️
 
-The `createAuthLayer` function is the core of Better Auth's Next.js integration. It provides a set of pre-built helpers that make it easy to implement authentication checks and guards in your Next.js routes and components.
+The `createAuthLayer` function is the core of Better Auth's Next.js integration. It provides a set of pre-built helpers that make it easy to implement authentication checks and guards in your Next.js actions, routes and components.
 
 ## Setup 🔧
 
 First, create an auth layer in your Next.js project:
 
-```ts
-// lib/auth.ts
-import { createAuthLayer } from '@payload-better-auth/nextjs'
+```typescript title="@/lib/auth.ts"
+import { createAuthLayer } from 'payload-better-auth'
 import { config } from '@/payload.config'
+import { payloadBetterAuthConfig } from '@/payload-better-auth.config'
 
-export const { auth, isAuth, isGuest, isUser, isAdmin, isRole, guardAuth } = createAuthLayer(
-  config,
-  {
-    // Your plugin options
-  }
-)
+export const {
+  // betterAuth instance
+  auth,
+  // checkers
+  isAuth,
+  isGuest,
+  isUser,
+  isAdmin,
+  isRole,
+  // guards
+  guardAuth,
+  // guardGuest,
+  // guardUser,
+  // guardAdmin,
+  // guardRole,
+} = createAuthLayer(config, payloadBetterAuthConfig)
 ```
+
+<Callout type="info" title="Better Auth Integration">
+This setup is similar to Better Auth's `lib/auth.ts` file, but with a key difference: you don't need to create a Better Auth instance manually using `betterAuth({...})`. The payload-better-auth plugin automatically creates and manages the Better Auth instance for you. The `createAuthLayer` function simply provides access to this pre-configured instance along with additional helpers.
+</Callout>
 
 ## Available Helpers 🎯
 
 The `createAuthLayer` function returns several helpers:
 
-### Checkers ✅
+{/* TODO: convert the following list to a manual <TypeTable /> */}
+
+## Better Auth Instance
+- `auth`: Better Auth Instance
+
+[Learn more on auth instance](../auth-layer/auth-instance)
+
+### Checkers
 - `isAuth`: Check if user is authenticated
 - `isGuest`: Check if user is a guest (not authenticated)
 - `isUser`: Check if user is logged in
 - `isAdmin`: Check if user is an admin
 - `isRole`: Check if user has specific role
 
-### Guards 🛡️
-- `guardAuth`: Protect routes and components
+[Learn more on checkers](../auth-layer/checkers)
 
-## Usage Examples 📝
+### Guards
+- `guardAuth`: Protect and redirect if user is not authenticated
+- `guardGuest`: Protect and redirect if user is a guest (not authenticated)
+- `guardUser`: Protect and redirect if user is logged in
+- `guardAdmin`: Protect and redirect if user is an admin
+- `guardRole`: Protect and redirect if user has specific role
 
-### Basic Setup
+[Learn more on guards](../auth-layer/guards)
 
-```ts
-// lib/auth.ts
-import { createAuthLayer } from '@payload-better-auth/nextjs'
-import { config } from '@/payload.config'
-
-export const { auth, isAuth, isGuest, isUser, isAdmin, isRole, guardAuth } = createAuthLayer(
-  config,
-  {
-    betterAuth: {
-      session: {
-        maxAge: 30 * 24 * 60 * 60, // 30 days
-      },
-    },
-  }
-)
-```
+## Usage Examples
 
 ### Using in Components
 
-```tsx
-// app/protected/page.tsx
+```tsx title="app/protected/page.tsx"
 import { isAdmin } from '@/lib/auth'
 
 export default async function ProtectedPage() {
@@ -85,8 +95,8 @@ export default async function ProtectedPage() {
 4. Handle errors appropriately
 5. Cache authentication state when possible
 
-## Next Steps 🚀
+{/* ## Next Steps 🚀
 
-- [Checkers](/docs/auth-layer/checkers)
-- [Guards](/docs/auth-layer/guards)
-- [Configuration](/docs/configuration/plugin-options)
+- [Checkers](../auth-layer/checkers)
+- [Guards](../auth-layer/guards)
+- [Configuration](../configuration/plugin-options) */}
