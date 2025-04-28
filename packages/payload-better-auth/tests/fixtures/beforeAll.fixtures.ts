@@ -10,7 +10,7 @@ import { getEndpoints } from 'better-auth/api'
 import { getAuthTables } from 'better-auth/db'
 import { setSuite, type Suite } from './suite.ctx'
 import { createBetterAuthInstance } from '../../src/better-auth/instance'
-import { betterAuthPluginConfig } from '../../dev/payload.plugins'
+import { betterAuthPluginConfig } from '../../dev/payload-better-auth.config'
 import { NextRESTClient } from '../../dev/helpers/NextRESTClient'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
