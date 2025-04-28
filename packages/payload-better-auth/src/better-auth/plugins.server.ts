@@ -404,9 +404,15 @@ export const defaultPluginsNew = <
 
   const configuredPluginKeys = Object.values(inputConfig ?? {}).map((p) => p.id)
 
-  return !inputConfig
-    ? pluginsDefault
-    : pluginsDefault.filter((p) => configuredPluginKeys.includes(p.id))
+  // console.log('configuredPluginKeys: ', configuredPluginKeys)
+
+  const filteredPlugins = pluginsDefault.filter(
+    (p) => !configuredPluginKeys.includes(p.id),
+  )
+
+  // console.log('filteredPlugins: ', filteredPlugins)
+
+  return !inputConfig ? pluginsDefault : filteredPlugins
 }
 
 export const userPlugins = <

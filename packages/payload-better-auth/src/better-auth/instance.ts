@@ -106,21 +106,25 @@ const buildBetterAuthOptions = <const O extends BetterAuthPluginOptions>(
   }
   // end cry on typescript types
 
+  const { plugins, ...userOptionsWithoutPlugins } =
+    pluginOptions.betterAuth ?? {}
+
   // Create Better Auth options
   return {
-    // defaults (sane defaults)
+    // options from user config
+    ////////////////////////////
+    ...(userOptionsWithoutPlugins || {}),
+
+    // overloads
     //////////////////////////////
     database: payloadAdapter({
       payload: payload ?? getPayload(),
     }),
     emailAndPassword: {
+      ...(userOptionsWithoutPlugins.emailAndPassword ?? {}),
       enabled: true,
     },
     plugins: pluginsToLoad(pluginOptions),
-
-    // options from plugin
-    ////////////////////////////
-    ...(pluginOptions.betterAuth || {}),
 
     // merge options (nested ones)
     //////////////////////////////////
