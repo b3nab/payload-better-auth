@@ -15,7 +15,7 @@ export const isAuth =
       headers: await headers(),
     })
 
-    console.log('isAuth :: ', response?.session)
+    // console.log('isAuth :: ', response?.session)
 
     return Boolean(response?.session)
   }

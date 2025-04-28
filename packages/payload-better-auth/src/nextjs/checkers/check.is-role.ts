@@ -106,20 +106,35 @@ type GetPLUGbyID<
 > = Extract<GetPlugin<O>, { id: ID }>
 type GetADM<O extends BetterAuthPluginOptions> = GetPLUGbyID<O, 'admin'>
 
+// // ....................
+// // IMPROVE GetPlugin<O> extends { id: 'admin' }
+// // ....................
+// export type InferRoles<
+//   O extends BetterAuthPluginOptions,
+//   RC = never,
+// > = GetADM<O> extends never
+//   ? DefaultRoles // "DefaultRoles-NO-admin()"
+//   : // : GetADM<O> extends { id: 'admin' }
+//     RolesFromOptions<O> extends never
+//     ? RC extends never
+//       ? DefaultRoles // "DefaultRoles-nothing"
+//       : RolesFromPermissions<RC>
+//     : RolesFromOptions<O>
+// // : "DefaultRoles-no-admin()--2"
+// // ....................
+// // ....................
+// // ....................
+
 // ....................
-// IMPROVE GetPlugin<O> extends { id: 'admin' }
+// SLIM Version
 // ....................
-export type InferRoles<
-  O extends BetterAuthPluginOptions,
-  RC = never,
-> = GetADM<O> extends never
-  ? DefaultRoles // "DefaultRoles-NO-admin()"
-  : // : GetADM<O> extends { id: 'admin' }
-    RolesFromOptions<O> extends never
-    ? RC extends never
+export type InferRoles<O extends BetterAuthPluginOptions> =
+  GetADM<O> extends never
+    ? DefaultRoles // "DefaultRoles-NO-admin()"
+    : // : GetADM<O> extends { id: 'admin' }
+      RolesFromOptions<O> extends never
       ? DefaultRoles // "DefaultRoles-nothing"
-      : RolesFromPermissions<RC>
-    : RolesFromOptions<O>
+      : RolesFromOptions<O>
 // : "DefaultRoles-no-admin()--2"
 // ....................
 // ....................
@@ -249,11 +264,11 @@ type ROLES_PLUG = InferRoles<DEFFF_PLUG>
 //      ^?
 // "RolesFromOptions"
 
-type ROLES_PERMISS = InferRoles<object, typeof rs>
+type ROLES_PERMISS = InferRoles<object> //, typeof rs>
 //      ^?
 // "DefaultRoles"
 
-type ROLES_FULL = InferRoles<DEFFF_PLUG, typeof rs>
+type ROLES_FULL = InferRoles<DEFFF_PLUG> //, typeof rs>
 //      ^?
 // "RolesFromPermissions"
 
@@ -284,11 +299,8 @@ type ROLES_FULL = InferRoles<DEFFF_PLUG, typeof rs>
 // type Roles<O extends BetterAuthPluginOptions> =
 //   BO<O>['endpoints']['setRole']['options']['metadata']['$Infer']['body']['role']
 
-export type IsRoleArgs<
-  O extends BetterAuthPluginOptions,
-  Roles extends RoleConfig,
-> = {
-  role: InferRoles<O, Roles> // extends never ? DefaultRoles : keyof Roles
+export type IsRoleArgs<O extends BetterAuthPluginOptions> = {
+  role: InferRoles<O> // extends never ? DefaultRoles : keyof Roles
 }
 
 // export const isRole =
@@ -318,24 +330,29 @@ export type IsRoleArgs<
 //   }
 
 export const isRole =
-  <O extends BetterAuthPluginOptions, RC extends RoleConfig>(
+  <O extends BetterAuthPluginOptions>(
     configPromise: Promise<SanitizedConfig>,
     pluginOptions: O,
-    roles?: RC,
   ) =>
-  async ({ role }: IsRoleArgs<O, RC>) => {
+  async ({ role }: IsRoleArgs<O>) => {
     const { payload, betterAuth } = await serverBefore(configPromise)
 
-    const responsePermission = await betterAuth.api.userHasPermission({
+    const data = await betterAuth.api.getSession({
       headers: await headers(),
-      body: {
-        permissions: {
-          byRole: [role as any],
-        },
-      },
     })
 
-    console.log('isRole :: ', responsePermission)
+    // const responsePermission = await betterAuth.api.userHasPermission({
+    //   headers: await headers(),
+    //   body: {
+    //     permissions: {
+    //       byRole: [role as any],
+    //     },
+    //   },
+    // })
 
-    return Boolean(responsePermission.success)
+    const userIsRole = data?.user.role === role
+
+    // console.log('isRole :: ', userIsRole)
+
+    return Boolean(userIsRole)
   }

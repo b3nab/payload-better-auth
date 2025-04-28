@@ -15,7 +15,7 @@ export const isGuest =
       headers: await headers(),
     })
 
-    console.log('isGuest :: ', !response?.session)
+    // console.log('isGuest :: ', !response?.session)
 
     return Boolean(!response?.session)
   }
