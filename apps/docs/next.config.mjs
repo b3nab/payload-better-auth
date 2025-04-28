@@ -8,13 +8,15 @@ const { version } = require('../../packages/payload-better-auth/package.json')
 // }
 // const { version } = packagePBA
 
+const [major, minor, patch] = version.split('.')
+
 const withMDX = createMDX()
 
 /** @type {import('next').NextConfig} */
 const config = {
   reactStrictMode: true,
   publicRuntimeConfig: {
-    latestVersion: `v${version}`,
+    latestVersion: `v${major}.${minor}.x`,
   },
   redirects: async () => {
     return [
