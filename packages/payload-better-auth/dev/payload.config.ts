@@ -7,7 +7,7 @@ import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { devUser } from './helpers/credentials'
 import { testEmailAdapter } from './helpers/testEmailAdapter'
 // import { seed } from './seed'
-import { betterAuthPluginConfig } from './payload.plugins'
+import { betterAuthPluginConfig } from './payload-better-auth.config'
 import { betterAuthPlugin } from '../src'
 
 const filename = fileURLToPath(import.meta.url)

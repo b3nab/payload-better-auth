@@ -1,10 +1,8 @@
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { getPayload } from 'payload'
+import { createAuthLayer } from '../../src'
 import configPromise from '@payload-config'
-import { getBetterAuthSafe, createAuthLayer } from '../../src'
-import { betterAuthPluginConfig } from '../payload.plugins'
-import { roles } from './permissions'
+import { betterAuthPluginConfig } from '../payload-better-auth.config'
 
 export const {
   auth,
@@ -16,11 +14,11 @@ export const {
   isAdmin,
   isRole,
   // guards
-  // guardAuth,
-  // guardGuest,
-  // guardUser,
-  // guardAdmin,
-  // guardRole,
+  guardAuth,
+  guardGuest,
+  guardUser,
+  guardAdmin,
+  guardRole,
 } = createAuthLayer(configPromise, betterAuthPluginConfig) //, roles)
 
 type AUTH = typeof auth
@@ -64,6 +62,8 @@ type $CONTEXT = Awaited<AUTH['$context']>
 // if you (v) hover on role you should see (property) role: "user" | "admin" | "dev"
 isRole({ role: 'dev' })
 //        ^?
+guardRole({ role: 'dev' })
+//           ^?
 
 // export const baSafe = getBetterAuthSafe<typeof betterAuthPluginConfig>(
 //   //          ^?

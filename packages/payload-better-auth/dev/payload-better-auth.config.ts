@@ -214,5 +214,3 @@ export const betterAuthPluginConfig = {
   },
   logs: 'trace',
 } as const satisfies BetterAuthPluginOptions
-
-export const plugins = [betterAuthPlugin(betterAuthPluginConfig)]

@@ -75,12 +75,12 @@ export interface Config {
     verification: Verification;
     twoFactor: TwoFactor;
     passkey: Passkey;
-    organization: Organization;
-    member: Member;
-    invitation: Invitation;
     oauthApplication: OauthApplication;
     oauthAccessToken: OauthAccessToken;
     oauthConsent: OauthConsent;
+    organization: Organization;
+    member: Member;
+    invitation: Invitation;
     subscription: Subscription;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -96,12 +96,12 @@ export interface Config {
     verification: VerificationSelect<false> | VerificationSelect<true>;
     twoFactor: TwoFactorSelect<false> | TwoFactorSelect<true>;
     passkey: PasskeySelect<false> | PasskeySelect<true>;
-    organization: OrganizationSelect<false> | OrganizationSelect<true>;
-    member: MemberSelect<false> | MemberSelect<true>;
-    invitation: InvitationSelect<false> | InvitationSelect<true>;
     oauthApplication: OauthApplicationSelect<false> | OauthApplicationSelect<true>;
     oauthAccessToken: OauthAccessTokenSelect<false> | OauthAccessTokenSelect<true>;
     oauthConsent: OauthConsentSelect<false> | OauthConsentSelect<true>;
+    organization: OrganizationSelect<false> | OrganizationSelect<true>;
+    member: MemberSelect<false> | MemberSelect<true>;
+    invitation: InvitationSelect<false> | InvitationSelect<true>;
     subscription: SubscriptionSelect<false> | SubscriptionSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -288,45 +288,6 @@ export interface Passkey {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "organization".
- */
-export interface Organization {
-  id: string;
-  name: string;
-  slug?: string | null;
-  logo?: string | null;
-  metadata?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "member".
- */
-export interface Member {
-  id: string;
-  organizationId: string | Organization;
-  userId: string | User;
-  role: string;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "invitation".
- */
-export interface Invitation {
-  id: string;
-  organizationId: string | Organization;
-  role?: string | null;
-  status: string;
-  expiresAt: string;
-  inviterId: string;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "oauthApplication".
  */
 export interface OauthApplication {
@@ -369,6 +330,45 @@ export interface OauthConsent {
   userId?: (string | null) | User;
   scopes?: string | null;
   consentGiven?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "organization".
+ */
+export interface Organization {
+  id: string;
+  name: string;
+  slug?: string | null;
+  logo?: string | null;
+  metadata?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "member".
+ */
+export interface Member {
+  id: string;
+  organizationId: string | Organization;
+  userId: string | User;
+  role: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "invitation".
+ */
+export interface Invitation {
+  id: string;
+  organizationId: string | Organization;
+  role?: string | null;
+  status: string;
+  expiresAt: string;
+  inviterId: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -430,18 +430,6 @@ export interface PayloadLockedDocument {
         value: string | Passkey;
       } | null)
     | ({
-        relationTo: 'organization';
-        value: string | Organization;
-      } | null)
-    | ({
-        relationTo: 'member';
-        value: string | Member;
-      } | null)
-    | ({
-        relationTo: 'invitation';
-        value: string | Invitation;
-      } | null)
-    | ({
         relationTo: 'oauthApplication';
         value: string | OauthApplication;
       } | null)
@@ -452,6 +440,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'oauthConsent';
         value: string | OauthConsent;
+      } | null)
+    | ({
+        relationTo: 'organization';
+        value: string | Organization;
+      } | null)
+    | ({
+        relationTo: 'member';
+        value: string | Member;
+      } | null)
+    | ({
+        relationTo: 'invitation';
+        value: string | Invitation;
       } | null)
     | ({
         relationTo: 'subscription';
@@ -625,42 +625,6 @@ export interface PasskeySelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "organization_select".
- */
-export interface OrganizationSelect<T extends boolean = true> {
-  name?: T;
-  slug?: T;
-  logo?: T;
-  metadata?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "member_select".
- */
-export interface MemberSelect<T extends boolean = true> {
-  organizationId?: T;
-  userId?: T;
-  role?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "invitation_select".
- */
-export interface InvitationSelect<T extends boolean = true> {
-  organizationId?: T;
-  role?: T;
-  status?: T;
-  expiresAt?: T;
-  inviterId?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "oauthApplication_select".
  */
 export interface OauthApplicationSelect<T extends boolean = true> {
@@ -700,6 +664,42 @@ export interface OauthConsentSelect<T extends boolean = true> {
   userId?: T;
   scopes?: T;
   consentGiven?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "organization_select".
+ */
+export interface OrganizationSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  logo?: T;
+  metadata?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "member_select".
+ */
+export interface MemberSelect<T extends boolean = true> {
+  organizationId?: T;
+  userId?: T;
+  role?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "invitation_select".
+ */
+export interface InvitationSelect<T extends boolean = true> {
+  organizationId?: T;
+  role?: T;
+  status?: T;
+  expiresAt?: T;
+  inviterId?: T;
   updatedAt?: T;
   createdAt?: T;
 }
