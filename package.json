@@ -13,6 +13,7 @@
     "type": "git",
     "url": "git+https://github.com/b3nab/payload-better-auth"
   },
+  "homepage": "https://payload-better-auth.abbenanti.com",
   "license": "AGPL-3.0-only",
   "keywords": [
     "payload-plugin",
