@@ -1,6 +1,6 @@
 {
-  "title": "v0.8.0",
-  "description": "Docs for payload-better-auth v0.8.0",
+  "title": "v0.8.x",
+  "description": "Docs for payload-better-auth v0.8.x",
   "root": true,
   "pages": [
     "---Getting Started---",
