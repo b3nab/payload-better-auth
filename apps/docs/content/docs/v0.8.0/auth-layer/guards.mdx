@@ -12,36 +12,93 @@ Guards are functions that protect your routes and components from unauthorized a
 
 ### guardAuth
 
-The `guardAuth` guard protects routes and components by verifying authentication:
+The `guardAuth` guard verifies if a user has an active session and returns session information. If `redirectUrl` is provided and the user is not authenticated, it will automatically redirect to the specified URL:
 
 ```ts
-try {
-  await guardAuth(request)
-  // Protected logic here
-} catch (error) {
-  // Handle unauthorized access
-}
+const result = await guardAuth(redirectUrl?: string)
+// Returns:
+// {
+//   hasSession: boolean
+//   session?: any
+//   user?: any
+// }
+```
+
+### guardGuest
+
+The `guardGuest` guard ensures that a user is not authenticated. If `redirectUrl` is provided and the user is authenticated, it will automatically redirect to the specified URL:
+
+```ts
+const result = await guardGuest(redirectUrl?: string)
+// Returns:
+// {
+//   hasSession: boolean
+//   session?: any
+//   user?: any
+// }
+```
+
+### guardUser
+
+The `guardUser` guard verifies that a user is authenticated and has a valid user record. If `redirectUrl` is provided and the user is not authenticated or doesn't have a `user` role, it will automatically redirect to the specified URL:
+
+```ts
+const result = await guardUser(redirectUrl?: string)
+// Returns:
+// {
+//   hasSession: boolean
+//   session?: any
+//   user?: any
+// }
+```
+
+### guardAdmin
+
+The `guardAdmin` guard ensures that a user is authenticated and has admin privileges. If `redirectUrl` is provided and the user is not authenticated or doesn't have `admin` role, it will automatically redirect to the specified URL:
+
+```ts
+const result = await guardAdmin(redirectUrl?: string)
+// Returns:
+// {
+//   hasSession: boolean
+//   session?: any
+//   user?: any
+// }
+```
+
+### guardRole
+
+The `guardRole` guard verifies that a user has a specific role. If `redirectUrl` is provided and the user is not authenticated or doesn't have the specified role, it will automatically redirect to the specified URL:
+
+```ts
+const result = await guardRole({ role: 'admin' }, redirectUrl?: string)
+// Returns:
+// {
+//   hasSession: boolean
+//   session?: any
+//   user?: any
+// }
 ```
 
 ## Usage Examples 📝
 
-### API Routes
+### Server components
 
-```ts
-// pages/api/protected.ts
+```ts title="app/protected/page.ts"
 import { guardAuth } from '@/lib/auth'
 
 export default async function handler(req, res) {
-  try {
-    await guardAuth(req)
-    // Protected route logic
-    res.status(200).json({ data: 'Protected data' })
-  } catch (error) {
-    res.status(401).json({ error: 'Unauthorized' })
+  const result = await guardAuth()
+
+  if (!result.hasSession) {
+    return res.status(401).json({ error: 'Unauthorized' })
   }
+
+  // Protected route logic
+  return res.status(200).json({ data: 'Protected data' })
 }
 ```
-
+{/*
 ### Middleware
 
 ```ts
@@ -49,58 +106,46 @@ export default async function handler(req, res) {
 import { guardAuth } from '@/lib/auth'
 
 export async function middleware(request) {
-  try {
-    await guardAuth(request)
-    return NextResponse.next()
-  } catch (error) {
-    return NextResponse.redirect(new URL('/login', request.url))
-  }
+  // Will automatically redirect to /login if not authenticated
+  const result = await guardAuth('/login')
+
+  // If we get here, the user is authenticated
+  return NextResponse.next()
 }
-```
+``` */}
 
 ### Route Handlers
 
-```ts
-// app/api/protected/route.ts
+```ts title="app/api/protected/route.ts"
 import { guardAuth } from '@/lib/auth'
 import { NextResponse } from 'next/server'
 
 export async function GET(request: Request) {
-  try {
-    await guardAuth(request)
-    return NextResponse.json({ data: 'Protected data' })
-  } catch (error) {
+  const result = await guardAuth()
+
+  if (!result.hasSession) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+
+  return NextResponse.json({ data: 'Protected data' })
 }
 ```
 
 ## Error Handling 🚨
 
-Guards throw errors when authentication fails. You should handle these errors appropriately:
+Guards return a result object that indicates whether the user has a valid session. You should check the `hasSession` property to determine if the user is authorized. If you provide a `redirectUrl`, the guard will handle the redirection automatically when the user is not authorized:
 
 ```ts
-try {
-  await guardAuth(request)
-} catch (error) {
-  if (error instanceof AuthenticationError) {
-    // Handle authentication error
-  } else {
-    // Handle other errors
-  }
+// With automatic redirection
+const result = await guardAuth('/login')
+// If not authenticated, user will be redirected to /login
+// If authenticated, result will contain session info
+
+// Without automatic redirection
+const result = await guardAuth()
+if (!result.hasSession) {
+  // Handle unauthorized access manually
+} else {
+  // Access granted, use result.user and result.session
 }
 ```
-
-## Best Practices 📚
-
-1. Use guards for route protection
-2. Implement proper error handling
-3. Consider using middleware for global protection
-4. Cache authentication state when possible
-5. Use appropriate HTTP status codes
-
-## Next Steps 🚀
-
-- [Checkers](/docs/auth-layer/checkers)
-- [createAuthLayer](/docs/auth-layer/create-auth-layer)
-- [Configuration](/docs/configuration/plugin-options)
