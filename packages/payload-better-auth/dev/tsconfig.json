@@ -31,9 +31,13 @@
       ],
       "payload-better-auth/rsc": [
         "../src/exports/rsc.ts"
-      ]
+      ],
+      "@/*": [
+        "./*"
+      ],
     },
     "noEmit": true,
     "emitDeclarationOnly": false,
+    "incremental": true
   }
 }
