@@ -2,26 +2,25 @@ import { headers } from 'next/headers.js'
 import { redirect } from 'next/navigation.js'
 import { serverBefore } from '../server.before.js'
 import type { GuardBuilder } from './guard.type.js'
+import type { BetterAuthPluginOptions } from '../../types.js'
 
-export const guardGuest: GuardBuilder =
+export const guardAuth: GuardBuilder<BetterAuthPluginOptions> =
   (configPromise, pluginOptions) => async (redirectUrl) => {
     const { payload, betterAuth } = await serverBefore(configPromise)
 
     const data = await betterAuth.api.getSession({
       headers: await headers(),
-      // asResponse: true,
     })
 
-    // const data = await responseSession.json()
+    // const userID = data?.user.id
 
-    // console.log('ISGUEST - data:: ', data)
+    // console.log('ISAUTH - data:: ', data)
 
-    if (redirectUrl && data?.session.token) redirect(redirectUrl)
+    if (redirectUrl && !data?.session.token) redirect(redirectUrl)
 
     return {
       hasSession: !!data?.session.token && !!data?.user,
-      data,
-      // payload,
-      // betterAuth,
+      session: data?.session,
+      user: data?.user,
     }
   }

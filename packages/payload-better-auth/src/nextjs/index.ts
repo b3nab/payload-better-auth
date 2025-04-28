@@ -18,37 +18,34 @@ import {
 import {
   type Guard,
   guardAuth,
-  //   guardGuest,
-  //   guardUser,
-  //   guardAdmin,
-  //   guardRole,
+  guardGuest,
+  guardUser,
+  guardAdmin,
+  guardRole,
 } from './guards/index.js'
-import type { admin } from 'better-auth/plugins'
 
 type Checker<Args = void> = Args extends void
   ? () => Promise<boolean>
   : (args: Args) => Promise<boolean>
 
-type RoleConfig = NonNullable<NonNullable<Parameters<typeof admin>[0]>['roles']>
-
-type AuthLayer<O extends BetterAuthPluginOptions, RC extends RoleConfig> = {
+type AuthLayer<O extends BetterAuthPluginOptions> = {
   auth: InferBetterAuthInstance<O>
   isAuth: Checker
   isGuest: Checker
   isUser: Checker
   isAdmin: Checker
-  isRole: Checker<IsRoleArgs<O, RC>>
+  isRole: Checker<IsRoleArgs<O>>
   guardAuth: Guard
+  guardGuest: Guard
+  guardUser: Guard
+  guardAdmin: Guard
+  guardRole: Guard<IsRoleArgs<O>>
 }
 
-export function createAuthLayer<
-  O extends BetterAuthPluginOptions,
-  RC extends RoleConfig,
->(
+export function createAuthLayer<O extends BetterAuthPluginOptions>(
   configPromise: Promise<SanitizedConfig>,
   pluginOptions: O,
-  roles?: RC,
-): AuthLayer<O, RC> {
+): AuthLayer<O> {
   createBetterAuthInstance({ pluginOptions })
   return {
     // better auth instance
@@ -59,13 +56,13 @@ export function createAuthLayer<
     isGuest: isGuest(configPromise, pluginOptions),
     isUser: isUser(configPromise, pluginOptions),
     isAdmin: isAdmin(configPromise, pluginOptions),
-    isRole: isRole(configPromise, pluginOptions, roles),
+    isRole: isRole(configPromise, pluginOptions),
 
     // guards
     guardAuth: guardAuth(configPromise, pluginOptions),
-    // guardGuest: guardGuest(configPromise, pluginOptions),
-    // guarUser: guarUser(configPromise, pluginOptions),
-    // guarAdmin: guarAdmin(configPromise, pluginOptions),
-    // guarRole: guarRole(configPromise, pluginOptions, roles),
+    guardGuest: guardGuest(configPromise, pluginOptions),
+    guardUser: guardUser(configPromise, pluginOptions),
+    guardAdmin: guardAdmin(configPromise, pluginOptions),
+    guardRole: guardRole<O>()(configPromise, pluginOptions),
   } as const
 }
