@@ -14,7 +14,6 @@
     "url": "git+https://github.com/b3nab/payload-better-auth"
   },
   "license": "AGPL-3.0-only",
-  "type": "module",
   "keywords": [
     "payload-plugin",
     "payload",
@@ -26,6 +25,9 @@
     "authentication",
     "authorization"
   ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "import": "./dist/index.js",
@@ -43,57 +45,38 @@
       "default": "./dist/exports/rsc.js"
     }
   },
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "files": [
     "dist"
   ],
-  "publishConfig": {
-    "registry": "https://registry.npm.abbenanti.com/",
-    "exports": {
-      ".": {
-        "import": "./dist/index.js",
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
-      },
-      "./client": {
-        "import": "./dist/exports/client.js",
-        "types": "./dist/exports/client.d.ts",
-        "default": "./dist/exports/client.js"
-      },
-      "./rsc": {
-        "import": "./dist/exports/rsc.js",
-        "types": "./dist/exports/rsc.d.ts",
-        "default": "./dist/exports/rsc.js"
-      }
-    },
-    "main": "./dist/index.js",
-    "types": "./dist/index.d.ts"
+  "engines": {
+    "node": "^18.20.2 || >=20.9.0",
+    "pnpm": "^9"
   },
-  "scripts": {
-    "build": "pnpm copyfiles && pnpm build:types && pnpm build:swc",
-    "build:swc": "swc ./src -d ./dist --config-file .swcrc --strip-leading-paths",
-    "build:types": "tsc --extendedDiagnostics --listEmittedFiles --outDir dist --rootDir ./src",
-    "build:types:trace": "tsc --extendedDiagnostics --traceResolution --listEmittedFiles --outDir dist --rootDir ./src",
-    "clean": "rimraf {dist,*.tsbuildinfo}",
-    "copyfiles": "copyfiles -u 1 \"src/**/*.{html,css,scss,ttf,woff,woff2,eot,svg,jpg,png,json}\" dist/",
-    "lint": "eslint",
-    "lint:fix": "eslint ./src --fix",
-    "publish:local": "pnpm publish --registry http://0.0.0.0:4873 --no-git-checks",
-    "bump": "pnpx bumpp",
-    "prepublishOnly": "pnpm clean && pnpm build",
-    "test": "jest -w",
-    "test:coverage": "jest --coverage --detectOpenHandles --verbose --forceExit",
-    "...DEV...": "",
-    "dev:OLD": "pnpm local:up -d && payload run ./dev/server.ts | pino-pretty",
-    "dev:all:OLD": "pnpm local:up -d && pnpm dev:sync && payload run ./dev/server.ts | pino-pretty",
-    "dev": "pnpm dev:sync && payload run ./dev/server.ts | pino-pretty",
-    "dev:all": "pnpm local:up -d && pnpm dev:sync && next dev | pino-pretty",
-    "dev:sync": "pnpm dev:generate-importmap && pnpm dev:generate-types",
-    "dev:generate-importmap": "pnpm dev:payload generate:importmap",
-    "dev:generate-types": "pnpm dev:payload generate:types",
-    "dev:payload": "cross-env NODE_OPTIONS=--no-deprecation PAYLOAD_CONFIG_PATH=./dev/payload.config.ts payload",
-    "local:up": "docker-compose -f ./dev/compose.local.yml up"
+  "peerDependencies": {
+    "better-auth": ">1.2.7",
+    "payload": ">=3.0.0 <4.0.0",
+    "react": ">=19.0.0 <20.0.0",
+    "react-dom": ">=19.0.0 <20.0.0",
+    "next": ">=15.0.0 <16.0.0"
+  },
+  "dependencies": {
+    "@better-auth/stripe": "1.2.7",
+    "@better-fetch/fetch": "1.1.15",
+    "@fastify/deepmerge": "^3.0.0",
+    "@polar-sh/better-auth": "^0.0.11",
+    "@polar-sh/sdk": "^0.32.9",
+    "@react-email/components": "^0.0.25",
+    "better-auth": "1.2.7",
+    "better-auth-harmony": "^1.2.4",
+    "busboy": "^1.6.0",
+    "http-status": "^2.1.0",
+    "mongodb": "^6.13.0",
+    "pino": "^9.6.0",
+    "pnpm": "9",
+    "qrcode": "^1.5.4",
+    "resend": "^4.0.1",
+    "stripe": "^17.7.0",
+    "tiny-invariant": "^1.3.3"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
@@ -138,12 +121,30 @@
     "sort-package-json": "^2.10.0",
     "typescript": "5.7.3"
   },
-  "peerDependencies": {
-    "payload": "^3"
-  },
-  "engines": {
-    "node": "^18.20.2 || >=20.9.0",
-    "pnpm": "^9"
+  "scripts": {
+    "build": "pnpm copyfiles && pnpm build:types && pnpm build:swc",
+    "build:swc": "swc ./src -d ./dist --config-file .swcrc --strip-leading-paths",
+    "build:types": "tsc --extendedDiagnostics --listEmittedFiles --outDir dist --rootDir ./src",
+    "build:types:trace": "tsc --extendedDiagnostics --traceResolution --listEmittedFiles --outDir dist --rootDir ./src",
+    "clean": "rimraf {dist,*.tsbuildinfo}",
+    "copyfiles": "copyfiles -u 1 \"src/**/*.{html,css,scss,ttf,woff,woff2,eot,svg,jpg,png,json}\" dist/",
+    "lint": "eslint",
+    "lint:fix": "eslint ./src --fix",
+    "publish:local": "pnpm publish --registry http://0.0.0.0:4873 --no-git-checks",
+    "bump": "pnpx bumpp",
+    "prepublishOnly": "pnpm clean && pnpm build",
+    "test": "jest -w",
+    "test:coverage": "jest --coverage --detectOpenHandles --verbose --forceExit",
+    "...DEV...": "",
+    "dev:OLD": "pnpm local:up -d && payload run ./dev/server.ts | pino-pretty",
+    "dev:all:OLD": "pnpm local:up -d && pnpm dev:sync && payload run ./dev/server.ts | pino-pretty",
+    "dev": "pnpm dev:sync && payload run ./dev/server.ts | pino-pretty",
+    "dev:all": "pnpm local:up -d && pnpm dev:sync && next dev | pino-pretty",
+    "dev:sync": "pnpm dev:generate-importmap && pnpm dev:generate-types",
+    "dev:generate-importmap": "pnpm dev:payload generate:importmap",
+    "dev:generate-types": "pnpm dev:payload generate:types",
+    "dev:payload": "cross-env NODE_OPTIONS=--no-deprecation PAYLOAD_CONFIG_PATH=./dev/payload.config.ts payload",
+    "local:up": "docker-compose -f ./dev/compose.local.yml up"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
@@ -151,24 +152,27 @@
     ]
   },
   "registry": "https://registry.npm.abbenanti.com/",
-  "dependencies": {
-    "@better-auth/stripe": "1.2.7",
-    "@better-fetch/fetch": "1.1.15",
-    "@fastify/deepmerge": "^3.0.0",
-    "@polar-sh/better-auth": "^0.0.11",
-    "@polar-sh/sdk": "^0.32.9",
-    "@react-email/components": "^0.0.25",
-    "better-auth": "1.2.7",
-    "better-auth-harmony": "^1.2.4",
-    "busboy": "^1.6.0",
-    "http-status": "^2.1.0",
-    "mongodb": "^6.13.0",
-    "pino": "^9.6.0",
-    "pnpm": "9",
-    "qrcode": "^1.5.4",
-    "resend": "^4.0.1",
-    "stripe": "^17.7.0",
-    "tiny-invariant": "^1.3.3"
+  "publishConfig": {
+    "registry": "https://registry.npm.abbenanti.com/",
+    "exports": {
+      ".": {
+        "import": "./dist/index.js",
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "./client": {
+        "import": "./dist/exports/client.js",
+        "types": "./dist/exports/client.d.ts",
+        "default": "./dist/exports/client.js"
+      },
+      "./rsc": {
+        "import": "./dist/exports/rsc.js",
+        "types": "./dist/exports/rsc.d.ts",
+        "default": "./dist/exports/rsc.js"
+      }
+    },
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts"
   },
   "packageManager": "pnpm@9.15.6+sha512.139cab068fdf0b751268179ac5f909b5be72afb4a75c513d1905d151befc8977b593d3cf8671ed83d4d6637c5c94b98ffbce108125de4a5a27a31233601a99de"
 }
