@@ -24,6 +24,11 @@ export type InferBetterAuthInstance<O extends BetterAuthPluginOptions> =
 //   api: Record<string, any>
 // }
 
+const defaultOptions = {} as const
+export type InferInternalBetterAuthInstance = ReturnType<
+  typeof betterAuth<BuildBetterAuthOptionsReturnType<typeof defaultOptions>>
+>
+
 export type InferPlugins<O extends BetterAuthPluginOptions> =
   InferBetterAuthInstance<O>['options']['plugins'][number]
 
