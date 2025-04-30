@@ -1,11 +1,9 @@
-import type { GuardBuilder } from './guard.type.js'
-import type { BetterAuthPluginOptions } from '../../types.js'
+import { GuardBuilder, type GuardWrap } from './guard.type.js'
 import { guardRole as guardRoleFunction } from './guard.role.js'
 
-export const guardAdmin: GuardBuilder<BetterAuthPluginOptions> = (
-  configPromise,
-  pluginOptions,
-) => {
-  const guardRole = guardRoleFunction()(configPromise, pluginOptions)
-  return async (redirectUrl) => guardRole({ role: 'admin' }, redirectUrl)
-}
+export const guardAdmin: GuardWrap = (configPromise, pluginOptions) =>
+  GuardBuilder(async (redirectUrl?: string) => {
+    const guardRole = guardRoleFunction()(configPromise, pluginOptions)
+    if (redirectUrl) return guardRole({ role: 'admin' }, redirectUrl)
+    return guardRole({ role: 'admin' })
+  })

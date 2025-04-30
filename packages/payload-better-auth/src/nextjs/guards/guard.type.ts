@@ -7,10 +7,6 @@ import type { InferInternalBetterAuthInstance } from 'src/better-auth/instance.j
 //   export interface User extends UserAny {}
 // }
 
-// export interface UserAny {
-//   [x: string]: any
-// }
-
 // type User = import('payload').User
 // export type Session = InferInternalBetterAuthInstance['$Infer']['Session']['session']
 // export type User = InferInternalBetterAuthInstance['$Infer']['Session']['user']
@@ -19,31 +15,68 @@ import type { InferInternalBetterAuthInstance } from 'src/better-auth/instance.j
 export type Session = import('payload').GeneratedTypes['collections']['session']
 // @ts-ignore
 export type User = import('payload').GeneratedTypes['user']
-// type SelectFromUser = import('payload').TypedCollectionSelect['user']
-// export type User = import('payload').TransformCollectionWithSelect<
-//   'user',
-//   SelectFromUser
-// >
-// export type User = import('payload').TypedUser
 
-export type GuardBuilder<O extends BetterAuthPluginOptions, Args = void> = (
-  configPromise: Promise<SanitizedConfig>,
-  pluginOptions: O,
-) => Guard<Args>
+export type GuardWrap<
+  O extends BetterAuthPluginOptions = object,
+  Args = void,
+> = (configPromise: Promise<SanitizedConfig>, pluginOptions: O) => Guard<Args>
 // & Awaited<ReturnType<GuardServerBefore>>
 
-export type Guard<Args = void> = Args extends void
-  ? (redirectUrl?: string) => Promise<GuardReturn>
-  : (args: Args, redirectUrl?: string) => Promise<GuardReturn>
+// export type GuardBuilder<O extends BetterAuthPluginOptions, Args = void> = (
+//   configPromise: Promise<SanitizedConfig>,
+//   pluginOptions: O,
+// ) => Guard<Args>
+// // & Awaited<ReturnType<GuardServerBefore>>
 
-type GuardReturn =
-  // | {
-  //     hasSession: true
-  //     session: any
-  //     user: User
-  //   }
-  {
-    hasSession: boolean
-    session?: Session
-    user?: User
-  }
+export type Guard<Args = void> = Args extends void
+  ? {
+      (): Promise<GuardReturn<false>>
+      (redirectUrl: string): Promise<GuardReturn<true>>
+    }
+  : {
+      (args: Args): Promise<GuardReturn<false>>
+      (args: Args, redirectUrl: string): Promise<GuardReturn<true>>
+    }
+
+export type GuardReturn<HasRedirectUrl extends boolean = false> =
+  HasRedirectUrl extends true
+    ? {
+        hasSession: true
+        session: Session
+        user: User
+      }
+    : // | {
+      {
+        hasSession: boolean
+        session?: Session
+        user?: User
+      }
+// (
+//   |
+//   {
+//     hasSession: false
+//     session?: undefined
+//     user?: undefined
+//   }
+//   |{
+//     hasSession: true
+//     session: Session
+//     user: User
+//   }
+// )
+//     hasSession: true
+//     session: any
+//     user: User
+//   }
+
+export function GuardBuilder(
+  fn: (redirectUrl?: string) => Promise<GuardReturn<boolean>>,
+): Guard<void>
+export function GuardBuilder<Args>(
+  fn: (args: Args, redirectUrl?: string) => Promise<GuardReturn<boolean>>,
+): Guard<Args>
+// biome-ignore lint/complexity/noBannedTypes: <explanation>
+export function GuardBuilder(fn: Function): any {
+  // At runtime, just return a function that delegates to fn.
+  return (...args: any[]) => fn(...args)
+}
