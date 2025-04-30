@@ -2,12 +2,9 @@ import type { Payload } from 'payload'
 import type { BetterAuthPluginOptions } from './types.js'
 import { payloadSingleton } from './singleton.payload.js'
 import type {
-  BuildBetterAuthOptionsReturnType,
   InferBetterAuthInstance,
   InferInternalBetterAuthInstance,
 } from './better-auth/instance.js'
-// biome-ignore lint/style/useImportType: <explanation>
-import { betterAuth } from 'better-auth'
 
 let betterAuthInstance: any | undefined
 
@@ -33,7 +30,6 @@ export const getBetterAuthSafe = <O extends BetterAuthPluginOptions>(
 
 // Internal stuffs
 // ----------------
-
 export const getBetterAuthSafeInternal = (
   payload?: Payload,
 ): InferInternalBetterAuthInstance =>
