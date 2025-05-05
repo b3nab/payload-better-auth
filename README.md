@@ -42,16 +42,22 @@ This plugin is thought to be used in production, with real users, so to be rock 
 The `payload-better-auth` plugin wraps the better-auth library to seamleassly integrate advanced authentication features into Payload CMS v3. It enhanches developer productivity and user experience by offering more sophisticated authentication methods beyond Payload's built-in auth system.
 Definitely it's a better-way 🤓 to manage authentication for Payload CMS v3.
 
+### Why This Plugin?
+
+While Payload CMS comes with a solid and extensible authentication system out of the box, it primarily focuses on basic email/password authentication and API keys. This serves many use cases well, but modern applications often require more sophisticated authentication methods and features.
+
+### Features
+
 The goal is to seamlessly integrate better-auth in your Payload CMS v3 application, providing a robust and feature-rich authentication system with a focus on user experience and developer productivity.
 
 - **Basic integration - Out of the box 🤝**
   - Integration with Better Auth
-  - Better Auth API Endpoints
+  - Automatic Collections creation
+  - Automatic Better Auth API Endpoints creation
   - Payload Adapter as Better Auth database
 - **Better Integration 🤓**
   - 2FA TOTP-based for Admin Panel
-  - Automatic Collections creation
-  - Extend Collections using Payload-like collection's config
+  - Easily extend Collections using Payload-like collection's config
 
 ## Installation
 
@@ -64,9 +70,11 @@ pnpm add payload-better-auth
 Into your `payload.config.ts` file, add the plugin:
 
 ```ts
-import { betterAuthPlugin } from "payload-better-auth";
+import { buildConfig } from 'payload'
+import { betterAuthPlugin } from "payload-better-auth"
 
 export default buildConfig({
+
   // ... other config
 
   plugins: [
@@ -83,44 +91,20 @@ export default buildConfig({
          */
         secret: process.env.BETTER_AUTH_SECRET,
       },
-      // Plugin options that override the default ones from the plugin
-      // betterAuthPlugins: {
-      //   twoFactor: true,
-      // },
-    }),
-
-    // ... other plugins
+    })
   ],
-});
+
+  // ... other config
+
+})
 ```
-
-### Why This Plugin?
-
-While Payload CMS comes with a solid and extensible authentication system out of the box, it primarily focuses on basic email/password authentication and API keys. This serves many use cases well, but modern applications often require more sophisticated authentication methods and features.
-
-### Features
-
-Here’s what the plugin currently offers:
-
-- Seamless Integration with Better Auth: Leverages Better Auth to provide advanced authentication features within your Payload CMS application.
-
-- 2FA TOTP-based for Admin Panel: Enhances security by adding Time-Based One-Time Password (TOTP) two-factor authentication to the PayloadCMS admin interface.
-
-- Automatic Collection Creation: Simplifies setup by automatically generating the required collections for user management and authentication.
-
-- Customizable Collections: Allows developers to extend default collections with additional fields, tailoring authentication data to specific needs.
-
-- Payload as Database: Ensures data consistency by using Payload CMS as the database adapter for Better Auth.
-
-- Enhanced Auth Endpoints: Provides Better Auth’s API endpoints for advanced authentication, complementing Payload’s default auth endpoints.
 
 ### Roadmap (TODOs)
 
-- [ ] Payload Collections Auth Endpoints - Needs to replace all remaining payload default auth endpoints
-- [ ] Auth Strategies - Needs to add strategies for better-auth plugins
-- [ ] Documentation & Testing
-  - [ ] Website for docs
-  - [ ] Tests - Needs more tests and e2e tests
+- [ ] Payload Auth Endpoints - Needs to replace all remaining payload default auth endpoints
+- [ ] Auth Strategies - Needs to improve auth strategies for better-auth plugins
+- [ ] Testing
+  - [ ] Tests - Needs to add more tests and e2e tests
 
 ## Important Notes
 
