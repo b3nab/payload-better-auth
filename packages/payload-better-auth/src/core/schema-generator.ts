@@ -20,17 +20,6 @@ export const generatePayloadCollections = (
 ): CollectionConfig[] => {
   const collections: CollectionConfig[] = []
 
-  const relationMap: Record<string, CollectionSlug> = Object.keys(
-    authTables,
-  ).reduce(
-    (acc, k) => ({
-      // biome-ignore lint/performance/noAccumulatingSpread: <explanation>
-      ...acc,
-      [`${k}Id`]: authTables[k].modelName,
-    }),
-    {},
-  )
-
   for (const [key, value] of Object.entries(authTables)) {
     const modelName = value.modelName as CollectionSlug
     let newCollection: CollectionConfig = {
@@ -45,7 +34,7 @@ export const generatePayloadCollections = (
       //   readVersions: isAdmin,
       // },
       slug: modelName,
-      fields: convertToPayloadFields(value.fields, relationMap),
+      fields: convertToPayloadFields(modelName, value.fields),
     }
     if (key === 'user') {
       newCollection.auth = true
@@ -61,7 +50,6 @@ export const generatePayloadCollections = (
     collections.push(newCollection)
   }
 
-  // getLogger().trace(relationMap, 'output from relationMap')
   // getLogger().trace(collections, 'output from generatePayloadCollections')
 
   return collections
@@ -73,8 +61,8 @@ export const generatePayloadCollections = (
  * @returns The fields in payload format
  */
 const convertToPayloadFields = (
+  modelName: string,
   fields: Record<string, FieldAttribute<FieldType>>,
-  relationMap: Record<string, CollectionSlug>,
 ): PayloadField[] => {
   return Object.entries(fields)
     .filter(
@@ -97,7 +85,7 @@ const convertToPayloadFields = (
           // TODO: better-auth FieldAttributeConfig . sortable has the same "reason to exists" as the payload FieldBase . index ??
           index: fieldValue.sortable,
           // type: convertToPayloadType(fieldValue.type),
-          ...convertToPayloadType(fieldValue, fieldKey, relationMap),
+          ...convertToPayloadType(modelName, fieldValue, fieldKey),
         }) as PayloadField,
     )
 }
@@ -107,25 +95,22 @@ const convertToPayloadFields = (
 // PAYLOAD FieldTypes
 // "text" | "number" | "checkbox" | "date" | "array"
 function convertToPayloadType(
+  modelName: string,
   { type: fieldType, references }: FieldAttribute<FieldType>,
   fieldKey: string,
-  relationMap: Record<string, CollectionSlug>,
 ): Partial<PayloadField> {
-  const relationTo = relationMap[fieldKey]
-  // TODO: how to map better-auth FieldAttributeConfig . references ??
-  // if(references) {
-  //   return {
-
-  //     type: 'relationship',
-
-  //   }
-  // }
-  if (relationTo) {
+  // Dynamic map better-auth FieldAttributeConfig . references
+  if (references) {
+    getLogger().trace(
+      references,
+      `[convertToPayloadType] references for ${fieldKey} on ${modelName}`,
+    )
     return {
       type: 'relationship',
-      relationTo,
+      relationTo: references.model,
     }
   }
+
   const defaultType: Partial<PayloadField> = {
     type: 'text',
   }
