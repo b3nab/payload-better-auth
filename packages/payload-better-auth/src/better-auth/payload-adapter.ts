@@ -36,7 +36,9 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
       // )
       const payload = config.payload || getPayload()
       if (!payload) {
-        throw new Error('Payload is not initialized')
+        throw new Error(
+          '[payloadAdapter - resolvePayload] Payload is not initialized',
+        )
       }
       return payload
     }
@@ -81,7 +83,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
         const { model, data: values } = data
 
         try {
-          const result = await payload.db.create({
+          const result = await payload.create({
             collection: getCollectionName(model),
             data: values,
           })
