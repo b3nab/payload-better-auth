@@ -1,4 +1,4 @@
-import { pino } from 'pino'
+import pino from 'pino'
 import invariant from 'tiny-invariant'
 
 // Also pino should be initialized with the payload config so it has to use a singleton pattern
