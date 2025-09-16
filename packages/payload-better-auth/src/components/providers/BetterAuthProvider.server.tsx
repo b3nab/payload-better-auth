@@ -106,7 +106,7 @@ export const BetterAuthServerWrapper = async (
       // payloadConfig={payload}
       authFlows={{
         twoFactor: {
-          enabled: payload.config.custom.authFlows.twoFactor,
+          enabled: payload.config.custom?.authFlows?.twoFactor,
           redirectUrl: formatAdminURL({
             adminRoute: payload.config.routes.admin,
             path: '/two-factor-verify',

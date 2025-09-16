@@ -42,12 +42,12 @@ interface BetterAuthProviderProps {
   }
 }
 
-export const BetterAuthProvider: React.FC<BetterAuthProviderProps> = ({
+export const BetterAuthProvider = ({
   children,
   // payloadConfig,
   pluginOptions,
   authFlows,
-}) => {
+}: BetterAuthProviderProps) => {
   // const router = useRouter()
   console.log('[PROVIDER] [BetterAuthProvider]')
 
