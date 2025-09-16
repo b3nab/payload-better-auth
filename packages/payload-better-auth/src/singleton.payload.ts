@@ -9,7 +9,7 @@ export const payloadSingleton = (payloadInstance: Payload) => {
 
 export const getPayload = (throwError = false) => {
   if (throwError && !payload) {
-    throw new Error('Payload is not initialized')
+    throw new Error('[getPayload] Payload is not initialized')
   }
   return payload
 }

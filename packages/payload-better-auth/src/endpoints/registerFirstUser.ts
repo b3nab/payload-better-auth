@@ -9,10 +9,11 @@ import { status as httpStatus } from 'http-status'
 import { getRequestCollection } from '../payload-utilities/getRequestEntity.js'
 import { getBetterAuth, getBetterAuthSafe } from '../singleton.better-auth.js'
 import invariant from 'tiny-invariant'
+import { getLogger } from '../singleton.logger.js'
 
 export const registerFirstUserHandler: PayloadHandler = async (req) => {
-  console.log('[payload-better-auth] registerFirstUserHandler')
-  console.log('req', req)
+  const logger = getLogger()
+  logger.trace('[payload-better-auth] registerFirstUserHandler')
 
   const collection = getRequestCollection(req)
   const authData: Record<string, any> = collection.config.auth
@@ -60,7 +61,6 @@ export const registerFirstUserHandler: PayloadHandler = async (req) => {
     `
     slug: ${slug}
     authData: ${JSON.stringify(authData, null, 2)}
-
   `,
   )
 
@@ -88,14 +88,13 @@ export const registerFirstUserHandler: PayloadHandler = async (req) => {
 
   const response = await betterAuth.api.signUpEmail({
     body: {
-      // @ts-ignore
-      role: 'admin',
+      // role: 'admin',
       name: authData.name,
       // username: authData.username,
       email: authData.email,
       password: authData.password,
-      emailVerified: verify ? true : authData.emailVerified,
-      twoFactorEnabled: authData.twoFactorEnabled,
+      // emailVerified: verify ? true : authData.emailVerified,
+      // twoFactorEnabled: authData.twoFactorEnabled,
     },
     asResponse: true,
   })
@@ -109,6 +108,8 @@ export const registerFirstUserHandler: PayloadHandler = async (req) => {
     id: result.user.id,
     data: {
       role: 'admin',
+      emailVerified: verify ? true : authData.emailVerified,
+      // twoFactorEnabled: authData.twoFactorEnabled,
     },
     overrideAccess: true,
   })

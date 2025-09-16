@@ -44,7 +44,7 @@ export const meHandler: PayloadHandler = async (req) => {
   // invariant(result.session, 'No session found')
 
   // const result = await response.json()
-  logger.trace('meHandler result', result)
+  logger.trace(result, 'meHandler result')
   // logger.trace('headers', response.headers)
 
   const formatResultForPayload = () => {

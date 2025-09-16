@@ -11,7 +11,7 @@ export const emailAndPasswordStrategy: AuthStrategyFunction = async ({
 }) => {
   payloadSingleton(payload)
   const logger = getLogger()
-  logger.trace('[server] [strategy] [emailAndPassword]')
+  // logger.trace('[server] [strategy] [emailAndPassword]')
   // console.log('emailAndPassword', headers)
   const betterAuth = getBetterAuth()
   const result = await betterAuth?.api.getSession({

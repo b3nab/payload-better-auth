@@ -21,7 +21,7 @@ export const twoFactorStrategy: AuthStrategyFunction = async ({
 }) => {
   payloadSingleton(payload)
   const logger = getLogger()
-  logger.trace('[server] [strategy] [twoFactor]')
+  // logger.trace('[server] [strategy] [twoFactor]')
 
   const cookies = await nextCookies()
   const cookiesList = cookies.getAll()
@@ -37,7 +37,7 @@ export const twoFactorStrategy: AuthStrategyFunction = async ({
     {
       twoFactorSession,
     },
-    '[server] [strategy] [twoFactor] twoFactorSession',
+    `[server] [strategy] [twoFactor] twoFactorSession: ${!!twoFactorSession}`,
   )
 
   const responseHeaders = new Headers(headers)
