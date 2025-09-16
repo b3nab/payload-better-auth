@@ -396,7 +396,13 @@ export const defaultPluginsNew = <
     },
     'two-factor': {
       key: 'twoFactor',
-      plugin: twoFactor(),
+      plugin: twoFactor({
+        // otpOptions: {
+        //   sendOTP(data, request) {
+        //       // TODO: implement send email for OTP
+        //   },
+        // }
+      }),
     },
   }
 
@@ -415,133 +421,133 @@ export const defaultPluginsNew = <
   return !inputConfig ? pluginsDefault : filteredPlugins
 }
 
-export const userPlugins = <
-  BAP extends BetterAuthPluginOptions['betterAuthPlugins'],
->(
-  inputConfig: NonNullable<BAP>,
-) => {
-  const stripeConfig = {
-    stripeClient: new Stripe(process.env.STRIPE_KEY || 'sk_test_'),
-    stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
-    ...(typeof inputConfig.stripe === 'boolean'
-      ? {}
-      : (inputConfig.stripe ?? {})),
-    // subscription: {
-    //   enabled: true,
-    //   plans: [
-    //     {
-    //       name: 'Starter',
-    //       priceId: 'price_1QxWWtLUjnrYIrmleljPKszG', // STARTER_PRICE_ID.default,
-    //       annualDiscountPriceId: 'price_1QxWYqLUjnrYIrmlonqPThVF', // STARTER_PRICE_ID.annual,
-    //       freeTrial: {
-    //         days: 7,
-    //       },
-    //     },
-    //   ],
-    // },
-  }
+// export const userPlugins = <
+//   BAP extends BetterAuthPluginOptions['betterAuthPlugins'],
+// >(
+//   inputConfig: NonNullable<BAP>,
+// ) => {
+//   const stripeConfig = {
+//     stripeClient: new Stripe(process.env.STRIPE_KEY || 'sk_test_'),
+//     stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
+//     ...(typeof inputConfig.stripe === 'boolean'
+//       ? {}
+//       : (inputConfig.stripe ?? {})),
+//     // subscription: {
+//     //   enabled: true,
+//     //   plans: [
+//     //     {
+//     //       name: 'Starter',
+//     //       priceId: 'price_1QxWWtLUjnrYIrmleljPKszG', // STARTER_PRICE_ID.default,
+//     //       annualDiscountPriceId: 'price_1QxWYqLUjnrYIrmlonqPThVF', // STARTER_PRICE_ID.annual,
+//     //       freeTrial: {
+//     //         days: 7,
+//     //       },
+//     //     },
+//     //   ],
+//     // },
+//   }
 
-  const polarConfig = {
-    client: new Polar({
-      accessToken: process.env.POLAR_ACCESS_TOKEN!,
-      // Use 'sandbox' if you're using the Polar Sandbox environment
-      // Remember that access tokens, products, etc. are completely separated between environments.
-      // Access tokens obtained in Production are for instance not usable in the Sandbox environment.
-      // server: 'production',
-      ...(typeof inputConfig.polar === 'object'
-        ? typeof inputConfig.polar.clientConfig === 'boolean'
-          ? {}
-          : (inputConfig.polar?.clientConfig ?? {})
-        : {}),
-    }),
-    ...(typeof inputConfig.polar === 'boolean'
-      ? {}
-      : (inputConfig.polar ?? {})),
-  }
+//   const polarConfig = {
+//     client: new Polar({
+//       accessToken: process.env.POLAR_ACCESS_TOKEN!,
+//       // Use 'sandbox' if you're using the Polar Sandbox environment
+//       // Remember that access tokens, products, etc. are completely separated between environments.
+//       // Access tokens obtained in Production are for instance not usable in the Sandbox environment.
+//       // server: 'production',
+//       ...(typeof inputConfig.polar === 'object'
+//         ? typeof inputConfig.polar.clientConfig === 'boolean'
+//           ? {}
+//           : (inputConfig.polar?.clientConfig ?? {})
+//         : {}),
+//     }),
+//     ...(typeof inputConfig.polar === 'boolean'
+//       ? {}
+//       : (inputConfig.polar ?? {})),
+//   }
 
-  return [
-    inputConfig.username &&
-      (typeof inputConfig.username === 'boolean'
-        ? username()
-        : username(inputConfig.username)),
-    inputConfig.anonymous &&
-      (typeof inputConfig.anonymous === 'boolean'
-        ? anonymous()
-        : anonymous(inputConfig.anonymous)),
-    inputConfig.phoneNumber &&
-      (typeof inputConfig.phoneNumber === 'boolean'
-        ? phoneNumber()
-        : phoneNumber(inputConfig.phoneNumber)),
-    inputConfig.magicLink &&
-      (typeof inputConfig.magicLink === 'boolean'
-        ? magicLink({
-            sendMagicLink: async () => {
-              console.warn('No sendMagicLink implementation provided')
-            },
-          })
-        : magicLink(inputConfig.magicLink)),
-    inputConfig.emailOTP &&
-      (typeof inputConfig.emailOTP === 'boolean'
-        ? emailOTP({
-            sendVerificationOTP: async () => {
-              console.warn('No sendVerificationOTP implementation provided')
-            },
-          })
-        : emailOTP(inputConfig.emailOTP)),
-    inputConfig.passkey &&
-      (typeof inputConfig.passkey === 'boolean'
-        ? passkey()
-        : passkey(inputConfig.passkey)),
-    inputConfig.genericOAuth &&
-      (typeof inputConfig.genericOAuth === 'boolean'
-        ? genericOAuth({
-            config: [
-              {
-                providerId: 'placeholder',
-                clientId: 'placeholder',
-                clientSecret: 'placeholder',
-              },
-            ],
-          })
-        : genericOAuth(inputConfig.genericOAuth)),
-    inputConfig.oneTap &&
-      (typeof inputConfig.oneTap === 'boolean'
-        ? oneTap()
-        : oneTap(inputConfig.oneTap)),
-    inputConfig.organization &&
-      (typeof inputConfig.organization === 'boolean'
-        ? organization()
-        : organization(inputConfig.organization)),
-    inputConfig.oidcProvider &&
-      (typeof inputConfig.oidcProvider === 'boolean'
-        ? oidcProvider({
-            loginPage: '/login',
-          })
-        : oidcProvider(inputConfig.oidcProvider)),
-    inputConfig.bearer &&
-      (typeof inputConfig.bearer === 'boolean'
-        ? bearer()
-        : bearer(inputConfig.bearer)),
-    inputConfig.sso &&
-      (typeof inputConfig.sso === 'boolean' ? sso() : sso(inputConfig.sso)),
-    inputConfig.multiSession &&
-      (typeof inputConfig.multiSession === 'boolean'
-        ? multiSession()
-        : multiSession(inputConfig.multiSession)),
-    inputConfig.oAuthProxy &&
-      (typeof inputConfig.oAuthProxy === 'boolean'
-        ? oAuthProxy()
-        : oAuthProxy(inputConfig.oAuthProxy)),
-    inputConfig.jwt &&
-      (typeof inputConfig.jwt === 'boolean' ? jwt() : jwt(inputConfig.jwt)),
-    inputConfig.emailHarmony &&
-      (typeof inputConfig.emailHarmony === 'boolean'
-        ? emailHarmony()
-        : emailHarmony(inputConfig.emailHarmony)),
-    inputConfig.stripe && stripe(stripeConfig),
-    inputConfig.polar && polar(polarConfig),
-  ].filter((p) => !!p)
-}
+//   return [
+//     inputConfig.username &&
+//       (typeof inputConfig.username === 'boolean'
+//         ? username()
+//         : username(inputConfig.username)),
+//     inputConfig.anonymous &&
+//       (typeof inputConfig.anonymous === 'boolean'
+//         ? anonymous()
+//         : anonymous(inputConfig.anonymous)),
+//     inputConfig.phoneNumber &&
+//       (typeof inputConfig.phoneNumber === 'boolean'
+//         ? phoneNumber()
+//         : phoneNumber(inputConfig.phoneNumber)),
+//     inputConfig.magicLink &&
+//       (typeof inputConfig.magicLink === 'boolean'
+//         ? magicLink({
+//             sendMagicLink: async () => {
+//               console.warn('No sendMagicLink implementation provided')
+//             },
+//           })
+//         : magicLink(inputConfig.magicLink)),
+//     inputConfig.emailOTP &&
+//       (typeof inputConfig.emailOTP === 'boolean'
+//         ? emailOTP({
+//             sendVerificationOTP: async () => {
+//               console.warn('No sendVerificationOTP implementation provided')
+//             },
+//           })
+//         : emailOTP(inputConfig.emailOTP)),
+//     inputConfig.passkey &&
+//       (typeof inputConfig.passkey === 'boolean'
+//         ? passkey()
+//         : passkey(inputConfig.passkey)),
+//     inputConfig.genericOAuth &&
+//       (typeof inputConfig.genericOAuth === 'boolean'
+//         ? genericOAuth({
+//             config: [
+//               {
+//                 providerId: 'placeholder',
+//                 clientId: 'placeholder',
+//                 clientSecret: 'placeholder',
+//               },
+//             ],
+//           })
+//         : genericOAuth(inputConfig.genericOAuth)),
+//     inputConfig.oneTap &&
+//       (typeof inputConfig.oneTap === 'boolean'
+//         ? oneTap()
+//         : oneTap(inputConfig.oneTap)),
+//     inputConfig.organization &&
+//       (typeof inputConfig.organization === 'boolean'
+//         ? organization()
+//         : organization(inputConfig.organization)),
+//     inputConfig.oidcProvider &&
+//       (typeof inputConfig.oidcProvider === 'boolean'
+//         ? oidcProvider({
+//             loginPage: '/login',
+//           })
+//         : oidcProvider(inputConfig.oidcProvider)),
+//     inputConfig.bearer &&
+//       (typeof inputConfig.bearer === 'boolean'
+//         ? bearer()
+//         : bearer(inputConfig.bearer)),
+//     inputConfig.sso &&
+//       (typeof inputConfig.sso === 'boolean' ? sso() : sso(inputConfig.sso)),
+//     inputConfig.multiSession &&
+//       (typeof inputConfig.multiSession === 'boolean'
+//         ? multiSession()
+//         : multiSession(inputConfig.multiSession)),
+//     inputConfig.oAuthProxy &&
+//       (typeof inputConfig.oAuthProxy === 'boolean'
+//         ? oAuthProxy()
+//         : oAuthProxy(inputConfig.oAuthProxy)),
+//     inputConfig.jwt &&
+//       (typeof inputConfig.jwt === 'boolean' ? jwt() : jwt(inputConfig.jwt)),
+//     inputConfig.emailHarmony &&
+//       (typeof inputConfig.emailHarmony === 'boolean'
+//         ? emailHarmony()
+//         : emailHarmony(inputConfig.emailHarmony)),
+//     inputConfig.stripe && stripe(stripeConfig),
+//     inputConfig.polar && polar(polarConfig),
+//   ].filter((p) => !!p)
+// }
 
 export const pluginsToLoad = <O extends BetterAuthPluginOptions>(
   pluginOptions: O,
