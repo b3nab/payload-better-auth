@@ -13,12 +13,20 @@ import deepmerge from '@fastify/deepmerge'
 import type { BetterAuthPluginOptions } from '../types.js'
 import { getLogger } from '../singleton.logger.js'
 import { isAdmin, isUser } from './access.js'
+import { createAuthStrategies } from '../strategies/strategies.payload-better-auth.js'
+import type { BetterAuthOptions } from 'better-auth'
+import { payloadBetterAuthEndpoints } from '../endpoints/endpoints.payload-better-auth.js'
 
 export const generatePayloadCollections = (
+  authOptions: BetterAuthOptions,
   authTables: BetterAuthDbSchema,
   extendsCollections?: BetterAuthPluginOptions['extendsCollections'],
 ): CollectionConfig[] => {
   const collections: CollectionConfig[] = []
+
+  const betterAuthStrategies = createAuthStrategies({
+    betterAuthOptions: authOptions,
+  })
 
   for (const [key, value] of Object.entries(authTables)) {
     const modelName = value.modelName as CollectionSlug
@@ -46,6 +54,22 @@ export const generatePayloadCollections = (
     }
     if (extendsCollections?.[modelName]) {
       newCollection = deepmerge()(newCollection, extendsCollections[modelName])
+    }
+    if (newCollection.auth) {
+      newCollection.auth = {
+        // disableLocalStrategy: true,
+        strategies: [...betterAuthStrategies],
+      }
+      newCollection.fields = [
+        ...newCollection.fields,
+        {
+          name: "password",
+          type: "text",
+          required: false,
+          hidden: true
+        }
+      ]
+      newCollection.endpoints = payloadBetterAuthEndpoints
     }
     collections.push(newCollection)
   }
@@ -101,10 +125,10 @@ function convertToPayloadType(
 ): Partial<PayloadField> {
   // Dynamic map better-auth FieldAttributeConfig . references
   if (references) {
-    getLogger().trace(
-      references,
-      `[convertToPayloadType] references for ${fieldKey} on ${modelName}`,
-    )
+    // getLogger().trace(
+    //   references,
+    //   `[convertToPayloadType] references for ${fieldKey} on ${modelName}`,
+    // )
     return {
       type: 'relationship',
       relationTo: references.model,
