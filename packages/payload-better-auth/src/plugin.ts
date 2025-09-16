@@ -41,19 +41,35 @@ import type { BetterAuthPluginOptions } from './types.js'
 export const betterAuthPlugin =
   (pluginOptions: BetterAuthPluginOptions) =>
   (incomingConfig: Config): Config => {
-    const config = { ...incomingConfig }
-
     const logger = initLogger({
       level: pluginOptions.logs || 'info',
     })
+    const config = { ...incomingConfig }
 
-    logger.info(`\n- betterAuthPlugin`)
+    logger.debug(`PLUGIN: payload-better-auth - initializing`)
 
     ///////////////////////////////////
     // Better Auth - INSTANCE
     ///////////////////////////////////
 
     const auth = createBetterAuthInstance({ pluginOptions })
+    const authEndpoints = getEndpoints(auth.$context, auth.options)
+    const betterAuthEndpoints = generatePayloadEndpoints(
+      auth,
+      authEndpoints.api,
+    )
+    const authTables = getAuthTables(auth.options)
+    const betterAuthCollections = generatePayloadCollections(
+      auth.options,
+      authTables,
+      pluginOptions.extendsCollections,
+    )
+
+    config.endpoints = [...(config.endpoints || []), ...betterAuthEndpoints]
+    config.collections = [
+      ...(config.collections || []),
+      ...betterAuthCollections,
+    ]
 
     // verifyTOTP should be available
     // auth.api.verifyTOTP({
@@ -72,128 +88,69 @@ export const betterAuthPlugin =
     //   })
     // }
 
-    const authEndpoints = getEndpoints(auth.$context, auth.options)
-    const authTables = getAuthTables(auth.options)
-
-    logger.trace({ authTables: Object.keys(authTables) }, 'authTables')
-    // console.log('authTables', JSON.stringify(authTables, null, 2))
+    // logger.trace({ authTables: Object.keys(authTables) }, 'authTables')
+    console.log(
+      Object.keys(authTables).map(
+        (key) =>
+          `${authTables[key].modelName} - ${Object.keys(authTables[key].fields).join(', ')}`,
+      ),
+    )
+    // console.table(
+    //   Object.keys(authTables).map((key) => ({
+    //     modelName: authTables[key].modelName,
+    //     fields: Object.keys(authTables[key].fields),
+    //   })),
+    // )
 
     // console.log('keys authEndpoints:', Object.keys(authEndpoints.api))
     // console.log(
     //   `[better-auth] authEndpoints.api: ${JSON.stringify(authEndpoints.api, null, 2)}`,
     // )
 
-    ///////////////////////////////////
-    // Add Better Auth - Core Schema
-    ///////////////////////////////////
-    const betterAuthCollections = generatePayloadCollections(
-      authTables,
-      pluginOptions.extendsCollections,
-    )
-    // Default collections
-    config.collections = [
-      ...(config.collections || []),
-      ...betterAuthCollections,
-    ]
-
-    const authCollection = config.collections.find(
-      (collection) => collection.auth === true,
-    )
-
-    ///////////////////////////////////
-    // Add Better Auth - Strategies
-    ///////////////////////////////////
-
-    const betterAuthStrategies = createAuthStrategies({
-      betterAuthOptions: auth.options,
-    })
-
-    if (authCollection) {
-      authCollection.auth = {
-        // disableLocalStrategy: true,
-        strategies: [...betterAuthStrategies],
-      }
-      authCollection.endpoints = payloadBetterAuthEndpoints
-    }
-    // config.endpoints = payloadBetterAuthEndpoints
-
-    // console.log('authCollection', authCollection)
-    // console.log('authCollection', authCollection?.slug)
-
-    ///////////////////////////////////
-    // Add Better Auth - Endpoints
-    ///////////////////////////////////
-
-    // if (!config.endpoints) {
-    //   config.endpoints = []
-    // }
-
-    // const betterAuthEndpoints = new EndpointFactory(
-    //   auth,
-    //   authEndpoints.api,
-    // ).buildEndpoints()
-    const betterAuthEndpoints = generatePayloadEndpoints(
-      auth,
-      authEndpoints.api,
-    )
-
-    // logger.trace(
-    //   {
-    //     endpoints: betterAuthEndpoints.map((endpnt) => endpnt.path),
-    //   },
-    //   '[plugin-better-auth] endpoints api',
-    // )
-    // console.log(
-    //   `[plugin-better-auth] endpoints api: ${JSON.stringify(betterAuthEndpoints, null, 2)}`,
-    // )
-
-    config.endpoints = [...(config.endpoints || []), ...betterAuthEndpoints]
-
     ///////////////////////////////////////////
     // Add Better Auth - Admin Customization
     ///////////////////////////////////////////
-    if (!config.admin) {
-      config.admin = {}
-    }
 
-    config.admin.components = {
-      ...(config.admin.components || {}),
-      providers: [
-        ...(config.admin.components?.providers || []),
-        {
-          path: 'payload-better-auth/rsc#BetterAuthServerWrapper',
-          serverProps: {
-            pluginOptions,
+    config.admin = {
+      ...(config.admin ?? {}),
+      components: {
+        ...(config.admin?.components || {}),
+        providers: [
+          ...(config.admin?.components?.providers || []),
+          {
+            path: 'payload-better-auth/rsc#BetterAuthServerWrapper',
+            serverProps: {
+              pluginOptions,
+            },
           },
-        },
-      ],
-      views: {
-        ...(config.admin.components?.views || {}),
-        SetupTwoFactor: {
-          path: '/two-factor-setup',
-          Component: 'payload-better-auth/rsc#SetupTwoFactorServer',
-        },
-        VerifyTwoFactor: {
-          path: '/two-factor-verify',
-          Component: 'payload-better-auth/rsc#VerifyTwoFactorServer',
+        ],
+        views: {
+          ...(config.admin?.components?.views || {}),
+          SetupTwoFactor: {
+            path: '/two-factor-setup',
+            Component: 'payload-better-auth/rsc#SetupTwoFactorServer',
+          },
+          VerifyTwoFactor: {
+            path: '/two-factor-verify',
+            Component: 'payload-better-auth/rsc#VerifyTwoFactorServer',
+          },
         },
       },
     }
 
-    // add custom config for auth flows
+    // // add custom config for auth flows
     config.custom = {
       ...(config.custom || {}),
       authFlows: {
-        twoFactor:
-          pluginOptions.betterAuthPlugins?.twoFactor ??
-          auth.options.plugins?.some((plugin) => plugin.id === 'two-factor'),
+        twoFactor: pluginOptions.betterAuthPlugins?.twoFactor ??
+        auth.options.plugins?.some((plugin) => plugin.id === 'two-factor'),
       },
     }
 
     const incomingOnInit = config.onInit
 
     config.onInit = async (payload) => {
-      console.log(`\n- betterAuthPlugin onInit`)
+      logger.trace(`PLUGIN: payload-better-auth - onInit`)
       // Ensure we are executing any existing onInit functions before running our own.
       if (incomingOnInit) {
         await incomingOnInit(payload)
@@ -203,5 +160,6 @@ export const betterAuthPlugin =
       payloadSingleton(payload)
     }
 
+    logger.trace(`PLUGIN: payload-better-auth - return`)
     return config
   }
