@@ -1,0 +1,113 @@
+---
+title: Introduction
+description: A powerful authentication plugin for PayloadCMS that enhances and extends the default auth system with modern security features.
+icon: Album
+---
+
+<span className='hidden dark:block' media="(prefers-color-scheme: dark)">
+![payload-better-auth-banner](banner-dark.png)
+</span>
+<span className='dark:hidden' media="(prefers-color-scheme: light)">
+![payload-better-auth-banner](banner.png)
+</span>
+
+# Better Auth for PayloadCMS 🔐
+
+<Callout type="warn" title="ATTENTION">
+  This plugin is currently a Work in Progress and not ready yet for production use.
+</Callout>
+
+You are one plugin away from revolutionizing your PayloadCMS's authentication system. This plugin seamlessly integrates [Better Auth](https://www.better-auth.com) with [Payload CMS v3](https://payloadcms.com), providing enhanced authentication capabilities.
+
+## Quick Start 🚀
+
+<Steps>
+  <Step title="Learn about Better Auth">
+    <p>Understand what Better Auth is and how it can help your project.</p>
+    <Link href="what-is-payload-better-auth">What is `payload-better-auth`?</Link>
+  </Step>
+  <Step title="Install the Plugin">
+    <p>Add Better Auth to your PayloadCMS project.</p>
+    <Link href="installation">Installation Guide</Link>
+  </Step>
+  <Step title="Configure Authentication">
+    <p>Set up authentication strategies and other settings.</p>
+    <Link href="configuration/plugin-options">Configuration Guide</Link>
+  </Step>
+</Steps>
+
+## Key Features 🎯
+
+<Tabs>
+  <Tab value="authentication" title="Authentication">
+    <ul>
+      <li>Multiple authentication strategies</li>
+      <li>Two-factor authentication</li>
+      <li>Session management</li>
+      <li>Role-based access control</li>
+    </ul>
+    <Link href="features/authentication-strategies">Learn more about authentication</Link>
+  </Tab>
+  <Tab value="security" title="Security">
+    <ul>
+      <li>Rate limiting</li>
+      <li>Encrypted storage</li>
+      <li>Security policies</li>
+      <li>Monitoring and logging</li>
+    </ul>
+    <Link href="advanced/security">Security best practices</Link>
+  </Tab>
+  <Tab value="developer-experience" title="Developer Experience">
+    <ul>
+      <li>Automatic collections</li>
+      <li>Pre-built endpoints</li>
+      <li>Extensible architecture</li>
+      <li>Comprehensive documentation</li>
+    </ul>
+    <Link href="api/authentication">API Reference</Link>
+  </Tab>
+</Tabs>
+
+## Next.js Integration 🛠️
+
+Better Auth provides a powerful integration with Next.js through the Auth Layer:
+
+<Accordions type="single">
+  <Accordion title="Checkers" id="checkers">
+    <p>Verify authentication state in your components and routes.</p>
+    <Link href="auth-layer/checkers">Learn about checkers</Link>
+  </Accordion>
+  <Accordion title="Guards" id="guards">
+    <p>Protect your routes and components from unauthorized access.</p>
+    <Link href="auth-layer/guards">Learn about guards</Link>
+  </Accordion>
+  <Accordion title="Configuration" id="configuration">
+    <p>Customize authentication behavior to match your needs.</p>
+    <Link href="configuration/plugin-options">Configuration options</Link>
+  </Accordion>
+</Accordions>
+
+## Community and Support 🤝
+
+{/* <GithubInfo
+  owner="b3nab"
+  repo="payload-better-auth"
+  description="A powerful authentication plugin for PayloadCMS"
+/> */}
+
+<Cards>
+  <Card
+    title="Report Issues"
+    href="https://github.com/b3nab/payload-better-auth/issues"
+    description="Found a bug? Let us know!"
+  />
+  {/* <Card
+    title="Contributing"
+    href="contributing"
+    description="Help improve payload-better-auth"
+  /> */}
+</Cards>
+
+## Credits
+
+Created by [Benedetto Abbenanti](https://ben.abbenanti.com)

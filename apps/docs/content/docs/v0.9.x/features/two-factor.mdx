@@ -1,0 +1,59 @@
+---
+title: Two-Factor Authentication
+description: Implement 2FA TOTP in your Payload admin panel
+---
+
+# Two-Factor Authentication
+
+The plugin provides built-in support for Time-based One-Time Password (TOTP) two-factor authentication in your Payload CMS admin panel.
+
+## Disabling 2FA
+
+2FA plugin is enabled by default to provide this feature to your Payload CMS admin panel.
+If you want to disable it you can change in your plugin configuration:
+
+```ts
+betterAuthPlugin({
+  betterAuthPlugins: {
+    twoFactor: false,
+  }
+})
+```
+
+## Admin Panel Integration
+
+The plugin automatically adds two new admin views:
+- `/admin/two-factor-setup` - For setting up 2FA
+- `/admin/two-factor-verify` - For verifying 2FA codes
+
+## Custom Components
+
+The plugin provides these components for the admin panel:
+- `SetupTwoFactorServer`
+- `VerifyTwoFactorServer`
+
+## API Endpoints
+
+The plugin exposes the following 2FA-related endpoints:
+
+```ts
+// Setup 2FA
+POST /api/auth/two-factor/setup
+{
+  "userId": string
+}
+
+// Verify 2FA code
+POST /api/auth/two-factor/verify
+{
+  "code": string,
+  "userId": string
+}
+```
+
+## Security Considerations
+
+1. 2FA is only available for admin users
+2. Each user can only have one 2FA device registered
+3. Backup codes are automatically generated during setup
+4. The secret is encrypted before storage

@@ -1,0 +1,151 @@
+---
+title: Guards
+description: Learn about the authentication guards available in Better Auth
+icon: ShieldAlert
+---
+
+# Guards 🛡️
+
+Guards are functions that protect your routes and components from unauthorized access. They are returned by the `createAuthLayer` function and can be used in various parts of your Next.js application.
+
+## Available Guards 🎯
+
+### guardAuth
+
+The `guardAuth` guard verifies if a user has an active session and returns session information. If `redirectUrl` is provided and the user is not authenticated, it will automatically redirect to the specified URL:
+
+```ts
+const result = await guardAuth(redirectUrl?: string)
+// Returns:
+// {
+//   hasSession: boolean
+//   session?: any
+//   user?: any
+// }
+```
+
+### guardGuest
+
+The `guardGuest` guard ensures that a user is not authenticated. If `redirectUrl` is provided and the user is authenticated, it will automatically redirect to the specified URL:
+
+```ts
+const result = await guardGuest(redirectUrl?: string)
+// Returns:
+// {
+//   hasSession: boolean
+//   session?: any
+//   user?: any
+// }
+```
+
+### guardUser
+
+The `guardUser` guard verifies that a user is authenticated and has a valid user record. If `redirectUrl` is provided and the user is not authenticated or doesn't have a `user` role, it will automatically redirect to the specified URL:
+
+```ts
+const result = await guardUser(redirectUrl?: string)
+// Returns:
+// {
+//   hasSession: boolean
+//   session?: any
+//   user?: any
+// }
+```
+
+### guardAdmin
+
+The `guardAdmin` guard ensures that a user is authenticated and has admin privileges. If `redirectUrl` is provided and the user is not authenticated or doesn't have `admin` role, it will automatically redirect to the specified URL:
+
+```ts
+const result = await guardAdmin(redirectUrl?: string)
+// Returns:
+// {
+//   hasSession: boolean
+//   session?: any
+//   user?: any
+// }
+```
+
+### guardRole
+
+The `guardRole` guard verifies that a user has a specific role. If `redirectUrl` is provided and the user is not authenticated or doesn't have the specified role, it will automatically redirect to the specified URL:
+
+```ts
+const result = await guardRole({ role: 'admin' }, redirectUrl?: string)
+// Returns:
+// {
+//   hasSession: boolean
+//   session?: any
+//   user?: any
+// }
+```
+
+## Usage Examples 📝
+
+### Server components
+
+```ts title="app/protected/page.ts"
+import { guardAuth } from '@/lib/auth'
+
+export default async function handler(req, res) {
+  const result = await guardAuth()
+
+  if (!result.hasSession) {
+    return res.status(401).json({ error: 'Unauthorized' })
+  }
+
+  // Protected route logic
+  return res.status(200).json({ data: 'Protected data' })
+}
+```
+{/*
+### Middleware
+
+```ts
+// middleware.ts
+import { guardAuth } from '@/lib/auth'
+
+export async function middleware(request) {
+  // Will automatically redirect to /login if not authenticated
+  const result = await guardAuth('/login')
+
+  // If we get here, the user is authenticated
+  return NextResponse.next()
+}
+``` */}
+
+### Route Handlers
+
+```ts title="app/api/protected/route.ts"
+import { guardAuth } from '@/lib/auth'
+import { NextResponse } from 'next/server'
+
+export async function GET(request: Request) {
+  const result = await guardAuth()
+
+  if (!result.hasSession) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  return NextResponse.json({ data: 'Protected data' })
+}
+```
+
+## Error Handling 🚨
+
+Guards return a result object that indicates whether the user has a valid session. You should check the `hasSession` property to determine if the user is authorized. If you provide a `redirectUrl`, the guard will handle the redirection automatically when the user is not authorized:
+
+```ts
+// With automatic redirection
+const result = await guardAuth('/login')
+// If not authenticated, user will be redirected to /login
+// If authenticated, result will contain session info
+
+// Without automatic redirection
+const result = await guardAuth()
+if (!result.hasSession) {
+  // Handle unauthorized access manually
+} else {
+  // Access granted, use result.user and result.session
+}
+```
