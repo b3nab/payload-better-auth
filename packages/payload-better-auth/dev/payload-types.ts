@@ -199,6 +199,7 @@ export interface User {
   stripeCustomerId?: string | null;
   nickname?: string | null;
   posts?: (string | Post)[] | null;
+  password?: string | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -208,7 +209,13 @@ export interface User {
   hash?: string | null;
   loginAttempts?: number | null;
   lockUntil?: string | null;
-  password?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -232,7 +239,7 @@ export interface Session {
  */
 export interface Account {
   id: string;
-  accountId: string | Account;
+  accountId: string;
   providerId: string;
   userId: string | User;
   accessToken?: string | null;
@@ -283,6 +290,7 @@ export interface Passkey {
   deviceType: string;
   backedUp: boolean;
   transports?: string | null;
+  aaguid?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -314,7 +322,7 @@ export interface OauthAccessToken {
   refreshToken?: string | null;
   accessTokenExpiresAt?: string | null;
   refreshTokenExpiresAt?: string | null;
-  clientId?: string | null;
+  clientId?: (string | null) | OauthApplication;
   userId?: (string | null) | User;
   scopes?: string | null;
   updatedAt: string;
@@ -326,7 +334,7 @@ export interface OauthAccessToken {
  */
 export interface OauthConsent {
   id: string;
-  clientId?: string | null;
+  clientId?: (string | null) | OauthApplication;
   userId?: (string | null) | User;
   scopes?: string | null;
   consentGiven?: boolean | null;
@@ -368,7 +376,7 @@ export interface Invitation {
   role?: string | null;
   status: string;
   expiresAt: string;
-  inviterId: string;
+  inviterId: string | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -385,6 +393,8 @@ export interface Subscription {
   status?: string | null;
   periodStart?: string | null;
   periodEnd?: string | null;
+  trialStart?: string | null;
+  trialEnd?: string | null;
   cancelAtPeriodEnd?: boolean | null;
   seats?: number | null;
   updatedAt: string;
@@ -542,6 +552,7 @@ export interface UserSelect<T extends boolean = true> {
   stripeCustomerId?: T;
   nickname?: T;
   posts?: T;
+  password?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -551,6 +562,13 @@ export interface UserSelect<T extends boolean = true> {
   hash?: T;
   loginAttempts?: T;
   lockUntil?: T;
+  sessions?:
+    | T
+    | {
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -620,6 +638,7 @@ export interface PasskeySelect<T extends boolean = true> {
   deviceType?: T;
   backedUp?: T;
   transports?: T;
+  aaguid?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -715,6 +734,8 @@ export interface SubscriptionSelect<T extends boolean = true> {
   status?: T;
   periodStart?: T;
   periodEnd?: T;
+  trialStart?: T;
+  trialEnd?: T;
   cancelAtPeriodEnd?: T;
   seats?: T;
   updatedAt?: T;

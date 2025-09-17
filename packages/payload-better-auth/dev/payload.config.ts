@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url'
 import sharp from 'sharp'
 import { buildConfig } from 'payload'
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
+import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { devUser } from './helpers/credentials'
 import { testEmailAdapter } from './helpers/testEmailAdapter'
@@ -47,9 +48,18 @@ export default buildConfig({
       },
     },
   ],
-  db: mongooseAdapter({
-    url: process.env.DATABASE_URI || '',
+  db: postgresAdapter({
+    // Postgres-specific arguments go here.
+    // `pool` is required.
+    pool: {
+      connectionString: process.env.DATABASE_URI,
+    },
+    idType: 'uuid',
+    // blocksAsJSON: true,
   }),
+  // db: mongooseAdapter({
+  //   url: process.env.DATABASE_URI || '',
+  // }),
   editor: lexicalEditor(),
   email: testEmailAdapter,
   // onInit: async (payload) => {
@@ -58,7 +68,7 @@ export default buildConfig({
   plugins: [betterAuthPlugin(betterAuthPluginConfig)],
   secret: process.env.PAYLOAD_SECRET || 'test-secret_key',
   serverURL: process.env.NEXT_PUBLIC_SERVER_URL,
-  sharp,
+  // sharp,
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },

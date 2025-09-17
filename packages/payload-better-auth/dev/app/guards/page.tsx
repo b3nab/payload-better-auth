@@ -1,11 +1,18 @@
-import { guardAuth } from '../../lib/auth'
+import { guardAuth, guardRole } from '../../lib/auth'
+
+// declare module 'payload-better-auth' {
+//   export type User = import('@/payload-types').User
+// }
 
 export default async function isAuthServerPage() {
   const userGuardAuth = await guardAuth('/sign-in')
+  const userGuardRole = await guardRole({ role: 'dev' })
 
   console.log('guardAuth Json response:: ', userGuardAuth)
 
-  return userGuardAuth.hasSession === true ? (
+  console.log('typed user ', userGuardAuth.user)
+
+  return userGuardAuth.hasSession ? (
     <div>
       <h1>OK</h1>
       <h2>User session: {JSON.stringify(userGuardAuth.session, null, 2)}</h2>
