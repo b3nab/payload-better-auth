@@ -4,7 +4,7 @@
  * They don't require running your Next.js so they are fast
  * Yet they still can test the Local API and custom endpoints using NextRESTClient helper.
  */
-import { describe, it, expect, beforeAll, afterAll } from '@jest/globals'
+import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import { beforeAllFixtures } from '../fixtures/beforeAll.fixtures'
 import { afterAllFixtures } from '../fixtures/afterAll.fixtures'
 import { getSuite } from '../fixtures/suite.ctx'
@@ -25,14 +25,14 @@ describe('Better Auth API', () => {
     const betterAuthEndpoints = Object.values(
       getSuite().betterAuthEndpoints.api || {},
     ).reduce((acc: any[], endpoint) => {
-      if (typeof endpoint.method === 'string') {
+      if ("method" in endpoint && typeof endpoint.method === 'string') {
         acc.push({
           path: `/auth${endpoint.path}`,
           method: endpoint.method.toLowerCase(),
         })
       }
-      if (typeof endpoint.method === 'object') {
-        for (const method of endpoint.method) {
+      if ("method" in endpoint && typeof endpoint.method === 'object') {
+        for (const method of endpoint.method as string[]) {
           acc.push({
             path: `/auth${endpoint.path}`,
             method: method.toLowerCase(),

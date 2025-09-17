@@ -4,7 +4,7 @@
  * They don't require running your Next.js so they are fast
  * Yet they still can test the Local API and custom endpoints using NextRESTClient helper.
  */
-import { describe, it, expect, beforeAll, afterAll } from '@jest/globals'
+import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import type { Payload } from 'payload'
 import type { betterAuth } from 'better-auth'
 import type { MongoMemoryReplSet } from 'mongodb-memory-server'
