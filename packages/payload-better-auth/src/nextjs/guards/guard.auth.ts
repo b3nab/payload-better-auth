@@ -32,9 +32,12 @@ export const guardAuth: GuardWrap = (configPromise, pluginOptions) =>
         hasSession,
       }
     }
+
+    const user = await payload.findByID({ collection: 'user', id: data.user.id })
+
     return {
       hasSession,
       session: data.session,
-      user: data.user,
+      user: user,
     }
   })
