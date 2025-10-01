@@ -39,6 +39,7 @@
     "---PLUGIN---": "",
     "plugin--": "pnpm --filter payload-better-auth",
     "test": "pnpm plugin-- test",
+    "test:int": "pnpm plugin-- test:int",
     "test:coverage": "pnpm plugin-- test:coverage",
     "build": "pnpm plugin-- build",
     "build:types": "pnpm plugin-- build:types",
@@ -46,7 +47,8 @@
     "bump": "pnpm plugin-- bump",
     "pub": "pnpm publish --filter payload-better-auth",
     "pub:local": "pnpm plugin-- publish:local",
-    "yeah": "pnpm test && pnpm build && pnpm bump && pnpm pub"
+    "yeah": "pnpm test && pnpm build && pnpm bump && pnpm pub",
+    "yolo": "pnpm build && pnpm bump && pnpm pub --no-git-checks"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.2.4"
@@ -55,5 +57,6 @@
     "onlyBuiltDependencies": [
       "sharp"
     ]
-  }
+  },
+  "packageManager": "pnpm@10.17.1"
 }

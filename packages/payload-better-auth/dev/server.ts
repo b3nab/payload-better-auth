@@ -32,4 +32,7 @@ const server = createServer((req, res) => {
   void handle(req, res, parsedUrl)
 })
 
-server.listen(DEV_PORT)
+server.listen(DEV_PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${DEV_PORT}`)
+  console.log(`📱 Admin panel: http://localhost:${DEV_PORT}/admin`)
+})
