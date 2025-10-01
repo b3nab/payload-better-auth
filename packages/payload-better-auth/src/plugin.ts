@@ -23,11 +23,8 @@ import {
   generatePayloadCollections,
   generatePayloadEndpoints,
 } from './core/index.js'
-// import { EndpointFactory } from './factory.endpoint.js'
 import { createBetterAuthInstance } from './better-auth/instance.js'
-import { createAuthStrategies } from './strategies/strategies.payload-better-auth.js'
 import { payloadSingleton } from './singleton.payload.js'
-import { payloadBetterAuthEndpoints } from './endpoints/endpoints.payload-better-auth.js'
 import { initLogger } from './singleton.logger.js'
 import type { BetterAuthPluginOptions } from './types.js'
 
@@ -71,41 +68,11 @@ export const betterAuthPlugin =
       ...betterAuthCollections,
     ]
 
-    // verifyTOTP should be available
-    // auth.api.verifyTOTP({
-    //   body: {
-    //     code: '',
-    //   },
-    // })
-
-    // retrieve the api instance from the singleton
-    // const authApi = getBetterAuthSafe<typeof pluginOptions>()
-    // if (authApi) {
-    //   authApi.api.verifyTOTP({
-    //     body: {
-    //       code: '',
-    //     },
-    //   })
-    // }
-
     // logger.trace({ authTables: Object.keys(authTables) }, 'authTables')
-    console.log(
-      Object.keys(authTables).map(
-        (key) =>
-          `${authTables[key].modelName} - ${Object.keys(authTables[key].fields).join(', ')}`,
-      ),
+    logger.debug(
+      Object.keys(authTables).map((key) => ({[authTables[key].modelName]: Object.keys(authTables[key].fields).join(', ')})),
+      "authTables with fields:"
     )
-    // console.table(
-    //   Object.keys(authTables).map((key) => ({
-    //     modelName: authTables[key].modelName,
-    //     fields: Object.keys(authTables[key].fields),
-    //   })),
-    // )
-
-    // console.log('keys authEndpoints:', Object.keys(authEndpoints.api))
-    // console.log(
-    //   `[better-auth] authEndpoints.api: ${JSON.stringify(authEndpoints.api, null, 2)}`,
-    // )
 
     ///////////////////////////////////////////
     // Add Better Auth - Admin Customization
