@@ -47,9 +47,9 @@ export const payloadAdapter = (config: PayloadAdapterConfig = {}) => {
       getFieldAttributes,
     }) => {
       // OVERRIDES getDefaultFieldName
-      const convertToBetterAuthFieldName = ({
-          field,
+      const getOriginalFieldName = ({
           model: unsafe_model,
+          field,
         }: { model: string; field: string }) => {
           // Plugin `schema`s can't define their own `id`. Better-auth auto provides `id` to every schema model.
           // Given this, we can't just check if the `field` (that being `id`) is within the schema's fields, since it is never defined.
@@ -60,14 +60,24 @@ export const payloadAdapter = (config: PayloadAdapterConfig = {}) => {
           const model = getDefaultModelName(unsafe_model); // Just to make sure the model name is correct.
 
           let f = schema[model]?.fields[field];
+          // console.log(`[getOriginalFieldName] model: ${model}, field: ${field} => ${f?.fieldName} -- getFieldName: ${getFieldName({ model, field })} -- getDefaultFieldName: ${getDefaultFieldName({ model, field })}`)
           if (!f) {
-            debugLog(`Field ${field} not found in model ${model}`);
-            debugLog(`Schema:`, schema);
+            // console.log(`Field ${field} not found in model ${model}`);
+            // console.log(`Schema:`, schema);
+            // console.log(`schema[${model}]?.fields:`, schema[model]?.fields)
+            // console.log("return: ", Object.keys(schema[model]?.fields).find((key) => schema[model]?.fields[key].fieldName === field))
             // Need to pull in the key value from the user options.
             return Object.keys(schema[model]?.fields).find((key) => schema[model]?.fields[key].fieldName === field) || field
           }
           return field;
         }
+
+      const getConvertedFieldName = ({ model, field }: { model: string; field: string }) => {
+        if (field === "id") {
+          return field
+        }
+        return schema[model]?.fields[field]?.fieldName || field
+      }
 
 
       const resolvePayload = async () => {
@@ -81,19 +91,26 @@ export const payloadAdapter = (config: PayloadAdapterConfig = {}) => {
       }
 
       function getCollectionName(model: string) {
-        return getModelName(model)
+        // console.log(`[getCollectionName] model: ${model} => ${getDefaultModelName(model)}`)
+        return getDefaultModelName(model)
       }
       // Helper to get the actual field name for Payload
       const getPayloadFieldName = (model: string) => (field: string) => {
-        return getFieldName({ model, field })
+        // console.log(`[getPayloadFieldName] model: ${model}, field: ${field} => ${getDefaultFieldName({ model, field })}`)
+        return getOriginalFieldName({ model, field })
+      }
+
+      // function to transform data object from better-auth to payload
+      const transformDataToPayload = (model: string, data: Record<string, any>) => {
+        return Object.fromEntries(Object.entries(data ?? {}).map(([key, value]) => [getOriginalFieldName({ model, field: key }), value]))
+      }
+      // function to transform data object from payload to better-auth
+      const transformDataToBetterAuth = (model: string, data: Record<string, any>) => {
+        return Object.fromEntries(Object.entries(data ?? {}).map(([key, value]) => [getConvertedFieldName({ model, field: key }), value]))
       }
 
       return {
         async count({ model, where }) {
-          // debugLog('count', { model, where })
-          // logger.trace({ model, where }, '[payloadAdapter] count')
-          // console.log('count', { model, where })
-
           const payload = await resolvePayload()
 
           try {
@@ -113,13 +130,9 @@ export const payloadAdapter = (config: PayloadAdapterConfig = {}) => {
         },
 
         async create({ model, data, select }) {
-          // debugLog('create', { model, data, select })
-          // logger.trace({ model, data, select }, '[payloadAdapter] create')
-          // console.log('create', { model, data, select })
-
           const payload = await resolvePayload()
 
-          const normalizedData = Object.fromEntries(Object.entries(data).map(([key, value]) => [convertToBetterAuthFieldName({ model, field: key }), value]))
+          const normalizedData = transformDataToPayload(model, data)
           data = normalizedData as any
           // normalize data keys to be compatible with Payload CMS
           if(model === "user") {
@@ -134,7 +147,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig = {}) => {
               depth: 0
             })
 
-            return result as any
+            return transformDataToBetterAuth(model, result) as any
           } catch (error) {
             console.error(error)
             throw new BetterAuthError(
@@ -144,10 +157,6 @@ export const payloadAdapter = (config: PayloadAdapterConfig = {}) => {
         },
 
         async findOne({ model, where, select }) {
-          // debugLog('findOne', { model, where, select })
-          // logger.trace({ model, where, select }, '[payloadAdapter] findOne')
-          // console.log('findOne', { model, where, select })
-
           const payload = await resolvePayload()
 
           try {
@@ -158,7 +167,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig = {}) => {
               depth: 0
             })
 
-            return (docs[0] as any) || null
+            return docs[0] ? transformDataToBetterAuth(model, docs[0]) as any : null
           } catch (error) {
             console.error(error)
             throw new BetterAuthError(
@@ -170,13 +179,6 @@ export const payloadAdapter = (config: PayloadAdapterConfig = {}) => {
         async findMany({ model, where, limit, offset, sortBy }) {
           offset = offset ? offset : 0
           limit = limit ? limit : 0
-          // debugLog('findMany', { model, where, limit, offset, sortBy })
-          // logger.trace(
-          //   { model, where, limit, offset, sortBy },
-          //   '[payloadAdapter] findMany',
-          // )
-          // console.log('findMany', { model, where, limit, offset, sortBy })
-
           const payload = await resolvePayload()
 
           try {
@@ -185,7 +187,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig = {}) => {
             // For offset, we need to fetch more records and manually slice
             const actualLimit = limit + offset
 
-            const { docs } = await payload.find({
+            const { docs: payloadDocs } = await payload.find({
               collection: getCollectionName(model),
               where: whereClause,
               limit: actualLimit ? actualLimit : undefined,
@@ -194,6 +196,8 @@ export const payloadAdapter = (config: PayloadAdapterConfig = {}) => {
                 : undefined,
               depth: 0
             })
+
+            const docs = payloadDocs.map((doc) => transformDataToBetterAuth(model, doc))
 
             return offset ? docs.slice(offset, actualLimit) as any[] : docs as any[]
           } catch (error) {
@@ -205,10 +209,6 @@ export const payloadAdapter = (config: PayloadAdapterConfig = {}) => {
         },
 
         async update({ model, where, update }) {
-          // debugLog('update', { model, where, update })
-          // logger.trace({ model, where, update }, '[payloadAdapter] update')
-          // console.log('update', { model, where, update })
-
           const payload = await resolvePayload()
 
           try {
@@ -230,7 +230,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig = {}) => {
               depth: 0
             })
 
-            return result as any
+            return transformDataToBetterAuth(model, result) as any
           } catch (error) {
             console.error(error)
             throw new BetterAuthError(
@@ -240,10 +240,6 @@ export const payloadAdapter = (config: PayloadAdapterConfig = {}) => {
         },
 
         async updateMany({ model, where, update }) {
-          // debugLog('updateMany', { model, where, update })
-          // logger.trace({ model, where, update }, '[payloadAdapter] updateMany')
-          // console.log('updateMany', { model, where, update })
-
           const payload = await resolvePayload()
 
           try {
@@ -274,10 +270,6 @@ export const payloadAdapter = (config: PayloadAdapterConfig = {}) => {
         },
 
         async delete({ model, where }) {
-          // debugLog('delete', { model, where })
-          // logger.trace({ model, where }, '[payloadAdapter] delete')
-          // console.log('delete', { model, where })
-
           const payload = await resolvePayload()
 
           try {
@@ -304,10 +296,6 @@ export const payloadAdapter = (config: PayloadAdapterConfig = {}) => {
         },
 
         async deleteMany({ model, where }) {
-          // debugLog('deleteMany', { model, where })
-          // logger.trace({ model, where }, '[payloadAdapter] deleteMany')
-          // console.log('deleteMany', { model, where })
-
           const payload = await resolvePayload()
 
           try {
@@ -432,7 +420,7 @@ const random = {
   }
 };
 
-export function generateRandomString(
+function generateRandomString(
 	length: number
 ): string {
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -443,7 +431,7 @@ export function generateRandomString(
 	return result;
 }
 
-export function bigIntFromBytes(bytes: Uint8Array): bigint {
+ function bigIntFromBytes(bytes: Uint8Array): bigint {
 	if (bytes.byteLength < 1) {
 		throw new TypeError("Empty Uint8Array");
 	}
@@ -455,7 +443,7 @@ export function bigIntFromBytes(bytes: Uint8Array): bigint {
 }
 
 
-export function generateRandomInteger(max: bigint): bigint {
+function generateRandomInteger(max: bigint): bigint {
 	if (max < 2) {
 		throw new Error("Argument 'max' must be a positive integer larger than 1");
 	}
@@ -493,7 +481,7 @@ export function generateRandomInteger(max: bigint): bigint {
 	return result;
 }
 
-export function generateRandomIntegerNumber(max: number): number {
+function generateRandomIntegerNumber(max: number): number {
 	if (max < 2 || max > Number.MAX_SAFE_INTEGER) {
 		throw new Error("Argument 'max' must be a positive integer larger than 1");
 	}
