@@ -14,12 +14,12 @@ jobs:
         with:
           node-version: lts/*
       - name: Install dependencies
-        run: npm install -g pnpm@9 && pnpm install
-      - name: Run Jest tests
+        run: npm install -g pnpm && pnpm install
+      - name: Run Integration Tests
         run: pnpm test:coverage
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: jest-coverage
-          path: coverage/
+          name: tests-coverage
+          path: packages/payload-better-auth/.coverage/
           retention-days: 30
