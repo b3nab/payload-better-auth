@@ -39,6 +39,7 @@
     "---PLUGIN---": "",
     "plugin--": "pnpm --filter payload-better-auth",
     "test": "pnpm plugin-- test",
+    "test:adapter": "pnpm plugin-- test:adapter",
     "test:int": "pnpm plugin-- test:int",
     "test:coverage": "pnpm plugin-- test:coverage",
     "build": "pnpm plugin-- build",

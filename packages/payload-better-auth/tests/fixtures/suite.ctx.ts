@@ -32,5 +32,7 @@ export const setSuite = (newSuite: Suite) => {
 }
 
 export const clearSuite = () => {
+  // console.log('\n\n============================\nClearing suite\n============================\n\n')
+  // console.log('process.env.DATABASE_URI =====> ', process.env.DATABASE_URI)
   suite = undefined
 }

@@ -140,7 +140,7 @@
     "test": "pnpm test:adapter && pnpm test:int && pnpm test:e2e",
     "test:coverage": "jest --coverage --detectOpenHandles --verbose --forceExit",
     "test:wrapdb": "sh -c 'pglite-server --port=54321 --run \"$0\" --include-database-url'",
-    "test:int": "vitest tests/integration",
+    "test:int": "vitest run tests/integration",
     "test:adapter": "vitest run tests/adapter",
     "test:adapter:watch": "vitest tests/adapter",
     "test:adapter:ui": "vitest --ui tests/adapter",
