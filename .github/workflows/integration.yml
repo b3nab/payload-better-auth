@@ -21,5 +21,5 @@ jobs:
         if: ${{ !cancelled() }}
         with:
           name: tests-coverage
-          path: packages/payload-better-auth/.coverage/
+          path: ./packages/payload-better-auth/.coverage/
           retention-days: 30
