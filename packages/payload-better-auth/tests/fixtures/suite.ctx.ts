@@ -1,20 +1,15 @@
 import type { Payload } from 'payload'
-import type { MongoMemoryReplSet } from 'mongodb-memory-server'
-import type {Server} from 'net'
+import type { StartedPostgreSqlContainer } from '@testcontainers/postgresql'
 import { betterAuth } from 'better-auth'
 import { getEndpoints } from 'better-auth/api'
 import type { BetterAuthDbSchema } from 'better-auth/db'
-import type { NextRESTClient } from '../../dev/helpers/NextRESTClient'
 
 export type Suite = {
-  memoryDB: Server
+  memoryDB: StartedPostgreSqlContainer
   payload: Payload
-  restClient: NextRESTClient
   betterAuth: ReturnType<typeof betterAuth>
   betterAuthEndpoints: ReturnType<typeof getEndpoints>
   betterAuthTables: BetterAuthDbSchema
-  // betterAuthOptions: BetterAuthOptions
-  // betterAuthPlugins: BetterAuthPlugin[]
 }
 
 let suite: Suite | undefined
@@ -31,8 +26,10 @@ export const setSuite = (newSuite: Suite) => {
   suite = newSuite
 }
 
-export const clearSuite = () => {
+export const clearSuite = async () => {
   // console.log('\n\n============================\nClearing suite\n============================\n\n')
   // console.log('process.env.DATABASE_URI =====> ', process.env.DATABASE_URI)
+  // await suite?.payload?.destroy()
+  // await suite?.memoryDB?.stop()
   suite = undefined
 }

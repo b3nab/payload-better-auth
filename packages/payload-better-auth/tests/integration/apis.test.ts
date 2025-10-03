@@ -10,7 +10,7 @@ import { afterAllFixtures } from '../fixtures/afterAll.fixtures'
 import { getSuite } from '../fixtures/suite.ctx'
 
 describe('Better Auth API', () => {
-  beforeAll(beforeAllFixtures())
+  beforeAll(beforeAllFixtures(), 1000*60)
 
   afterAll(afterAllFixtures())
 

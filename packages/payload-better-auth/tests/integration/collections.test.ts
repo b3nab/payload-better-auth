@@ -5,18 +5,12 @@
  * Yet they still can test the Local API and custom endpoints using NextRESTClient helper.
  */
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
-import type { Payload } from 'payload'
-import type { betterAuth } from 'better-auth'
-import type { MongoMemoryReplSet } from 'mongodb-memory-server'
-import type { NextRESTClient } from '../../dev/helpers/NextRESTClient'
-
 import { beforeAllFixtures } from '../fixtures/beforeAll.fixtures'
 import { afterAllFixtures } from '../fixtures/afterAll.fixtures'
-import type { getAuthTables } from 'better-auth/db'
 import { getSuite } from '../fixtures/suite.ctx'
 
 describe('Better Auth Collections', () => {
-  beforeAll(beforeAllFixtures())
+  beforeAll(beforeAllFixtures(), 1000*60)
 
   afterAll(afterAllFixtures())
 

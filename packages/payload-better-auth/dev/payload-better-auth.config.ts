@@ -203,5 +203,5 @@ export const betterAuthPluginConfig = {
   extendsCollections: {
     user: UserExtend,
   },
-  logs: 'trace',
+  // logs: 'trace',
 } as const satisfies BetterAuthPluginOptions

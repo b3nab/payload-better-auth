@@ -6,7 +6,7 @@ import { afterAllFixtures } from "../fixtures/afterAll.fixtures";
 import { getSuite } from "../fixtures/suite.ctx";
 
 describe("Payload Adapter Tests", async () => {
-    beforeAll(beforeAllFixtures(true))
+    beforeAll(beforeAllFixtures(), 1000*60)
 
     afterAll(afterAllFixtures())
 
