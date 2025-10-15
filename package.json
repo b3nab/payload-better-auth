@@ -48,7 +48,8 @@
     "bump": "pnpm plugin-- bump",
     "pub": "pnpm publish --filter payload-better-auth",
     "pub:local": "pnpm plugin-- publish:local",
-    "yeah": "pnpm test && pnpm build && pnpm bump && pnpm pub",
+    "ye": "pnpm test && pnpm build && pnpm bump && pnpm pub",
+    "yeah": "pnpm test && pnpm build && pnpm bump && pnpm pub --no-git-checks",
     "yolo": "pnpm build && pnpm bump && pnpm pub --no-git-checks"
   },
   "devDependencies": {
