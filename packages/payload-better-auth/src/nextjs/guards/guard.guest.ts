@@ -17,9 +17,11 @@ export const guardGuest: GuardWrap = (configPromise, pluginOptions) =>
 
     if (redirectUrl && data?.session.token) redirect(redirectUrl)
 
+    const user = data?.user.id ? await payload.findByID({ collection: 'user', id: data.user.id }) : null
+
     return {
       hasSession: !!data?.session.token && !!data?.user,
       session: data?.session,
-      user: data?.user,
+      user,
     }
   })

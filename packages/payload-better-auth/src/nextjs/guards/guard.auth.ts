@@ -38,6 +38,6 @@ export const guardAuth: GuardWrap = (configPromise, pluginOptions) =>
     return {
       hasSession,
       session: data.session,
-      user: user,
+      user,
     }
   })

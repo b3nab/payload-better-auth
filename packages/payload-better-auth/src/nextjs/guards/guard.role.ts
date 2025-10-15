@@ -27,6 +27,8 @@ export const guardRole =
         }
       }
 
+      const user = await payload.findByID({ collection: 'user', id: data.user.id })
+
       // const userID = data?.user.id
 
       // console.log('ISAUTH - data:: ', data)
@@ -34,6 +36,6 @@ export const guardRole =
       return {
         hasSession: hasRole,
         session: data?.session,
-        user: data?.user,
+        user,
       }
     })
