@@ -1,5 +1,5 @@
 {
-  "name": "payload-better-auth",
+  "name": "@b3nab/payload-better-auth",
   "version": "0.9.5",
   "description": "A Payload CMS 3 plugin for Better Auth",
   "author": {
@@ -20,6 +20,7 @@
     "cms",
     "plugin",
     "better-auth",
+    "payload-better-auth",
     "security",
     "auth",
     "authentication",

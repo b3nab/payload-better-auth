@@ -98,7 +98,7 @@ export const baseOptions: BaseLayoutProps = {
           // icon: <Book />,
           text: 'Introduction',
           description:
-            'Learn to use payload-better-auth on your website/saas/whatever.',
+            'Learn to use @b3nab/payload-better-auth on your website/saas/whatever.',
           url: '/docs',
         },
         {

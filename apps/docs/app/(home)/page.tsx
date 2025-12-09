@@ -120,7 +120,7 @@ export default function Home() {
               title: '@/payload.config.ts',
             }}
             code={`import { buildConfig } from 'payload'
-import { betterAuthPlugin } from "payload-better-auth"
+import { betterAuthPlugin } from "@b3nab/payload-better-auth"
 
 export default buildConfig({
   // ... your payload configuration

@@ -14,7 +14,7 @@ import {
 } from '@payloadcms/richtext-lexical'
 import { searchFields } from '@/search/fieldOverrides'
 import { beforeSyncWithSearch } from '@/search/beforeSync'
-import { betterAuthPlugin } from 'payload-better-auth'
+import { betterAuthPlugin } from '@b3nab/payload-better-auth'
 import { betterAuthPluginConfig } from './payload.better-auth'
 
 import type { Page, Post } from '@/payload-types'

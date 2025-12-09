@@ -40,7 +40,7 @@ This project is licensed under the [GNU Affero General Public License v3.0](LICE
 ## Installation
 
 ```bash
-pnpm add payload-better-auth
+pnpm add @b3nab/payload-better-auth
 ```
 
 ## Quick Start
@@ -48,7 +48,7 @@ pnpm add payload-better-auth
 Into your `payload.config.ts` file, add the plugin:
 
 ```ts
-import { betterAuthPlugin } from 'payload-better-auth'
+import { betterAuthPlugin } from '@b3nab/payload-better-auth'
 
 export default buildConfig({
 

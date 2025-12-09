@@ -23,13 +23,13 @@
       "@payload-config": [
         "./payload.config.ts"
       ],
-      "payload-better-auth": [
+      "@b3nab/payload-better-auth": [
         "../src/index.ts"
       ],
-      "payload-better-auth/client": [
+      "@b3nab/payload-better-auth/client": [
         "../src/exports/client.ts"
       ],
-      "payload-better-auth/rsc": [
+      "@b3nab/payload-better-auth/rsc": [
         "../src/exports/rsc.ts"
       ],
       "@/*": [

@@ -22,8 +22,8 @@
     <a href="https://github.com/b3nab/payload-better-auth/issues">Issues</a>
   </p>
 
-[![npm](https://img.shields.io/npm/dm/payload-better-auth)](https://npm.chart.dev/payload-better-auth?primary=neutral&gray=neutral&theme=dark)
-[![npm version](https://img.shields.io/npm/v/payload-better-auth.svg)](https://www.npmjs.com/package/payload-better-auth)
+[![npm](https://img.shields.io/npm/dm/@b3nab/payload-better-auth)](https://npm.chart.dev/@b3nab/payload-better-auth?primary=neutral&gray=neutral&theme=dark)
+[![npm version](https://img.shields.io/npm/v/@b3nab/payload-better-auth.svg)](https://www.npmjs.com/package/@b3nab/payload-better-auth)
 [![GitHub stars](https://img.shields.io/github/stars/b3nab/payload-better-auth)](https://github.com/b3nab/payload-better-auth/stargazers)
 
 </p>
@@ -39,7 +39,7 @@ This plugin is thought to be used in production, with real users, so to be rock 
 
 ## Description
 
-The `payload-better-auth` plugin wraps the better-auth library to seamleassly integrate advanced authentication features into Payload CMS v3. It enhanches developer productivity and user experience by offering more sophisticated authentication methods beyond Payload's built-in auth system.
+The `@b3nab/payload-better-auth` plugin wraps the better-auth library to seamleassly integrate advanced authentication features into Payload CMS v3. It enhanches developer productivity and user experience by offering more sophisticated authentication methods beyond Payload's built-in auth system.
 Definitely it's a better-way 🤓 to manage authentication for Payload CMS v3.
 
 ### Why This Plugin?
@@ -62,7 +62,7 @@ The goal is to seamlessly integrate better-auth in your Payload CMS v3 applicati
 ## Installation
 
 ```bash
-pnpm add payload-better-auth
+pnpm add @b3nab/payload-better-auth
 ```
 
 ## Quick Start
@@ -71,7 +71,7 @@ Into your `payload.config.ts` file, add the plugin:
 
 ```ts
 import { buildConfig } from 'payload'
-import { betterAuthPlugin } from "payload-better-auth"
+import { betterAuthPlugin } from "@b3nab/payload-better-auth"
 
 export default buildConfig({
 
