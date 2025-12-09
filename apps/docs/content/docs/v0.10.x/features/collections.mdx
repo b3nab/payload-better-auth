@@ -1,0 +1,77 @@
+---
+title: Collections
+description: Manage and extend Better Auth collections
+---
+
+# Collections
+
+The plugin automatically creates and manages necessary collections for authentication.
+
+## Default Collections
+
+The plugin creates the following collections:
+
+### Users Collection
+- Stores user accounts and profiles
+- Handles authentication and authorization
+- Supports custom field extensions
+
+### Sessions Collection
+- Manages authentication sessions
+- Tracks login history
+- Handles session expiration
+
+### Verification Collection
+- Stores email verification tokens
+- Manages password reset tokens
+- Handles account recovery
+
+### Two Factor Collection
+- Stores 2FA configurations
+- Manages TOTP secrets
+- Handles backup codes
+
+## Extending Collections
+
+You can extend the default collections with additional fields:
+
+```ts
+betterAuthPlugin({
+  extendsCollections: {
+    users: {
+      fields: [
+        {
+          name: 'customField',
+          type: 'text',
+        },
+      ],
+    },
+  },
+})
+```
+
+## Collection Permissions
+
+The plugin automatically sets up appropriate permissions for each collection:
+
+- Users: Read/Write for authenticated users
+- Sessions: Read/Write for authenticated users
+- Verification: Read/Write for system
+- Two Factor: Read/Write for authenticated users
+
+## Custom Collection Config
+
+You can override default collection configurations:
+
+```ts
+betterAuthPlugin({
+  betterAuth: {
+    user: {
+      // Override user collection config
+    },
+    session: {
+      // Override session collection config
+    },
+  },
+})
+```

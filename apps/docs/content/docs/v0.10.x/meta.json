@@ -1,0 +1,27 @@
+{
+  "title": "v0.10.x",
+  "description": "Docs for @b3nab/payload-better-auth v0.10.x",
+  "root": true,
+  "pages": [
+    "---Getting Started---",
+    "introduction",
+    "what-is-payload-better-auth",
+    "installation",
+    "---Features---",
+    "features/authentication-strategies",
+    "features/two-factor",
+    "features/rbac",
+    "---Auth Layer---",
+    "auth-layer/create-auth-layer",
+    "auth-layer/auth-instance",
+    "auth-layer/checkers",
+    "auth-layer/guards",
+    "---Configuration---",
+    "configuration/plugin-options",
+    "configuration/collections",
+    "---API Reference---",
+    "api/plugin-options",
+    "api/authentication",
+    "api/collections"
+  ]
+}

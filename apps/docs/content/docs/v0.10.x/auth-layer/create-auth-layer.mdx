@@ -1,0 +1,102 @@
+---
+title: createAuthLayer
+description: Learn how to use the createAuthLayer function to set up authentication in your Next.js application
+icon: LandPlot
+# icon: Layers
+---
+
+# createAuthLayer 🛠️
+
+The `createAuthLayer` function is the core of Better Auth's Next.js integration. It provides a set of pre-built helpers that make it easy to implement authentication checks and guards in your Next.js actions, routes and components.
+
+## Setup 🔧
+
+First, create an auth layer in your Next.js project:
+
+```typescript title="@/lib/auth.ts"
+import { createAuthLayer } from '@b3nab/payload-better-auth'
+import { config } from '@/payload.config'
+import { payloadBetterAuthConfig } from '@/payload-better-auth.config'
+
+export const {
+  // betterAuth instance
+  auth,
+  // checkers
+  isAuth,
+  isGuest,
+  isUser,
+  isAdmin,
+  isRole,
+  // guards
+  guardAuth,
+  // guardGuest,
+  // guardUser,
+  // guardAdmin,
+  // guardRole,
+} = createAuthLayer(config, payloadBetterAuthConfig)
+```
+
+<Callout type="info" title="Better Auth Integration">
+This setup is similar to Better Auth's `lib/auth.ts` file, but with a key difference: you don't need to create a Better Auth instance manually using `betterAuth({...})`. The @b3nab/payload-better-auth plugin automatically creates and manages the Better Auth instance for you. The `createAuthLayer` function simply provides access to this pre-configured instance along with additional helpers.
+</Callout>
+
+## Available Helpers 🎯
+
+The `createAuthLayer` function returns several helpers:
+
+{/* TODO: convert the following list to a manual <TypeTable /> */}
+
+## Better Auth Instance
+- `auth`: Better Auth Instance
+
+[Learn more on auth instance](../auth-layer/auth-instance)
+
+### Checkers
+- `isAuth`: Check if user is authenticated
+- `isGuest`: Check if user is a guest (not authenticated)
+- `isUser`: Check if user is logged in
+- `isAdmin`: Check if user is an admin
+- `isRole`: Check if user has specific role
+
+[Learn more on checkers](../auth-layer/checkers)
+
+### Guards
+- `guardAuth`: Protect and redirect if user is not authenticated
+- `guardGuest`: Protect and redirect if user is a guest (not authenticated)
+- `guardUser`: Protect and redirect if user is logged in
+- `guardAdmin`: Protect and redirect if user is an admin
+- `guardRole`: Protect and redirect if user has specific role
+
+[Learn more on guards](../auth-layer/guards)
+
+## Usage Examples
+
+### Using in Components
+
+```tsx title="app/protected/page.tsx"
+import { isAdmin } from '@/lib/auth'
+
+export default async function ProtectedPage() {
+  const isAdminUser = await isAdmin()
+
+  if (!isAdminUser) {
+    return <div>Access denied</div>
+  }
+
+  return <div>Admin content</div>
+}
+```
+
+## Best Practices 📚
+
+1. Create a single auth layer instance and export it
+2. Use guards for route protection
+3. Use checkers for conditional rendering
+4. Handle errors appropriately
+5. Cache authentication state when possible
+
+{/* ## Next Steps 🚀
+
+- [Checkers](../auth-layer/checkers)
+- [Guards](../auth-layer/guards)
+- [Configuration](../configuration/plugin-options) */}

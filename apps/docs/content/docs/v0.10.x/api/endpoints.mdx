@@ -1,0 +1,102 @@
+---
+title: API Endpoints
+description: Better Auth API endpoints reference
+---
+
+# API Endpoints
+
+The plugin provides several authentication endpoints under the `/api/auth` path.
+
+## Authentication Endpoints
+
+### Login
+```http
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+```
+
+### Register
+```http
+POST /api/auth/register
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "password123",
+  "name": "John Doe"
+}
+```
+
+### Logout
+```http
+POST /api/auth/logout
+```
+
+### Verify Email
+```http
+POST /api/auth/verify
+Content-Type: application/json
+
+{
+  "token": "verification_token"
+}
+```
+
+### Two Factor Authentication
+
+#### Setup 2FA
+```http
+POST /api/auth/two-factor/setup
+Content-Type: application/json
+
+{
+  "userId": "user_id"
+}
+```
+
+#### Verify 2FA Code
+```http
+POST /api/auth/two-factor/verify
+Content-Type: application/json
+
+{
+  "code": "123456",
+  "userId": "user_id"
+}
+```
+
+## Response Format
+
+All endpoints return responses in this format:
+
+```json
+{
+  "success": boolean,
+  "error": string | null,
+  "data": object | null
+}
+```
+
+## Error Codes
+
+Common error codes and their meanings:
+
+- `400` - Bad Request
+- `401` - Unauthorized
+- `403` - Forbidden
+- `404` - Not Found
+- `429` - Too Many Requests
+- `500` - Internal Server Error
+
+## Rate Limiting
+
+The API endpoints are rate-limited by default:
+
+- Login attempts: 5 per minute
+- Registration: 3 per hour
+- 2FA verification: 5 per minute
