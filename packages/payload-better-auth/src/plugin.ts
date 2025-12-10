@@ -85,7 +85,7 @@ export const betterAuthPlugin =
         providers: [
           ...(config.admin?.components?.providers || []),
           {
-            path: 'payload-better-auth/rsc#BetterAuthServerWrapper',
+            path: '@b3nab/payload-better-auth/rsc#BetterAuthServerWrapper',
             serverProps: {
               pluginOptions,
             },
@@ -95,11 +95,11 @@ export const betterAuthPlugin =
           ...(config.admin?.components?.views || {}),
           SetupTwoFactor: {
             path: '/two-factor-setup',
-            Component: 'payload-better-auth/rsc#SetupTwoFactorServer',
+            Component: '@b3nab/payload-better-auth/rsc#SetupTwoFactorServer',
           },
           VerifyTwoFactor: {
             path: '/two-factor-verify',
-            Component: 'payload-better-auth/rsc#VerifyTwoFactorServer',
+            Component: '@b3nab/payload-better-auth/rsc#VerifyTwoFactorServer',
           },
         },
       },
