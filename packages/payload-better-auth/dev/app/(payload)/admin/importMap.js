@@ -21,9 +21,9 @@ import { StrikethroughFeatureClient as StrikethroughFeatureClient_e70f5e05f09f93
 import { UnderlineFeatureClient as UnderlineFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
-import { BetterAuthServerWrapper as BetterAuthServerWrapper_0814f4521f2b1f0fcc391051cb30e62b } from 'payload-better-auth/rsc'
-import { SetupTwoFactorServer as SetupTwoFactorServer_0814f4521f2b1f0fcc391051cb30e62b } from 'payload-better-auth/rsc'
-import { VerifyTwoFactorServer as VerifyTwoFactorServer_0814f4521f2b1f0fcc391051cb30e62b } from 'payload-better-auth/rsc'
+import { BetterAuthServerWrapper as BetterAuthServerWrapper_501c5fdba6c9a607d65ee1a19fe5a153 } from '@b3nab/payload-better-auth/rsc'
+import { SetupTwoFactorServer as SetupTwoFactorServer_501c5fdba6c9a607d65ee1a19fe5a153 } from '@b3nab/payload-better-auth/rsc'
+import { VerifyTwoFactorServer as VerifyTwoFactorServer_501c5fdba6c9a607d65ee1a19fe5a153 } from '@b3nab/payload-better-auth/rsc'
 
 export const importMap = {
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
@@ -49,7 +49,7 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#UnderlineFeatureClient": UnderlineFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#BoldFeatureClient": BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
-  "payload-better-auth/rsc#BetterAuthServerWrapper": BetterAuthServerWrapper_0814f4521f2b1f0fcc391051cb30e62b,
-  "payload-better-auth/rsc#SetupTwoFactorServer": SetupTwoFactorServer_0814f4521f2b1f0fcc391051cb30e62b,
-  "payload-better-auth/rsc#VerifyTwoFactorServer": VerifyTwoFactorServer_0814f4521f2b1f0fcc391051cb30e62b
+  "@b3nab/payload-better-auth/rsc#BetterAuthServerWrapper": BetterAuthServerWrapper_501c5fdba6c9a607d65ee1a19fe5a153,
+  "@b3nab/payload-better-auth/rsc#SetupTwoFactorServer": SetupTwoFactorServer_501c5fdba6c9a607d65ee1a19fe5a153,
+  "@b3nab/payload-better-auth/rsc#VerifyTwoFactorServer": VerifyTwoFactorServer_501c5fdba6c9a607d65ee1a19fe5a153
 }
