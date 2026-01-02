@@ -1,5 +1,3 @@
-// @ts-strict-ignore
-import { status as httpStatus } from 'http-status'
 
 import type { PayloadHandler } from 'payload'
 import { headersWithCors, generatePayloadCookie } from 'payload'
@@ -58,6 +56,40 @@ export const loginHandler: PayloadHandler = async (req) => {
   console.log('result', result)
   console.log('headers', response.headers)
 
+  // If 2FA redirect is required, skip permission check and return fake user
+  if (result.twoFactorRedirect) {
+    // IMPORTANT:
+    // Payload may attempt to load user-scoped preferences (nav prefs) using `user.id`.
+    // On SQL adapters, that `user_id` column is often a UUID. If we return a non-UUID
+    // placeholder (e.g. "two-factor-id"), it can crash with "invalid input syntax for type uuid".
+    const twoFactorPlaceholderUserId = '00000000-0000-0000-0000-000000000000'
+
+    return Response.json(
+      {
+        message: t('authentication:passed'),
+        ...result,
+        user: {
+          id: twoFactorPlaceholderUserId,
+          email: 'two-factor-email',
+          collection: req.payload.config.admin.user,
+          by: 'endpoint-login',
+          _twoFactorPending: true,
+          _strategy: 'better-auth',
+        },
+      },
+      {
+        headers: headersWithCors({
+          headers: response.headers,
+          req,
+        }),
+        status: response.status,
+      },
+    )
+  }
+
+  // Only check permissions if we have a real user (not 2FA redirect)
+  invariant(result.user, 'User not found in login response')
+
   const canEnterCMS = await betterAuth.api.userHasPermission({
     body: {
       userId: result.user.id,
@@ -72,49 +104,6 @@ export const loginHandler: PayloadHandler = async (req) => {
   invariant(canEnterCMS.success, 'cannot enter cms, permission denied.')
 
   logger.debug(canEnterCMS.success, '[loginHandler] SUCCESS! Entering CMS..')
-  // if (result.twoFactorRedirect) {
-  //   console.log('redirecting to two factor')
-  //   // return redirect(`${req.payload.config.routes.admin}/two-factor`)
-  //   return Response.redirect(
-  //     formatAdminURL({
-  //       adminRoute: req.payload.config.routes.admin,
-  //       path: '/two-factor-verify',
-  //     }),
-  //   )
-  // }
-
-  // Check if 2FA is required
-  // if (result.twoFactorRedirect) {
-  //   // Construct full URL for redirect
-  //   const protocol = req.headers.get('x-forwarded-proto') || 'http'
-  //   const redirectUrl = new URL(
-  //     formatAdminURL({
-  //       adminRoute: req.payload.config.routes.admin,
-  //       path: '/two-factor-verify',
-  //     }),
-  //     `${protocol}://${req.headers.get('host')}`,
-  //   ).toString()
-
-  //   // return redirect(redirectUrl)
-  //   return Response.redirect(redirectUrl, 303)
-  // }
-
-  // const cookie = generatePayloadCookie({
-  //   collectionAuthConfig: collection.config.auth,
-  //   cookiePrefix: req.payload.config.cookiePrefix,
-  //   token: result.token,
-  // })
-
-  if (result.twoFactorRedirect) {
-    result.user = {
-      ...result,
-      ...result.user,
-      id: 'two-factor-id',
-      email: 'two-factor-email',
-      collection: req.payload.config.admin.user,
-      by: 'endpoint-login',
-    }
-  }
 
   if (collection.config.auth.removeTokenFromResponses) {
     result.token = undefined

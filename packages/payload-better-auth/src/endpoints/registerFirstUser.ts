@@ -1,9 +1,7 @@
 import {
   Forbidden,
   type PayloadHandler,
-  type Payload,
   headersWithCors,
-  generatePayloadCookie,
 } from 'payload'
 import { status as httpStatus } from 'http-status'
 import { getRequestCollection } from '../payload-utilities/getRequestEntity.js'
@@ -103,47 +101,39 @@ export const registerFirstUserHandler: PayloadHandler = async (req) => {
   const result = await response.json()
   invariant(result.token, 'User registered but no token returned')
 
-  const fixRoleResponse = await payload.update({
+  await payload.update({
     collection: 'user',
     id: result.user.id,
     data: {
       role: 'admin',
       emailVerified: verify ? true : authData.emailVerified,
-      // twoFactorEnabled: authData.twoFactorEnabled,
     },
     overrideAccess: true,
   })
-  // if (verify) {
-  //   // auto-verify (if applicable)
-  //   await payload.update({
-  //     id: result.user.id,
-  //     collection: slug,
-  //     data: {
-  //       _verified: true,
-  //     },
-  //     req,
-  //   })
-  // }
 
-  // const cookie = generatePayloadCookie({
-  //   collectionAuthConfig: collection.config.auth,
-  //   cookiePrefix: req.payload.config.cookiePrefix,
-  //   token: result.token,
-  // })
+  // Check if 2FA plugin is enabled in the config
+  const twoFactorPluginEnabled =
+    payload.config.custom?.authFlows?.twoFactor ?? false
 
   return Response.json(
     {
-      // exp: result.exp,
       message: t('authentication:successfullyRegisteredFirstUser'),
       token: result.token,
-      user: result.user,
+      user: {
+        ...result.user,
+        role: 'admin',
+        emailVerified: verify ? true : authData.emailVerified,
+      },
+      // Include 2FA setup information for the client
+      twoFactor: {
+        enabled: twoFactorPluginEnabled,
+        userHasTwoFactor: false,
+        shouldPromptSetup: twoFactorPluginEnabled,
+      },
     },
     {
       headers: headersWithCors({
         headers: response.headers,
-        // new Headers({
-        //   'Set-Cookie': cookie,
-        // }),
         req,
       }),
       status: httpStatus.OK,
