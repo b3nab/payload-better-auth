@@ -76,18 +76,6 @@ export const FormVerifyTwoFactor: React.FC = () => {
       }
       return finalResponse
     }
-    // const workaroundResponse = await fetch(
-    //   `${window.location.origin}/api/user/verify-2fa`,
-    //   {
-    //     method: 'post',
-    //     body: JSON.stringify({
-    //       code: data.otp.value as string,
-    //     }),
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //     },
-    //   },
-    // )
 
     const response = await fireVerify2FA()
 
