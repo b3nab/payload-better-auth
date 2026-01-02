@@ -1,20 +1,20 @@
 import type { Payload } from 'payload'
 import type { BetterAuthOptions, Where } from 'better-auth'
-import { createAdapter, type AdapterDebugLogs } from 'better-auth/adapters'
+import { createAdapterFactory, type DBAdapterDebugLogOption } from 'better-auth/adapters'
 import { BetterAuthError } from 'better-auth'
 import { getPayload } from '../singleton.payload.js'
 import { getLogger } from '../singleton.logger.js'
 
 interface PayloadAdapterConfig {
   payload?: Payload
-  debugLogs?: AdapterDebugLogs
+  debugLogs?: DBAdapterDebugLogOption
 }
 
 export const payloadAdapter = (config: PayloadAdapterConfig = {}) => {
   const logger = getLogger()
   logger.trace('payloadAdapter')
   // console.log(`- payloadAdapter WRAPPER`)
-  return createAdapter({
+  return createAdapterFactory({
     config: {
       adapterId: 'payloadcms',
       adapterName: 'Payload CMS',
