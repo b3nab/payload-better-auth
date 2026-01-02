@@ -6,20 +6,19 @@ import { formatAdminURL } from '@payloadcms/ui/shared'
 import { usePathname, useRouter } from 'next/navigation.js'
 import { useAuth } from '@payloadcms/ui'
 import { createAuthClient } from 'better-auth/react'
-import { twoFactorClient } from 'better-auth/plugins'
-import { passkeyClient } from 'better-auth/client/plugins'
-import type { BetterAuthClientPlugin } from 'better-auth/types'
+import { adminClient, twoFactorClient } from 'better-auth/client/plugins'
 import type { BetterAuthPluginOptions } from '../../types.js'
 
-function generateBetterAuthClient(pluginOptions: BetterAuthPluginOptions): any {
+function generateBetterAuthClient(pluginOptions: BetterAuthPluginOptions) {
   const clientPlugins = []
+  clientPlugins.push(adminClient())
   clientPlugins.push(twoFactorClient())
-  if (pluginOptions.betterAuthPlugins?.passkey) {
-    clientPlugins.push(passkeyClient())
-  }
   return createAuthClient<{
-    plugins: typeof clientPlugins
-  }>({ plugins: clientPlugins })
+    plugins: typeof clientPlugins,
+    fetchOptions: {
+      credentials: 'include', // Required to send cookies (like better-auth.two_factor)
+    },
+  }>({ plugins: clientPlugins, fetchOptions: { credentials: 'include' } })
 }
 
 interface BetterAuthClientContextType {
@@ -101,12 +100,9 @@ const CheckAuthFlows = ({
     //   router.refresh()
     // }
 
-    if (
-      user?.id === 'two-factor-id' &&
-      authFlows.twoFactor.enabled &&
-      !isVerifyTwoFactorPage &&
-      !pathname.includes('/logout')
-    ) {
+    const isTwoFactorPending = (user as any)?._twoFactorPending === true
+
+    if (isTwoFactorPending && authFlows.twoFactor.enabled && !isVerifyTwoFactorPage && !pathname.includes('/logout')) {
       // window.location.href = authFlows.twoFactor.redirectUrl
       router.push(authFlows.twoFactor.redirectUrl)
     }

@@ -6,97 +6,53 @@ import { redirect } from 'next/navigation.js'
 import { BetterAuthProvider } from './BetterAuthProvider.client.js'
 import invariant from 'tiny-invariant'
 import { getLogger } from '../../singleton.logger.js'
-import type { ReactNode, JSX } from 'react'
+import type { FC, ReactNode } from 'react'
 
 interface BetterAuthWrapperProps extends ServerComponentProps {
   children: ReactNode
   pluginOptions: BetterAuthPluginOptions
 }
 
-export const BetterAuthServerWrapper = async (
-  wrapperProps: BetterAuthWrapperProps,
-): Promise<JSX.Element> => {
+export const BetterAuthServerWrapper: FC<BetterAuthWrapperProps> = async (
+  wrapperProps,
+) => {
   const logger = getLogger()
   logger.trace('[server] [BetterAuthServerWrapper]')
   const { children, pluginOptions, payload, user, req } = wrapperProps
-  // console.log('[server] [BetterAuthServerWrapper] [wrapperProps]', wrapperProps)
-  const cookies = await nextCookies()
-  const headers = await nextHeaders()
 
-  // logger.debug(
-  //   pluginOptions,
-  //   '[server] [BetterAuthServerWrapper] [pluginOptions]',
-  // )
-  // logger.debug(
-  //   {
-  //     cookies,
-  //     headers,
-  //     req,
-  //     user,
-  //   },
-  //   '[server] [BetterAuthServerWrapper]',
-  // )
+  // If we're in a pending 2FA state, force navigation to the verify page.
+  // This must work on refresh too, so we do NOT rely on custom request headers.
+  const isTwoFactorPending = (user as any)?._twoFactorPending === true
+  if (isTwoFactorPending) {
+    const verifyPath = formatAdminURL({
+      adminRoute: payload.config.routes.admin,
+      path: '/two-factor-verify',
+    })
 
-  // logger.debug(
-  //   `[server] [BetterAuthServerWrapper] [cookies]: ${String(cookies)}`,
-  // )
-  // logger.debug(
-  //   `[server] [BetterAuthServerWrapper] [headers]: ${String(headers)}`,
-  // )
+    const currentURL =
+      typeof (req as any)?.url === 'string' ? (req as any).url : undefined
 
-  // logger.debug(`[server] [BetterAuthServerWrapper] [req]: ${String(req)}`)
-  // logger.debug(`[server] [BetterAuthServerWrapper] [user]: ${String(user)}`)
-  // console.log('[server] [BetterAuthServerWrapper] [payload]', payload)
+    // NOTE:
+    // `PayloadRequest` is only a Partial<Request>. In some cases `req.url` can be undefined.
+    // If we can't reliably determine the current pathname, we must NOT redirect,
+    // otherwise we can create a redirect loop (ERR_TOO_MANY_REDIRECTS).
+    if (currentURL) {
+      try {
+        const currentPathname = new URL(currentURL).pathname
 
-  const twoFactorSession = cookies.get('better-auth.two_factor')
-  const redirected = headers.get('x-two-factor-redirect')
+        logger.debug({currentPathname}, 'currentPathname')
 
-  if (twoFactorSession && redirected) {
-    logger.debug(
-      `[server] [BetterAuthServerWrapper] [redirected]: ${String(redirected)}`,
-    )
-    return redirect(
-      formatAdminURL({
-        adminRoute: payload.config.routes.admin,
-        path: '/two-factor-verify',
-      }),
-    )
+        if (!currentPathname.startsWith(verifyPath)) {
+          logger.debug(
+            '[server] [BetterAuthServerWrapper] pending 2FA -> redirecting',
+          )
+          return redirect(verifyPath)
+        }
+      } catch {
+        // If URL parsing fails (e.g. relative URL), skip redirect and let the client handle it.
+      }
+    }
   }
-
-  // get current url
-  // console.log('[better-auth] [strategy] [twoFactor] headers', headers)
-
-  // invariant(refererURL, 'Referer URL is required')
-
-  // Check if 2FA is required
-  // if (twoFactorSession && refererURL) {
-  //   const currentUrl = new URL(refererURL)
-  //   const currentPath = currentUrl.pathname
-  //   console.log('currentPath', currentPath)
-  //   const isVerifyTwoFactorPage = currentPath.includes('two-factor-verify')
-  //   if (!isVerifyTwoFactorPage) {
-  //     // Construct full URL for redirect
-  //     const protocol = headers.get('x-forwarded-proto') || 'http'
-  //     const redirectUrl = new URL(
-  //       formatAdminURL({
-  //         adminRoute: payload.config.routes.admin,
-  //         path: '/two-factor-verify',
-  //       }),
-  //       `${protocol}://${headers.get('host')}`,
-  //     ).toString()
-
-  //     return redirect(redirectUrl)
-  //   }
-  // }
-
-  // if (twoFactorSession && !isVerifyTwoFactorPage) {
-  //   return new Response(null, {
-  //     headers: {
-  //       Location: `${payload.config.routes.admin}/two-factor-verify`,
-  //     },
-  //     status: 302,
-  //   })
-  // }
 
   return (
     <BetterAuthProvider
