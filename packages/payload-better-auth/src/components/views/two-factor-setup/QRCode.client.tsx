@@ -1,14 +1,14 @@
 'use client'
 
-import QRCode from 'qrcode'
+import type React from 'react'
 import { useEffect, useState } from 'react'
-import type { FC, JSX } from 'react'
+import QRCode from 'qrcode'
 
 interface QrCode2FAProps {
   uri: string | null
 }
 
-export const QRCode2FA = ({ uri }: QrCode2FAProps): JSX.Element => {
+export const QRCode2FA: React.FC<QrCode2FAProps> = ({ uri }) => {
   const [qrcode, setQrcode] = useState<string | null>(null)
   useEffect(() => {
     const getQRCodeImage = async () => {

@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, type FC } from 'react'
+import type React from 'react'
+import { useState } from 'react'
 // import '../../index.css'
 
 import {
@@ -23,7 +24,7 @@ interface FormsTwoFactorProps {
   action: 'enable' | 'disable'
 }
 
-export const FormsTwoFactor: FC<FormsTwoFactorProps> = ({
+export const FormsTwoFactor: React.FC<FormsTwoFactorProps> = ({
   action: actionFromProps,
 }) => {
   const [action, setAction] = useState<'enable' | 'disable'>(actionFromProps)
