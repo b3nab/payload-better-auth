@@ -37,12 +37,10 @@ import type { BetterAuthPluginOptions } from './types.js'
  */
 export const betterAuthPlugin =
   (pluginOptions: BetterAuthPluginOptions) =>
-  (incomingConfig: Config): Config => {
+  (config: Config): Config => {
     const logger = initLogger({
       level: pluginOptions.logs || 'info',
     })
-    const config = { ...incomingConfig }
-
     logger.debug(`PLUGIN: payload-better-auth - initializing`)
 
     ///////////////////////////////////
@@ -78,6 +76,13 @@ export const betterAuthPlugin =
     // Add Better Auth - Admin Customization
     ///////////////////////////////////////////
 
+    const twoFactorPluginEnabled = auth.options.plugins?.some(
+      (plugin) => plugin.id === 'two-factor',
+    )
+
+    // Check if social providers are configured
+    const socialProviders = Object.keys(auth.options.socialProviders || {})
+
     config.admin = {
       ...(config.admin ?? {}),
       components: {
@@ -90,6 +95,28 @@ export const betterAuthPlugin =
               pluginOptions,
             },
           },
+        ],
+        // BeforeDashboard: Modal prompt for admin users to setup 2FA
+        beforeDashboard: [
+          ...(twoFactorPluginEnabled
+            ? ['@b3nab/payload-better-auth/rsc#TwoFactorSetupPromptServer']
+            : []),
+          ...(config.admin?.components?.beforeDashboard || []),
+        ],
+        // AfterLogin: Social login buttons
+        afterLogin: [
+          ...(config.admin?.components?.afterLogin || []),
+          ...(socialProviders.length > 0
+            ? [
+                {
+                  path: '@b3nab/payload-better-auth/rsc#SocialLoginButtonsServer',
+                  serverProps: {
+                    socialProviders,
+                    adminRoute: config.routes?.admin || '/admin',
+                  },
+                },
+              ]
+            : []),
         ],
         views: {
           ...(config.admin?.components?.views || {}),
@@ -109,8 +136,7 @@ export const betterAuthPlugin =
     config.custom = {
       ...(config.custom || {}),
       authFlows: {
-        twoFactor: pluginOptions.betterAuthPlugins?.twoFactor ??
-        auth.options.plugins?.some((plugin) => plugin.id === 'two-factor'),
+        twoFactor: twoFactorPluginEnabled,
       },
     }
 
