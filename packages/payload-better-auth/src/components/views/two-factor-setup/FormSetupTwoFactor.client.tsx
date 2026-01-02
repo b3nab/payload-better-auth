@@ -66,7 +66,7 @@ export const FormsTwoFactor: React.FC<FormsTwoFactorProps> = ({
       setNeedVerification(true)
       setQrCodeURI(response.data.totpURI)
       toast.success(
-        'Two factor authentication enabled - verify your TOTP code to complete setup',
+        'Two-Factor Authentication enabled. Please verify your TOTP code to complete the setup.',
       )
       setAction('disable')
     }
@@ -78,7 +78,7 @@ export const FormsTwoFactor: React.FC<FormsTwoFactorProps> = ({
       password: data.password.value as string,
     })
     console.log('response', response)
-    toast.success('Two factor authentication disabled')
+    toast.success('Two-Factor Authentication has been disabled')
     setAction('enable')
     redirect('/admin')
   }
@@ -92,7 +92,7 @@ export const FormsTwoFactor: React.FC<FormsTwoFactorProps> = ({
     if (response.error) {
       toast.error(response.error.message || 'An error occurred')
     } else {
-      toast.success('Two factor authentication verified')
+      toast.success('Two-Factor Authentication verified successfully')
       try {
         // try to set the user, even here it could return response.data as a Blob the first time
         // but here we don't do the same workaround as the /two-factor-verify
@@ -125,13 +125,13 @@ export const FormsTwoFactor: React.FC<FormsTwoFactorProps> = ({
           <div className={'form-header'}>
             <h1>
               {action === 'enable'
-                ? 'Enable Two Factor Authentication'
-                : 'Disable Two Factor Authentication'}
+                ? 'Enable Two-Factor Authentication'
+                : 'Disable Two-Factor Authentication'}
             </h1>
             <p>
               {action === 'enable'
-                ? 'Enter your password to enable two factor authentication'
-                : 'Enter your password to disable two factor authentication'}
+                ? 'Enter your password to enable Two-Factor Authentication (2FA). This will add an extra layer of security to your account and help prevent unauthorized access to the Admin Panel.'
+                : 'Enter your password to disable Two-Factor Authentication (2FA). Disabling 2FA will reduce the security of your account and make it more vulnerable to unauthorized access.'}
             </p>
           </div>
 
@@ -153,10 +153,9 @@ export const FormsTwoFactor: React.FC<FormsTwoFactorProps> = ({
       ) : (
         <div>
           <div className={'form-header'}>
-            <h1>Verify Two Factor Authentication</h1>
+            <h1>Complete Two-Factor Authentication Setup</h1>
             <p>
-              Scan the QR code with your authenticator app and enter the code
-              below
+              Scan the QR code below with your authenticator app (such as Google Authenticator, Authy, or Microsoft Authenticator), then enter the verification code to complete the setup and secure your account.
             </p>
           </div>
           <div style={{ display: 'flex', justifyContent: 'center' }}>

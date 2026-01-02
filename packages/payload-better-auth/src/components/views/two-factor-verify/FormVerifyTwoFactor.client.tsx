@@ -1,12 +1,11 @@
 'use client'
 
-import { useState, type FC } from 'react'
+import type React from 'react'
 
 import {
   EmailField,
   Form,
   FormSubmit,
-  PasswordField,
   TextField,
   toast,
   useAuth,
@@ -15,9 +14,8 @@ import {
 } from '@payloadcms/ui'
 import type { FormState } from 'payload'
 import { useBetterAuthClient } from '../../providers/BetterAuthProvider.client.js'
-import { redirect } from 'next/navigation.js'
 
-export const FormVerifyTwoFactor: FC = () => {
+export const FormVerifyTwoFactor: React.FC = () => {
   const { config, getEntityConfig } = useConfig()
   const {
     admin: {
@@ -29,7 +27,7 @@ export const FormVerifyTwoFactor: FC = () => {
   const { t } = useTranslation()
 
   const initialState: FormState = {
-    password: {
+    otp: {
       initialValue: '',
       valid: false,
       value: '',
@@ -59,7 +57,7 @@ export const FormVerifyTwoFactor: FC = () => {
       let finalResponse: any
       try {
         const response = await betterAuthClient.twoFactor.verifyTotp({
-          code: data.password.value as string,
+          code: data.otp.value as string,
         })
         let res = response.data
         if (typeof (response.data as unknown as Blob).text === 'function') {
@@ -83,7 +81,7 @@ export const FormVerifyTwoFactor: FC = () => {
     //   {
     //     method: 'post',
     //     body: JSON.stringify({
-    //       code: data.password.value as string,
+    //       code: data.otp.value as string,
     //     }),
     //     headers: {
     //       'Content-Type': 'application/json',
@@ -101,17 +99,12 @@ export const FormVerifyTwoFactor: FC = () => {
       return
     }
     if (response.user) {
-      // let res = response.data
-      // if (typeof (response.data as unknown as Blob).text === 'function') {
-      //   const blobText = await (response.data as unknown as Blob).text()
-      //   res = JSON.parse(blobText)
-      // }
-      // if (res.user) {
       setUser({ ...response.user, collection: userSlug })
-      toast.success('Two factor authentication verified')
-      redirect('/admin')
+      toast.success('Two-Factor Authentication verified successfully')
+      // Full page reload to ensure PayloadCMS hooks are properly synced
+      window.location.href = '/admin'
     } else {
-      toast.error('Invalid code')
+      toast.error('Invalid verification code. Please try again.')
     }
     // }
   }
@@ -120,9 +113,9 @@ export const FormVerifyTwoFactor: FC = () => {
     <>
       <div>
         <div className={'form-header'}>
-          <h1>Verify 2FA</h1>
+          <h1>Verify Two-Factor Authentication</h1>
           <p>
-            Enter the code from your authenticator app to verify your account
+            Enter the verification code from your authenticator app to complete the login process and access your account securely.
           </p>
         </div>
 
@@ -131,14 +124,28 @@ export const FormVerifyTwoFactor: FC = () => {
           initialState={initialState}
           method="POST"
         >
-          <PasswordField
+          <TextField
             field={{
-              name: 'password',
+              name: 'otp',
+              type: 'text',
               label: 'Code',
               required: true,
+              minLength: 6,
+              maxLength: 6,
+              admin: {
+                placeholder: "000000",
+                autoComplete: "one-time-code",
+
+              },
             }}
-            autoComplete="one-time-code"
-            path="password"
+            validate={(value) => {
+              if (!value) return 'Code is required'
+              if (!/^\d{6}$/.test(value)) {
+                return 'OTP must be exactly 6 digits'
+              }
+              return true
+            }}
+            path="otp"
           />
 
           <FormSubmit size="large">{t('general:submit')}</FormSubmit>
