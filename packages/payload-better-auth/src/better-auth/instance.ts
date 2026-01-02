@@ -1,11 +1,13 @@
+import type { BetterAuthPluginOptions } from '../types.js'
+import { type PluginsToLoad, pluginsToLoad } from './plugins.server.js'
 import type { Payload } from 'payload'
-import { betterAuth } from 'better-auth'
-import type { Adapter, BetterAuthOptions, BetterAuthPlugin } from 'better-auth'
+import type { BetterAuthOptions, BetterAuthPlugin } from 'better-auth'
+import type { DBAdapter } from '@better-auth/core/db/adapter'
+import { betterAuth } from 'better-auth/minimal'
 import { payloadAdapter } from './payload-adapter.js'
 import { getPayload } from '../singleton.payload.js'
-import { type PluginsToLoad, pluginsToLoad } from './plugins.server.js'
 import { betterAuthSingleton } from '../singleton.better-auth.js'
-import type { BetterAuthPluginOptions } from '../types.js'
+import { getLogger } from '../singleton.logger.js'
 
 // The type for the Better Auth instance with proper plugin inference
 export type InferBetterAuthInstance<O extends BetterAuthPluginOptions> =
@@ -71,7 +73,7 @@ export type BuildOptions<O extends BetterAuthPluginOptions> =
 export type BuildBetterAuthOptionsReturnType<
   O extends BetterAuthPluginOptions,
 > = O['betterAuth'] & {
-  database: (options: BetterAuthOptions) => Adapter
+  database: (options: BetterAuthOptions) => DBAdapter
   emailAndPassword: {
     enabled: boolean
   }
@@ -92,6 +94,7 @@ const buildBetterAuthOptions = <const O extends BetterAuthPluginOptions>(
   pluginOptions: O,
   payload?: Payload,
 ): BuildBetterAuthOptionsReturnType<O> => {
+  const logger = getLogger()
   // Load plugins based on configuration
   // const plugins = pluginsToLoad(pluginOptions)
 
@@ -103,7 +106,7 @@ const buildBetterAuthOptions = <const O extends BetterAuthPluginOptions>(
     if (Array.isArray(trusted)) {
       trustedOrigins = [process.env.NEXT_PUBLIC_SERVER_URL ?? '', ...trusted]
     } else {
-      trustedOrigins = async (request: Request) => [
+      trustedOrigins = async (request) => [
         process.env.NEXT_PUBLIC_SERVER_URL ?? '',
         ...(await trusted(request)),
       ]
@@ -124,11 +127,68 @@ const buildBetterAuthOptions = <const O extends BetterAuthPluginOptions>(
     //////////////////////////////
     database: payloadAdapter({
       payload: payload ?? getPayload(),
+      debugLogs: !!pluginOptions.logs
     }),
+    emailVerification: {
+      sendOnSignUp: true,
+      sendOnSignIn: true, // sends a verification email on sign‑in if the user isn’t verified
+      autoSignInAfterVerification: true,
+      sendVerificationEmail: async ({ user, url, token }, request) => {
+        try {
+        await payload?.sendEmail({
+          to: user.email,
+            subject: 'Verify your email address',
+            text: `Click the link to verify your email: ${url}`,
+          })
+        } catch (error) {
+          logger.error(error, 'Error sending verification email')
+          console.error("email verification url", url)
+          console.error("email verification token", token)
+        }
+      },
+      ...(userOptionsWithoutPlugins.emailVerification ?? {}),
+    },
     emailAndPassword: {
+      sendResetPassword: async ({ user, url, token }, request) => {
+        try {
+        await payload?.sendEmail({
+          to: user.email,
+          subject: 'Reset your password',
+          text: `Click the link to reset your password: ${url}`,
+        })
+        } catch (error) {
+          logger.error(error, 'Error sending reset password email')
+          console.error("reset password url", url)
+          console.error("reset password token", token)
+        }
+      },
       ...(userOptionsWithoutPlugins.emailAndPassword ?? {}),
       enabled: true,
     },
+    user: {
+      changeEmail: {
+        enabled: true,
+        sendChangeEmailVerification: async (
+          { user, newEmail, url, token },
+          request,
+        ) => {
+          try {
+          await payload?.sendEmail({
+            to: user.email, // verification email must be sent to the current user email to approve the change
+            subject: 'Approve email change',
+            text: `Click the link to approve the change: ${url}`,
+          })
+          } catch (error) {
+            logger.error(error, 'Error sending change email verification email')
+            console.error("change email verification url", url)
+            console.error("change email verification token", token)
+          }
+        },
+        ...(userOptionsWithoutPlugins.user?.changeEmail ?? {}),
+      },
+      ...(userOptionsWithoutPlugins.user ?? {}),
+    },
+
     plugins: pluginsToLoad(pluginOptions),
 
     // merge options (nested ones)
