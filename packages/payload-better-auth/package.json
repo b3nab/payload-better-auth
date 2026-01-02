@@ -61,6 +61,7 @@
     "react-dom": ">=19.0.0 <20.0.0"
   },
   "dependencies": {
+    "@better-auth/core": "1.4.10",
     "@better-auth/stripe": "1.4.10",
     "@better-fetch/fetch": "1.1.21",
     "@fastify/deepmerge": "^3.1.0",
