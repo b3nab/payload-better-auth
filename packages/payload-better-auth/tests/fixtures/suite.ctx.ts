@@ -1,15 +1,15 @@
 import type { Payload } from 'payload'
 import type { StartedPostgreSqlContainer } from '@testcontainers/postgresql'
-import { betterAuth } from 'better-auth'
+import { betterAuth } from 'better-auth/minimal'
 import { getEndpoints } from 'better-auth/api'
-import type { BetterAuthDbSchema } from 'better-auth/db'
+import type { BetterAuthDBSchema } from 'better-auth/db'
 
 export type Suite = {
   memoryDB: StartedPostgreSqlContainer
   payload: Payload
   betterAuth: ReturnType<typeof betterAuth>
   betterAuthEndpoints: ReturnType<typeof getEndpoints>
-  betterAuthTables: BetterAuthDbSchema
+  betterAuthTables: BetterAuthDBSchema
 }
 
 let suite: Suite | undefined
