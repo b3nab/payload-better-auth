@@ -20,7 +20,7 @@ import { getLogger } from '../singleton.logger.js'
  * 1. If a 2FA verification is pending (better-auth.two_factor cookie exists)
  * 2. Otherwise, validates the session via Better Auth's getSession API
  */
-export const betterAuthStrategy: AuthStrategyFunction = async ({
+export const strategyHandler: AuthStrategyFunction = async ({
   headers,
   payload,
   isGraphQL,
@@ -96,3 +96,9 @@ export const betterAuthStrategy: AuthStrategyFunction = async ({
   }
 }
 
+export const createBetterAuthStrategy = () => {
+  return {
+    name: 'better-auth',
+    authenticate: strategyHandler,
+  }
+}
