@@ -53,7 +53,7 @@
     "yolo": "pnpm build && pnpm bump && pnpm pub --no-git-checks"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.2.4"
+    "@biomejs/biome": "^2.3.10"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
