@@ -1,44 +1,20 @@
-import type { AuthStrategy, AuthStrategyFunction } from 'payload'
-import type { betterAuth, BetterAuthOptions } from 'better-auth'
-import { getBetterAuth } from '../singleton.better-auth.js'
-import { payloadSingleton } from '../singleton.payload.js'
-import { emailAndPasswordStrategy } from './email-and-password.js'
-import { twoFactorStrategy } from './two-factor.js'
-
-const socialStrategy: AuthStrategyFunction = async ({
-  headers,
-  payload,
-  isGraphQL,
-  strategyName,
-}) => {
-  console.log('socialStrategy', headers)
-  return {
-    user: null,
-  }
-}
-
-const defaultStrategies: Record<string, AuthStrategyFunction> = {
-  // built-in
-  'email-and-password': emailAndPasswordStrategy,
-  // social: socialStrategy,
-  // plugins
-  'two-factor': twoFactorStrategy,
-  // totp: totpStrategy,
-  // passkey: passkeyStrategy,
-}
+import type { AuthStrategy } from 'payload'
+import type { BetterAuthOptions } from 'better-auth/minimal'
+import { betterAuthStrategy } from './better-auth.strategy.js'
 
 interface StrategyFactoryOptions {
   betterAuthOptions: BetterAuthOptions
 }
 
-// TODO: add strategies
 export const createAuthStrategies = (
   options: StrategyFactoryOptions,
 ): AuthStrategy[] => {
-  const { betterAuthOptions } = options
-
-  return Object.entries(defaultStrategies).map(([strategyName, strategy]) => ({
-    name: strategyName,
-    authenticate: strategy,
-  }))
+  // Single unified strategy handles all Better Auth auth methods
+  // because all methods ultimately result in a Better Auth session
+  return [
+    {
+      name: 'better-auth',
+      authenticate: betterAuthStrategy,
+    },
+  ]
 }
