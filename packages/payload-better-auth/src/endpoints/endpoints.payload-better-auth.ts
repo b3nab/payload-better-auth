@@ -5,7 +5,6 @@ import { logoutHandler } from './logout.js'
 import { meHandler } from './me.js'
 import { refreshHandler } from './refresh.js'
 import { registerFirstUserHandler } from './registerFirstUser.js'
-import { verify2faHandler } from './verify-2fa.js'
 
 // TODO: add all endpoints
 // TODO: add all handlers
@@ -25,11 +24,6 @@ export const payloadBetterAuthEndpoints: Endpoint[] = wrapInternalEndpoints([
     handler: loginHandler,
     method: 'post',
     path: '/login',
-  },
-  {
-    handler: verify2faHandler,
-    method: 'post',
-    path: '/verify-2fa',
   },
   {
     handler: logoutHandler,
