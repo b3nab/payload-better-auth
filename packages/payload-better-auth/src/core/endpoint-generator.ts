@@ -1,7 +1,7 @@
 import type {
-  BetterAuthDbSchema,
-  FieldAttribute,
-  FieldType,
+  BetterAuthDBSchema,
+  DBFieldAttribute,
+  DBFieldType,
 } from 'better-auth/db'
 import type {
   CollectionConfig,
@@ -12,7 +12,6 @@ import type {
   PayloadHandler,
 } from 'payload'
 import type { AuthContext, betterAuth } from 'better-auth'
-// biome-ignore lint/style/useImportType: <explanation>
 import { getEndpoints } from 'better-auth/api'
 import deepmerge from '@fastify/deepmerge'
 import type { BetterAuthPluginOptions } from '../types.js'
@@ -25,8 +24,7 @@ import type {
 } from '../better-auth/instance.js'
 
 type AuthEndpointsApi<O extends BetterAuthPluginOptions> = ReturnType<
-  // @ts-ignore
-  typeof getEndpoints<AuthContext, BuildBetterAuthOptionsReturnType<O>>
+  typeof getEndpoints<BuildBetterAuthOptionsReturnType<O>>
 >['api']
 
 export const generatePayloadEndpoints = <O extends BetterAuthPluginOptions>(

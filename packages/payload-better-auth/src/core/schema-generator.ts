@@ -1,7 +1,7 @@
 import type {
-  BetterAuthDbSchema,
-  FieldAttribute,
-  FieldType,
+  BetterAuthDBSchema,
+  DBFieldAttribute,
+  DBFieldType,
 } from 'better-auth/db'
 import type {
   CollectionConfig,
@@ -13,20 +13,18 @@ import deepmerge from '@fastify/deepmerge'
 import type { BetterAuthPluginOptions } from '../types.js'
 import { getLogger } from '../singleton.logger.js'
 import { isAdmin, isUser } from './access.js'
-import { createAuthStrategies } from '../strategies/strategies.payload-better-auth.js'
-import type { BetterAuthOptions } from 'better-auth'
+import { createBetterAuthStrategy } from '../strategy/better-auth.strategy.js'
+import type { BetterAuthOptions } from 'better-auth/minimal'
 import { payloadBetterAuthEndpoints } from '../endpoints/endpoints.payload-better-auth.js'
 
 export const generatePayloadCollections = (
   authOptions: BetterAuthOptions,
-  authTables: BetterAuthDbSchema,
+  authTables: BetterAuthDBSchema,
   extendsCollections?: BetterAuthPluginOptions['extendsCollections'],
 ): CollectionConfig[] => {
   const collections: CollectionConfig[] = []
 
-  const betterAuthStrategies = createAuthStrategies({
-    betterAuthOptions: authOptions,
-  })
+  const betterAuthStrategy = createBetterAuthStrategy()
 
   for (const [key, value] of Object.entries(authTables)) {
     const modelName = value.modelName as CollectionSlug
@@ -51,6 +49,25 @@ export const generatePayloadCollections = (
         admin: isAdmin,
         unlock: isAdmin,
       }
+      // Add 2FA UI field to user collection if twoFactor plugin is enabled
+      const twoFactorEnabled = authOptions.plugins?.some(
+        (p) => p.id === 'two-factor',
+      )
+      if (twoFactorEnabled) {
+        newCollection.fields = [
+          {
+            name: 'twoFactorButton',
+            type: 'ui',
+            admin: {
+              components: {
+                Field: '@b3nab/payload-better-auth/client#TwoFactorAccountButton',
+              },
+              position: 'sidebar',
+            },
+          },
+          ...newCollection.fields,
+        ]
+      }
     }
     if (extendsCollections?.[modelName]) {
       newCollection = deepmerge()(newCollection, extendsCollections[modelName])
@@ -58,7 +75,10 @@ export const generatePayloadCollections = (
     if (newCollection.auth) {
       newCollection.auth = {
         // disableLocalStrategy: true,
-        strategies: [...betterAuthStrategies],
+        strategies: [
+          betterAuthStrategy,
+          ...((typeof newCollection.auth === 'object' && newCollection.auth?.strategies) ? newCollection.auth.strategies : []),
+        ],
       }
       newCollection.fields = [
         ...newCollection.fields,
@@ -86,7 +106,7 @@ export const generatePayloadCollections = (
  */
 const convertToPayloadFields = (
   modelName: string,
-  fields: Record<string, FieldAttribute<FieldType>>,
+  fields: Record<string, DBFieldAttribute<DBFieldType>>,
 ): PayloadField[] => {
   return Object.entries(fields)
     .filter(
@@ -103,10 +123,10 @@ const convertToPayloadFields = (
           //   update: ({ req: { user }, id }) => user?.id === id,
           // },
           hidden: fieldValue.returned ?? false,
-          // TODO: how to map better-auth FieldAttributeConfig . input ??
+          // TODO: how to map better-auth DBFieldAttributeConfig . input ??
           defaultValue: fieldValue.defaultValue,
           unique: fieldValue.unique,
-          // TODO: better-auth FieldAttributeConfig . sortable has the same "reason to exists" as the payload FieldBase . index ??
+          // TODO: better-auth DBFieldAttributeConfig . sortable has the same "reason to exists" as the payload FieldBase . index ??
           index: fieldValue.sortable,
           // type: convertToPayloadType(fieldValue.type),
           ...convertToPayloadType(modelName, fieldValue, fieldKey),
@@ -114,16 +134,16 @@ const convertToPayloadFields = (
     )
 }
 
-// BETTER AUTH FieldType
+// BETTER AUTH DBFieldType
 // "string" | "number" | "boolean" | "date" | `${"string" | "number"}[]`
 // PAYLOAD FieldTypes
 // "text" | "number" | "checkbox" | "date" | "array"
 function convertToPayloadType(
   modelName: string,
-  { type: fieldType, references }: FieldAttribute<FieldType>,
+  { type: fieldType, references }: DBFieldAttribute<DBFieldType>,
   fieldKey: string,
 ): Partial<PayloadField> {
-  // Dynamic map better-auth FieldAttributeConfig . references
+  // Dynamic map better-auth DBFieldAttributeConfig . references
   if (references) {
     // getLogger().trace(
     //   references,
