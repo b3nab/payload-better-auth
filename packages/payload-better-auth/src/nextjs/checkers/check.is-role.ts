@@ -5,10 +5,9 @@ import type { SanitizedConfig } from 'payload'
 import type {
   InferBetterAuthInstance,
   InferPlugins,
-} from 'src/better-auth/instance.js'
-import { betterAuth } from 'better-auth'
+} from '../../better-auth/instance.js'
+import { betterAuth } from 'better-auth/minimal'
 import { admin } from 'better-auth/plugins'
-import { passkey } from 'better-auth/plugins/passkey'
 
 // export type InferRoles<
 //   O extends BetterAuthPluginOptions,
@@ -45,9 +44,19 @@ export type DefaultRoles = 'user' | 'admin'
 type GetPlugin<O extends BetterAuthPluginOptions> = O['betterAuth'] extends {
   plugins: infer Plugins
 }
-  ? Plugins extends Array<infer P>
+  ? Plugins extends readonly (infer P)[]
     ? P
-    : never
+    : Plugins extends (infer P)[]
+      ? P
+      : never
+  : never
+
+// Extract admin plugin's options (the parameter passed to admin() function)
+type ExtractAdminOptions<P> = P extends {
+  id: 'admin'
+  options?: infer Opts
+}
+  ? Opts
   : never
 
 type RolesFromPermissions<RC> = RC extends object ? keyof RC : never
@@ -146,12 +155,12 @@ type isnever_keyof = keyof NEV extends never ? 'NEVER' : 'something'
 type adm = GetADM<DEFFF_PLUG>
 //   ^?
 
-// type rolesOPT = InferRoles<DEFFF_PLUG>
-// //    ^?
+type rolesOPT = InferRoles<DEFFF_PLUG>
+//    ^?
 // type rolesOPT = [GetADM<DEFFF_PLUG>] extends [never] ? 'never' : 'ok'
 // //    ^?
-type rolesOPT = GetADM<DEFFF_PLUG> extends never ? 'never' : 'admin'
-//    ^?
+// type rolesOPT = GetADM<DEFFF_PLUG> extends never ? 'never' : 'admin'
+// //    ^?
 
 // export type InferRoles<
 //   O extends BetterAuthPluginOptions,
@@ -186,25 +195,34 @@ type rolesOPT = GetADM<DEFFF_PLUG> extends never ? 'never' : 'admin'
 type AdminPlugin<O extends BetterAuthPluginOptions> =
   GetPlugin<O> extends infer P ? (P extends { id: 'admin' } ? P : never) : never
 
-type AdminRoles<O extends BetterAuthPluginOptions> = AdminPlugin<O> extends {
-  endpoints: {
-    setRole: {
-      options: { metadata: { $Infer: { body: { role: infer R } } } }
-    }
+type AdminRoles<O extends BetterAuthPluginOptions> =
+  // Try to infer from admin plugin's $Infer.Session.user.role (1.4.9+ structure)
+  AdminPlugin<O> extends {
+    $Infer: { Session: { user: { role: infer R } } }
   }
-}
-  ? Exclude<R, string[]>
-  : 'DEF_ADM'
+    ? R extends readonly (infer U)[]
+      ? U
+      : R
+    : // Fallback to endpoints.setRole metadata path
+      AdminPlugin<O> extends {
+          endpoints: {
+            setRole: {
+              options: { metadata: { $Infer: { body: { role: infer R } } } }
+            }
+          }
+        }
+      ? R extends readonly (infer U)[]
+        ? U
+        : R
+      : 'DEF_ADM'
 
-type RolesFromOptions<O extends BetterAuthPluginOptions> = GetADM<O> extends {
-  endpoints: {
-    setRole: {
-      options: { metadata: { $Infer: { body: { role: infer R } } } }
-    }
-  }
-}
-  ? Exclude<R, string[]>
-  : 'DEF_OPT'
+type RolesFromOptions<O extends BetterAuthPluginOptions> =
+  // Extract admin plugin options and check for roles property
+  ExtractAdminOptions<GetADM<O>> extends infer AdminOpts
+    ? AdminOpts extends { roles: Record<string, unknown> }
+      ? keyof AdminOpts['roles']
+      : never
+    : never
 
 const rs = {
   admin: undefined,
@@ -220,7 +238,6 @@ const defaultConf_PLUG = {
       admin({
         roles: rs,
       }),
-      passkey(),
     ],
   },
 }
@@ -272,62 +289,9 @@ type ROLES_FULL = InferRoles<DEFFF_PLUG> //, typeof rs>
 //      ^?
 // "RolesFromPermissions"
 
-// biome-ignore lint/complexity/noBannedTypes: <explanation>
-// type EXInternalRoles = ExtractInferRoles<{}>
-// //      ^?
-// type EXInternalRolesBA = ExtractInferRoles<BetterAuthPluginOptions>
-// //      ^?
-// type EXBasic = ExtractInferRoles
-// //      ^?
-
-// type IDK =
-//   BO['endpoints']['setRole']['options']['metadata']['$Infer']['body']['role']
-
-// type Plugins<O extends BetterAuthPluginOptions> =
-//   InferBetterAuthInstance<O>['options']['plugins']
-
-// type BO<O extends BetterAuthPluginOptions> = Plugins<O> extends infer ADM
-//   ? ADM extends {
-//       id: 'admin'
-//     }
-//     ? {
-//         [K in keyof ADM]: ADM[K]
-//       }
-//     : never
-//   : never
-
-// type Roles<O extends BetterAuthPluginOptions> =
-//   BO<O>['endpoints']['setRole']['options']['metadata']['$Infer']['body']['role']
-
 export type IsRoleArgs<O extends BetterAuthPluginOptions> = {
   role: InferRoles<O> // extends never ? DefaultRoles : keyof Roles
 }
-
-// export const isRole =
-//   <O extends BetterAuthPluginOptions, RC extends RoleConfig>(
-//     configPromise: Promise<SanitizedConfig>,
-//     pluginOptions: O,
-//     roles?: RC,
-//   ) =>
-//   async ({ role }: IsRoleArgs<O, RC>) => {
-//     const { payload, betterAuth } = await serverBefore<O>(
-//       configPromise,
-//       pluginOptions,
-//     )
-
-//     const responsePermission = await betterAuth.api.userHasPermission({
-//       headers: await headers(),
-//       body: {
-//         permissions: {
-//           byRole: [role as any],
-//         },
-//       },
-//     })
-
-//     console.log('isRole :: ', responsePermission)
-
-//     return Boolean(responsePermission.success)
-//   }
 
 export const isRole =
   <O extends BetterAuthPluginOptions>(

@@ -1,7 +1,7 @@
 import type { SanitizedConfig } from 'payload'
 import type { GuardServerBefore } from '../server.before.js'
 import type { BetterAuthPluginOptions } from '../../types.js'
-import type { InferInternalBetterAuthInstance } from 'src/better-auth/instance.js'
+import type { InferInternalBetterAuthInstance } from '../../better-auth/instance.js'
 
 // declare module 'payload' {
 //   export interface User extends UserAny {}
