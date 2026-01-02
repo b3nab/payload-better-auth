@@ -24,13 +24,11 @@ export const TwoFactorSetupPrompt: React.FC<TwoFactorSetupPromptProps> = ({
     // Only show if:
     // 1. 2FA plugin is enabled
     // 2. User hasn't enabled 2FA yet
-    // 3. User is admin (first user typically has admin role)
     // 4. User hasn't dismissed this prompt in this session
     const isDismissed = localStorage.getItem(STORAGE_KEY) === 'true' || sessionStorage.getItem(STORAGE_KEY) === 'true'
 
     if (
       enabled &&
-      user?.role === 'admin' &&
       !user?.twoFactorEnabled &&
       !isDismissed
     ) {
@@ -41,7 +39,7 @@ export const TwoFactorSetupPrompt: React.FC<TwoFactorSetupPromptProps> = ({
   const handleDismiss = () => {
     sessionStorage.setItem(STORAGE_KEY, 'true')
     setShowPrompt(false)
-    toast.info('You can setup 2FA anytime from the admin account page')
+    toast.info('You can setup 2FA anytime from the cms account page')
   }
 
   const handleSetup = () => {
@@ -91,7 +89,7 @@ export const TwoFactorSetupPrompt: React.FC<TwoFactorSetupPromptProps> = ({
               color: 'var(--theme-text)',
             }}
           >
-            Secure Your Admin Account
+            Secure Your Account
           </h2>
         </div>
 
@@ -103,31 +101,10 @@ export const TwoFactorSetupPrompt: React.FC<TwoFactorSetupPromptProps> = ({
             lineHeight: 1.6,
           }}
         >
-          As an administrator, we strongly recommend enabling{' '}
+          We strongly recommend enabling{' '}
           <strong>Two-Factor Authentication (2FA)</strong> to add an extra layer
-          of security to your account.
+          of security to your account and prevent unauthorized access to Admin Panel.
         </p>
-
-        <div
-          style={{
-            backgroundColor: 'var(--theme-elevation-50)',
-            borderRadius: '6px',
-            padding: '1rem',
-            marginBottom: '1.5rem',
-          }}
-        >
-          <p
-            style={{
-              margin: 0,
-              fontSize: '0.875rem',
-              color: 'var(--theme-elevation-600)',
-            }}
-          >
-            💡 With 2FA enabled, you&apos;ll need your password and a code from
-            your authenticator app to sign in, making your account much more
-            secure.
-          </p>
-        </div>
 
         <div
           style={{
