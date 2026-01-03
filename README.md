@@ -127,5 +127,9 @@ export default buildConfig({
 
 ## Credits
 
-Created by [Benedetto Abbenanti](https://ben.abbenanti.com)
-[Better Auth](https://better-auth.com) [PayloadCMS](https://payloadcms.com)
+Created and maintained by [Benedetto Abbenanti](https://ben.abbenanti.com).
+
+This project would not be possible without the following open-source projects:
+
+- [Better Auth](https://better-auth.com)
+- [PayloadCMS](https://payloadcms.com)
