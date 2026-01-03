@@ -8,7 +8,7 @@
     Payload Better Auth Plugin
   </h2>
 
-  <p align="center">
+<p align="center">
     You are one plugin away to revolutionize your PayloadCMS's auth.
   <!-- The most comprehensive authentication library for TypeScript -->
     <br />
@@ -30,25 +30,34 @@
 
 <!-- # Payload Better Auth Plugin -->
 
-> ⚠️ **WARNING**: This plugin is currently a WIP and not yet totally ready.
-> I mean, I'm using it in production, but it's not yet public available.
-> If you want a preview access to the plugin, you should contact the author (in private) and request an access token for the private npm registry.
+> ⚠️ **ATTENTION**: If you want a preview access to the plugin, you should
+> contact the author (in private) and request access to the private registry.
 
-A plugin that integrates [Better Auth](https://www.better-auth.com) with [Payload CMS v3](https://payloadcms.com), providing enhanced authentication capabilities.
-This plugin is thought to be used in production, with real users, so to be rock solid well tested and reliable. 🗿
+A plugin that integrates [Better Auth](https://www.better-auth.com) with
+[Payload CMS v3](https://payloadcms.com), providing enhanced authentication
+capabilities. This plugin is thought to be used in production, with real users,
+so to be rock solid well tested and reliable. 🗿
 
 ## Description
 
-The `@b3nab/payload-better-auth` plugin wraps the better-auth library to seamleassly integrate advanced authentication features into Payload CMS v3. It enhanches developer productivity and user experience by offering more sophisticated authentication methods beyond Payload's built-in auth system.
+The `@b3nab/payload-better-auth` plugin wraps the better-auth library to
+seamleassly integrate advanced authentication features into Payload CMS v3. It
+enhanches developer productivity and user experience by offering more
+sophisticated authentication methods beyond Payload's built-in auth system.
 Definitely it's a better-way 🤓 to manage authentication for Payload CMS v3.
 
 ### Why This Plugin?
 
-While Payload CMS comes with a solid and extensible authentication system out of the box, it primarily focuses on basic email/password authentication and API keys. This serves many use cases well, but modern applications often require more sophisticated authentication methods and features.
+While Payload CMS comes with a solid and extensible authentication system out of
+the box, it primarily focuses on basic email/password authentication and API
+keys. This serves many use cases well, but modern applications often require
+more sophisticated authentication methods and features.
 
 ### Features
 
-The goal is to seamlessly integrate better-auth in your Payload CMS v3 application, providing a robust and feature-rich authentication system with a focus on user experience and developer productivity.
+The goal is to seamlessly integrate better-auth in your Payload CMS v3
+application, providing a robust and feature-rich authentication system with a
+focus on user experience and developer productivity.
 
 - **Basic integration - Out of the box 🤝**
   - Integration with Better Auth
@@ -70,11 +79,10 @@ pnpm add @b3nab/payload-better-auth
 Into your `payload.config.ts` file, add the plugin:
 
 ```ts
-import { buildConfig } from 'payload'
-import { betterAuthPlugin } from "@b3nab/payload-better-auth"
+import { buildConfig } from "payload";
+import { betterAuthPlugin } from "@b3nab/payload-better-auth";
 
 export default buildConfig({
-
   // ... other config
 
   plugins: [
@@ -91,27 +99,23 @@ export default buildConfig({
          */
         secret: process.env.BETTER_AUTH_SECRET,
       },
-    })
+    }),
   ],
-
   // ... other config
-
-})
+});
 ```
 
 ### Roadmap (TODOs)
 
-- [ ] Payload Auth Endpoints - Needs to replace all remaining payload default auth endpoints
-- [ ] Auth Strategies - Needs to improve auth strategies for better-auth plugins
-- [ ] Testing
-  - [ ] Tests - Needs to add more tests and e2e tests
+- \[ ] Payload Auth Endpoints - Needs to replace all remaining payload default
+  auth endpoints
 
 ## Important Notes
 
-1. This plugin may perform operations that could affect your application and database
-2. Not yet production-ready - use at your own risk
-3. Maintainers are not responsible for issues that may occur
-4. Contributions via issues and PRs are highly encouraged
+1. This plugin may perform operations that could affect your application and
+   database
+2. Maintainers are not responsible for issues that may occur
+3. Contributions via issues and PRs are highly encouraged
 
 ## Contributing
 
@@ -124,3 +128,4 @@ export default buildConfig({
 ## Credits
 
 Created by [Benedetto Abbenanti](https://ben.abbenanti.com)
+[Better Auth](https://better-auth.com) [PayloadCMS](https://payloadcms.com)
