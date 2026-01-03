@@ -1,6 +1,16 @@
 import type { SVGProps } from "react";
+import type React from "react";
 
-export const socialProviders = {
+type SocialProviderIcon = React.FC<SVGProps<any>>;
+
+type SocialProvider = {
+	Icon: SocialProviderIcon;
+	stringIcon: string;
+};
+
+type SocialProviders = Record<string, SocialProvider>;
+
+export const socialProviders: SocialProviders = {
 	apple: {
 		Icon: (props?: SVGProps<any>) => (
 			<svg

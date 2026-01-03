@@ -1,7 +1,6 @@
 import type { Endpoint, PayloadHandler } from 'payload'
+import { addDataAndFileToRequest, addLocalesToRequestFromData } from 'payload'
 
-import { addDataAndFileToRequest } from './addDataAndFileToRequest.js'
-import { addLocalesToRequestFromData } from './addLocalesToRequest.js'
 import { payloadSingleton } from '../singleton.payload.js'
 
 export const wrapInternalEndpoints = (endpoints: Endpoint[]): Endpoint[] => {
