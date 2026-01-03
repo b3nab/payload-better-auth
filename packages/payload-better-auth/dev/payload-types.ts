@@ -74,7 +74,6 @@ export interface Config {
     account: Account;
     verification: Verification;
     twoFactor: TwoFactor;
-    passkey: Passkey;
     oauthApplication: OauthApplication;
     oauthAccessToken: OauthAccessToken;
     oauthConsent: OauthConsent;
@@ -82,6 +81,7 @@ export interface Config {
     member: Member;
     invitation: Invitation;
     subscription: Subscription;
+    'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -95,7 +95,6 @@ export interface Config {
     account: AccountSelect<false> | AccountSelect<true>;
     verification: VerificationSelect<false> | VerificationSelect<true>;
     twoFactor: TwoFactorSelect<false> | TwoFactorSelect<true>;
-    passkey: PasskeySelect<false> | PasskeySelect<true>;
     oauthApplication: OauthApplicationSelect<false> | OauthApplicationSelect<true>;
     oauthAccessToken: OauthAccessTokenSelect<false> | OauthAccessTokenSelect<true>;
     oauthConsent: OauthConsentSelect<false> | OauthConsentSelect<true>;
@@ -103,6 +102,7 @@ export interface Config {
     member: MemberSelect<false> | MemberSelect<true>;
     invitation: InvitationSelect<false> | InvitationSelect<true>;
     subscription: SubscriptionSelect<false> | SubscriptionSelect<true>;
+    'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -110,6 +110,7 @@ export interface Config {
   db: {
     defaultIDType: string;
   };
+  fallbackLocale: null;
   globals: {};
   globalsSelect: {};
   locale: null;
@@ -150,7 +151,7 @@ export interface Post {
     root: {
       type: string;
       children: {
-        type: string;
+        type: any;
         version: number;
         [k: string]: unknown;
       }[];
@@ -278,24 +279,6 @@ export interface TwoFactor {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "passkey".
- */
-export interface Passkey {
-  id: string;
-  name?: string | null;
-  publicKey: string;
-  userId: string | User;
-  credentialID: string;
-  counter: number;
-  deviceType: string;
-  backedUp: boolean;
-  transports?: string | null;
-  aaguid?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "oauthApplication".
  */
 export interface OauthApplication {
@@ -305,7 +288,7 @@ export interface OauthApplication {
   metadata?: string | null;
   clientId?: string | null;
   clientSecret?: string | null;
-  redirectURLs?: string | null;
+  redirectUrls?: string | null;
   type?: string | null;
   disabled?: boolean | null;
   userId?: (string | null) | User;
@@ -348,7 +331,7 @@ export interface OauthConsent {
 export interface Organization {
   id: string;
   name: string;
-  slug?: string | null;
+  slug: string;
   logo?: string | null;
   metadata?: string | null;
   updatedAt: string;
@@ -396,9 +379,29 @@ export interface Subscription {
   trialStart?: string | null;
   trialEnd?: string | null;
   cancelAtPeriodEnd?: boolean | null;
+  cancelAt?: string | null;
+  canceledAt?: string | null;
+  endedAt?: string | null;
   seats?: number | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-kv".
+ */
+export interface PayloadKv {
+  id: string;
+  key: string;
+  data:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -434,10 +437,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'twoFactor';
         value: string | TwoFactor;
-      } | null)
-    | ({
-        relationTo: 'passkey';
-        value: string | Passkey;
       } | null)
     | ({
         relationTo: 'oauthApplication';
@@ -627,23 +626,6 @@ export interface TwoFactorSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "passkey_select".
- */
-export interface PasskeySelect<T extends boolean = true> {
-  name?: T;
-  publicKey?: T;
-  userId?: T;
-  credentialID?: T;
-  counter?: T;
-  deviceType?: T;
-  backedUp?: T;
-  transports?: T;
-  aaguid?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "oauthApplication_select".
  */
 export interface OauthApplicationSelect<T extends boolean = true> {
@@ -652,7 +634,7 @@ export interface OauthApplicationSelect<T extends boolean = true> {
   metadata?: T;
   clientId?: T;
   clientSecret?: T;
-  redirectURLs?: T;
+  redirectUrls?: T;
   type?: T;
   disabled?: T;
   userId?: T;
@@ -737,9 +719,20 @@ export interface SubscriptionSelect<T extends boolean = true> {
   trialStart?: T;
   trialEnd?: T;
   cancelAtPeriodEnd?: T;
+  cancelAt?: T;
+  canceledAt?: T;
+  endedAt?: T;
   seats?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-kv_select".
+ */
+export interface PayloadKvSelect<T extends boolean = true> {
+  key?: T;
+  data?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

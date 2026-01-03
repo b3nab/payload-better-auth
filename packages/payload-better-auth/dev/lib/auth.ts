@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { createAuthLayer } from '../../src'
 import configPromise from '@payload-config'
 import { betterAuthPluginConfig } from '../payload-better-auth.config'
+import { InferSession, InferUser } from 'better-auth'
 
 export const {
   auth,
@@ -22,53 +23,20 @@ export const {
 } = createAuthLayer(configPromise, betterAuthPluginConfig) //, roles)
 
 type AUTH = typeof auth
-type $INFER = AUTH['$Infer']
-type Session = $INFER['Session']
-type User = Session['user']
-type Roles = User['role']
 //    ^?
 
-type $CONTEXT = Awaited<AUTH['$context']>
-//   ^?
-
-// type Tables = $CONTEXT["tables"]
-// //   ^?
-// type Options = $CONTEXT["options"]
-// //   ^?
-// type Plugins = Options["plugins"]
-// //   ^?
-// type ee = Plugins extends undefined
-// //   ^?
-//  ? "VABBE"
-//  : Plugins extends infer PLUGIN
-//   ? PLUGIN extends {
-//     id: "admin"
-//   }
-//   ? PLUGIN
-//   : "CCA"
-//   : "SUCA"
-
-// type Plugins = AUTH['options']['plugins']
-// type BO = Plugins extends {
-//   id: 'admin'
-// } ? Plugins[number] extends infer ADM
-//     ? ADM
-//     : never
-//   :"SUCA"
-
-// type IDK = BO['endpoints']['setRole']['options']['metadata']['$Infer']['body']['role']
-// //   ^?
+type INFSession = InferSession<typeof auth.options>
+//    ^?
+type INFUser = InferUser<typeof auth.options>
+//    ^?
+type INFRoles = INFUser['role']
+//    ^?
 
 // if you (v) hover on role you should see (property) role: "user" | "admin" | "dev"
 isRole({ role: 'dev' })
 //        ^?
 guardRole({ role: 'dev' })
 //           ^?
-
-// export const baSafe = getBetterAuthSafe<typeof betterAuthPluginConfig>(
-//   //          ^?
-//   await getPayload({ config: configPromise }),
-// )
 
 // Check if the type inference is working correctly for the better-auth instance
 const bool = false
@@ -96,10 +64,10 @@ if (bool) {
       //      ^?
       body: { idToken: '' },
     }),
-    auth.api.listPasskeys({
-      //      ^?
-      headers: await headers(),
-    }),
+    // auth.api.listPasskeys({
+    //   //      ^?
+    //   headers: await headers(),
+    // }),
     auth.api.stripeWebhook({
       //      ^?
       headers: await headers(),
@@ -112,13 +80,13 @@ if (bool) {
       //      ^?
       headers: await headers(),
     }),
-    auth.api.polarCheckout({
-      //      ^?
-      query: {
-        productId: '1',
-        quantity: 1,
-      },
-    }),
+    // auth.api.polarCheckout({
+    //   //      ^?
+    //   query: {
+    //     productId: '1',
+    //     quantity: 1,
+    //   },
+    // }),
     auth.api.verifyTOTP({
       //      ^?
       body: { code: '' },

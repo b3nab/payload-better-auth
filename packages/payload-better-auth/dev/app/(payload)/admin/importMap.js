@@ -21,9 +21,13 @@ import { StrikethroughFeatureClient as StrikethroughFeatureClient_e70f5e05f09f93
 import { UnderlineFeatureClient as UnderlineFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
+import { TwoFactorAccountButton as TwoFactorAccountButton_b1ba387367309d337c1fb2b5742a307d } from '@b3nab/payload-better-auth/client'
+import { SocialLoginButtonsServer as SocialLoginButtonsServer_501c5fdba6c9a607d65ee1a19fe5a153 } from '@b3nab/payload-better-auth/rsc'
+import { TwoFactorSetupPromptServer as TwoFactorSetupPromptServer_501c5fdba6c9a607d65ee1a19fe5a153 } from '@b3nab/payload-better-auth/rsc'
 import { BetterAuthServerWrapper as BetterAuthServerWrapper_501c5fdba6c9a607d65ee1a19fe5a153 } from '@b3nab/payload-better-auth/rsc'
 import { SetupTwoFactorServer as SetupTwoFactorServer_501c5fdba6c9a607d65ee1a19fe5a153 } from '@b3nab/payload-better-auth/rsc'
 import { VerifyTwoFactorServer as VerifyTwoFactorServer_501c5fdba6c9a607d65ee1a19fe5a153 } from '@b3nab/payload-better-auth/rsc'
+import { CollectionCards as CollectionCards_ab83ff7e88da8d3530831f296ec4756a } from '@payloadcms/ui/rsc'
 
 export const importMap = {
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
@@ -49,7 +53,11 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#UnderlineFeatureClient": UnderlineFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#BoldFeatureClient": BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
+  "@b3nab/payload-better-auth/client#TwoFactorAccountButton": TwoFactorAccountButton_b1ba387367309d337c1fb2b5742a307d,
+  "@b3nab/payload-better-auth/rsc#SocialLoginButtonsServer": SocialLoginButtonsServer_501c5fdba6c9a607d65ee1a19fe5a153,
+  "@b3nab/payload-better-auth/rsc#TwoFactorSetupPromptServer": TwoFactorSetupPromptServer_501c5fdba6c9a607d65ee1a19fe5a153,
   "@b3nab/payload-better-auth/rsc#BetterAuthServerWrapper": BetterAuthServerWrapper_501c5fdba6c9a607d65ee1a19fe5a153,
   "@b3nab/payload-better-auth/rsc#SetupTwoFactorServer": SetupTwoFactorServer_501c5fdba6c9a607d65ee1a19fe5a153,
-  "@b3nab/payload-better-auth/rsc#VerifyTwoFactorServer": VerifyTwoFactorServer_501c5fdba6c9a607d65ee1a19fe5a153
+  "@b3nab/payload-better-auth/rsc#VerifyTwoFactorServer": VerifyTwoFactorServer_501c5fdba6c9a607d65ee1a19fe5a153,
+  "@payloadcms/ui/rsc#CollectionCards": CollectionCards_ab83ff7e88da8d3530831f296ec4756a
 }

@@ -1,7 +1,7 @@
 import { createAuthClient } from "better-auth/react";
 import {
 	organizationClient,
-	passkeyClient,
+	// passkeyClient,
 	twoFactorClient,
 	adminClient,
 	multiSessionClient,
@@ -9,7 +9,7 @@ import {
 	oidcClient,
 	genericOAuthClient,
 } from "better-auth/client/plugins";
-import { toast } from "sonner";
+// import { toast } from "sonner";
 import { stripeClient } from "@better-auth/stripe/client";
 
 export const client = createAuthClient({
@@ -20,7 +20,7 @@ export const client = createAuthClient({
 				window.location.href = "/two-factor";
 			},
 		}),
-		passkeyClient(),
+		// passkeyClient(),
 		adminClient(),
 		multiSessionClient(),
 		oneTapClient({
@@ -38,7 +38,7 @@ export const client = createAuthClient({
 	fetchOptions: {
 		onError(e) {
 			if (e.error.status === 429) {
-				toast.error("Too many requests. Please try again later.");
+				alert("Too many requests. Please try again later.");
 			}
 		},
 	},
