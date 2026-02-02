@@ -54,7 +54,9 @@ export const defaultPluginsNew = <
     },
     'open-api': {
       key: 'openAPI',
-      plugin: openAPI(),
+      plugin: openAPI({
+        disableDefaultReference: process.env.NODE_ENV === "production"
+      }),
     },
     'two-factor': {
       key: 'twoFactor',
