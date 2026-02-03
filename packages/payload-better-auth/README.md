@@ -1,7 +1,5 @@
 # Payload Better Auth Plugin
 
-> ⚠️ **WARNING**: This plugin is currently a Proof of Concept and not ready for production use.
-
 A plugin that integrates [Better Auth](https://www.better-auth.com) with [Payload CMS v3](https://payloadcms.com), providing enhanced authentication capabilities.
 This plugin is thought to be used in production, with real users, so to be rock solid. 🗿
 
@@ -18,13 +16,13 @@ While Payload CMS comes with a solid and extensible authentication system out of
 ### Features and TODOs
 
 - [x] Basic integration with better-auth
-- [~] Payload Adapter for better-auth database - Needs refinement on `buildWhereClause`
-- [~] Collections - Needs refinement on `convertToPayloadFields` and `convertToPayloadType`
+- [x] Payload Adapter for better-auth database - Needs refinement on `buildWhereClause`
+- [x] Collections - Needs refinement on `convertToPayloadFields` and `convertToPayloadType`
 - [x] Better Auth API Endpoints
 - [~] Payload Collections Auth Endpoints - Needs to replace all remaining payload default auth endpoints
-- [~] Auth Strategies - Needs to add strategies for better-auth plugins
-- [ ] Documentation
-- [~] Tests - Needs more tests and e2e tests
+- [x] Auth Strategies - Needs to add strategies for better-auth plugins
+- [x] Documentation
+- [x] Tests - Needs more tests and e2e tests
 
 ## Important Notes
 

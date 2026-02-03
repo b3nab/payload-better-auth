@@ -22,9 +22,10 @@
     <a href="https://github.com/b3nab/payload-better-auth/issues">Issues</a>
   </p>
 
-[![npm](https://img.shields.io/npm/dm/@b3nab/payload-better-auth)](https://npm.chart.dev/@b3nab/payload-better-auth?primary=neutral&gray=neutral&theme=dark)
-[![npm version](https://img.shields.io/npm/v/@b3nab/payload-better-auth.svg)](https://www.npmjs.com/package/@b3nab/payload-better-auth)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/b3nab/payload-better-auth)
 [![GitHub stars](https://img.shields.io/github/stars/b3nab/payload-better-auth)](https://github.com/b3nab/payload-better-auth/stargazers)
+[![npm version](https://img.shields.io/npm/v/@b3nab/payload-better-auth.svg)](https://www.npmjs.com/package/@b3nab/payload-better-auth)
+[![npm](https://img.shields.io/npm/dm/@b3nab/payload-better-auth)](https://npm.chart.dev/@b3nab/payload-better-auth?primary=neutral&gray=neutral&theme=dark)
 
 </p>
 
