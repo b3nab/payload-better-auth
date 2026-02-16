@@ -17,9 +17,9 @@ export const payloadAdapter = (config: PayloadAdapterConfig = {}) => {
   return createAdapterFactory({
     config: {
       adapterId: 'payloadcms',
-      adapterName: 'Payload CMS',
+      adapterName: 'PayloadCMS',
       supportsJSON: true, // Payload supports JSON fields
-      supportsDates: true, // Payload handles dates natively
+      supportsDates: false, // PayloadCMS returns an ISO string
       supportsBooleans: true, // Payload supports boolean fields
       supportsNumericIds: false, // Payload uses string IDs by default
       debugLogs: config.debugLogs ?? false,
