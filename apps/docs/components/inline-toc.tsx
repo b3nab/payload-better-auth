@@ -1,7 +1,7 @@
 'use client';
 
 import { ChevronDown } from './icons';
-import type { TOCItemType } from 'fumadocs-core/server';
+import type { TOCItemType } from 'fumadocs-core/toc';
 import {
   Collapsible,
   CollapsibleContent,
