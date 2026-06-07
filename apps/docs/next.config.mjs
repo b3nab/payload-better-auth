@@ -15,8 +15,8 @@ const withMDX = createMDX()
 /** @type {import('next').NextConfig} */
 const config = {
   reactStrictMode: true,
-  publicRuntimeConfig: {
-    latestVersion: `v${major}.${minor}.x`,
+  env: {
+    LATEST_VERSION: `v${major}.${minor}.x`,
   },
   redirects: async () => {
     return [

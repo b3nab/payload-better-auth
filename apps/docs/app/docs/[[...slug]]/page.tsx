@@ -18,11 +18,8 @@ import { ImageZoom } from 'fumadocs-ui/components/image-zoom'
 // import { GithubInfo } from '@/components/github-info'
 import Link from 'next/link'
 // import { Step, Steps } from '@/components/steps'
-import getConfig from 'next/config'
 
-const { publicRuntimeConfig } = getConfig()
-
-const latestVersion = publicRuntimeConfig.latestVersion
+const latestVersion = process.env.LATEST_VERSION!
 
 const needToResolveLatest = (params: { slug?: string[] }) => {
   if (params.slug?.[0] === 'latest')
