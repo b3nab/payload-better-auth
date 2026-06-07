@@ -175,10 +175,19 @@ export const baseOptions: BaseLayoutProps = {
     //   text: 'My Home',
     // },
     {
-      type: 'icon',
-      icon: <>{`Support <♥️/>`}</>,
-      url: '/',
-      text: 'My Home',
+      type: 'custom',
+      secondary: true,
+      children: (
+        <a
+          href="https://github.com/sponsors/b3nab"
+          target="_blank"
+          rel="noreferrer noopener"
+          className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium text-fd-muted-foreground transition-colors hover:bg-fd-accent hover:text-fd-accent-foreground"
+        >
+          <Heart className="size-4 fill-pink-500 text-pink-500" />
+          Sponsor
+        </a>
+      ),
     },
   ],
 }
