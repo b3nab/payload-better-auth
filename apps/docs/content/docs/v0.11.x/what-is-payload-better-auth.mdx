@@ -1,0 +1,41 @@
+---
+title: What is @b3nab/payload-better-auth?
+description: Learn about the Better Auth plugin for PayloadCMS and its core features
+icon: CircleHelp
+---
+
+# What is @b3nab/payload-better-auth? 🤔
+
+Better Auth is a powerful authentication plugin for PayloadCMS that enhances and extends the default auth system with modern security features.
+
+## Why This Plugin? 🎯
+
+While Payload CMS comes with a solid and extensible authentication system out of the box, it primarily focuses on basic email/password authentication and API keys. Modern applications often require more sophisticated authentication methods and features.
+
+This plugin bridges that gap by providing:
+- Advanced authentication methods beyond basic email/password
+- Enhanced security features like 2FA
+- Automatic collections creation
+- Automatic endpoints creation
+- Extensible authentication workflows
+
+## Core Features 🚀
+
+### Basic Integration 🤝
+- **Seamless Better Auth Integration**: Drop-in authentication enhancement for your Payload CMS
+- **API Endpoints**: Ready-to-use authentication endpoints
+- **Database Adapter**: Uses Payload as the database for Better Auth
+
+### Advanced Features 🎯
+- **Two-Factor Authentication**: TOTP-based 2FA wired into the admin (setup prompt, dedicated views, account control)
+- **Social Login**: `SocialLoginButtons` auto-injected into the admin login when `betterAuth.socialProviders` is configured
+- **Default email flows**: email verification and password reset shipped out of the box, fully overridable via `betterAuth.emailAndPassword` / `betterAuth.emailVerification`
+- **Automatic Collections**: Payload collections generated from your Better Auth config
+- **Extensible Architecture**: Patch any collection via `extendsCollections`
+- **Developer Experience**: Pino-based plugin logger with adjustable level
+
+## Next Steps 🚀
+
+- [Installation](./installation)
+- [Auth Layer](./auth-layer/create-auth-layer)
+- [Configuration](./configuration/plugin-options)

@@ -1,0 +1,95 @@
+---
+title: Plugin Options
+description: Type reference for the BetterAuthPluginOptions object
+---
+
+# Plugin Options
+
+`betterAuthPlugin(options)` accepts a single `BetterAuthPluginOptions` object. The full type lives in `src/types.ts`:
+
+```ts
+import type { CollectionConfig, CollectionSlug } from 'payload'
+import type { BetterAuthOptions } from 'better-auth/minimal'
+
+export type CollectionConfigExtend<T extends CollectionSlug> = Omit<
+  CollectionConfig<T>,
+  'slug'
+>
+
+export type BetterAuthPluginOptions = Readonly<{
+  /**
+   * Better Auth config. Merged on top of the plugin defaults.
+   * https://www.better-auth.com/docs/reference/options
+   */
+  betterAuth?: Omit<BetterAuthOptions, 'database'>
+
+  /**
+   * Per-collection overrides applied on top of the auto-generated
+   * Better Auth collections (user, session, account, verification, ...).
+   */
+  extendsCollections?: {
+    [K in CollectionSlug]?: CollectionConfigExtend<K>
+  }
+
+  /**
+   * Plugin log level. Pass `false` to silence the plugin entirely.
+   * @default 'info'
+   */
+  logs?: false | 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace'
+}>
+```
+
+Note: the `database` field of `BetterAuthOptions` is intentionally omitted. The plugin wires the Payload adapter automatically; you cannot (and should not) pass a custom Better Auth `database`.
+
+## Field reference
+
+### `betterAuth`
+
+The native [Better Auth options object](https://www.better-auth.com/docs/reference/options). Anything you would pass to `betterAuth({ ... })` directly goes here, including `plugins: [...]`, `socialProviders: { ... }`, `emailAndPassword: { ... }`, `user: { ... }`, etc.
+
+The plugin merges your options on top of a set of defaults (see `src/better-auth/instance.ts` and `src/better-auth/plugins.server.ts`). Your settings always win.
+
+```ts
+import { betterAuthPlugin } from '@b3nab/payload-better-auth'
+import { twoFactor } from 'better-auth/plugins/two-factor'
+import { passkey } from '@better-auth/passkey'
+
+betterAuthPlugin({
+  betterAuth: {
+    appName: 'My App',
+    plugins: [
+      twoFactor(),
+      passkey(),
+    ],
+    socialProviders: {
+      github: {
+        clientId: process.env.GITHUB_CLIENT_ID!,
+        clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+      },
+    },
+  },
+})
+```
+
+### `extendsCollections`
+
+Lets you patch any of the auto-generated collections (e.g. add Payload hooks, custom fields, or admin overrides) without re-implementing the schema.
+
+```ts
+betterAuthPlugin({
+  extendsCollections: {
+    user: {
+      admin: { useAsTitle: 'email' },
+      hooks: {
+        afterChange: [/* ... */],
+      },
+    },
+  },
+})
+```
+
+The slug keys are Payload collection slugs (singular: `user`, `session`, `account`, `verification`, plus any added by plugins such as `twoFactor`, `passkey`, etc.).
+
+### `logs`
+
+Controls the plugin's Pino logger. Accepts `false` to disable or any Pino level. Defaults to `'info'`.

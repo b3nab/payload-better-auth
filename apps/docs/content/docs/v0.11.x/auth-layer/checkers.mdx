@@ -1,0 +1,96 @@
+---
+title: Checkers
+description: Server-side functions that report on the current auth state
+icon: ShieldCheck
+---
+
+# Checkers
+
+Checkers are boolean-returning helpers that report the current auth state on the server. They are produced by `createAuthLayer(configPromise, pluginOptions)` and internally call `auth.api.getSession({ headers: await headers() })`, so they are **server-only** (any caller using `next/headers`: server components, server actions, route handlers, middleware).
+
+For client-side auth state, create a Better Auth React client with `createAuthClient` from `better-auth/react` (or, inside the Payload admin, use the `useBetterAuthClient()` hook from `@b3nab/payload-better-auth/client`).
+
+## Available checkers
+
+All checkers take no arguments at call time. The factories from `createAuthLayer` curry the Payload config + plugin options so usage stays terse.
+
+### `isAuth(): Promise<boolean>`
+Returns `true` when there is a valid session, regardless of role.
+
+### `isGuest(): Promise<boolean>`
+Returns `true` when there is NO session. The inverse of `isAuth`.
+
+### `isUser(): Promise<boolean>`
+Shortcut for `isRole({ role: 'user' })`. Returns `true` when `session.user.role === 'user'`.
+
+### `isAdmin(): Promise<boolean>`
+Shortcut for `isRole({ role: 'admin' })`. Returns `true` when `session.user.role === 'admin'`.
+
+### `isRole({ role }): Promise<boolean>`
+Returns `true` when `session.user.role === role`.
+
+The `role` parameter is typed via `InferRoles<O>`: if you registered the Better Auth `admin()` plugin with a custom `roles` map, those role keys are autocompleted. Without a custom admin plugin you get `'user' | 'admin'`.
+
+```ts
+// With admin({ roles: { user, admin, editor } }) registered,
+// 'editor' is a valid role key here.
+const isEditor = await isRole({ role: 'editor' })
+```
+
+Important: this compares against a single string field (`user.role`). Users that hold multiple roles are not supported by this helper as written; if you need set membership use `auth.api.userHasPermission(...)` directly.
+
+## Usage
+
+### Server component
+
+```tsx
+// app/protected/page.tsx
+import { isAdmin } from '@/lib/auth'
+
+export default async function ProtectedPage() {
+  if (!(await isAdmin())) return <div>Access denied</div>
+  return <div>Admin content</div>
+}
+```
+
+### Route handler
+
+```ts
+// app/api/protected/route.ts
+import { NextResponse } from 'next/server'
+import { isAuth } from '@/lib/auth'
+
+export async function GET() {
+  if (!(await isAuth())) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  return NextResponse.json({ data: 'Protected data' })
+}
+```
+
+### Client component
+
+Checkers will throw in client components (they use `next/headers`). Create a Better Auth React client and use its hooks instead:
+
+```ts
+// lib/auth-client.ts
+import { createAuthClient } from 'better-auth/react'
+
+export const authClient = createAuthClient()
+```
+
+```tsx
+'use client'
+import { authClient } from '@/lib/auth-client'
+
+export default function ProtectedComponent() {
+  const { data: session, isPending } = authClient.useSession()
+  if (isPending) return <div>Loading...</div>
+  if (!session?.user) return <div>Please log in</div>
+  return <div>Protected content</div>
+}
+```
+
+## When to reach for a guard instead
+
+Checkers report; they don't redirect. If you want "either there is a valid session and I get the user, or the request is redirected away" in one call, use a [guard](./guards).

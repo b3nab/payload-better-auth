@@ -1,0 +1,122 @@
+---
+title: Next.js Helpers
+description: Pre-built authentication helpers for Next.js applications
+# icon: NextJS
+---
+
+# Next.js Helpers 🛠️
+
+The plugin provides a set of pre-built helpers for Next.js applications through the `createAuthLayer` function. These helpers make it easy to implement authentication checks and guards in your Next.js routes and components.
+
+## Setup 🔧
+
+First, create an auth layer in your Next.js project:
+
+```ts
+// lib/auth.ts
+import { createAuthLayer } from '@b3nab/payload-better-auth'
+import config from '@/payload.config'
+import { payloadBetterAuthConfig } from '@/lib/payload-better-auth.config'
+
+export const {
+  auth,
+  // checkers
+  isAuth, isGuest, isUser, isAdmin, isRole,
+  // guards
+  guardAuth, guardGuest, guardUser, guardAdmin, guardRole,
+} = createAuthLayer(config, payloadBetterAuthConfig)
+```
+
+## Checkers ✅
+
+Checkers are boolean-returning functions that report the current auth state:
+
+```ts
+// Check if user is authenticated
+const isAuthenticated = await isAuth()
+
+// Check if user is a guest (not authenticated)
+const isGuestUser = await isGuest()
+
+// Check if user has the 'user' role (shortcut for isRole({ role: 'user' }))
+const isBaseUser = await isUser()
+
+// Check if user has the 'admin' role
+const isAdminUser = await isAdmin()
+
+// Check if user has a specific role
+const hasRole = await isRole({ role: 'editor' })
+```
+
+## Guards 🛡️
+
+Guards combine the check with a redirect: pass a `redirectUrl` and the unauthorized branch never returns, so `session` and `user` are guaranteed. Omit it to handle the unauthorized branch yourself via `hasSession`.
+
+```tsx
+// app/admin-area/page.tsx
+import { guardAdmin } from '@/lib/auth'
+
+export default async function AdminAreaPage() {
+  const { user } = await guardAdmin('/login') // bounces if not admin
+  return <div>Hello {user.email}</div>
+}
+```
+
+## Usage Examples 📝
+
+### Route Handlers
+
+```ts
+// app/api/protected/route.ts
+import { NextResponse } from 'next/server'
+import { guardAuth } from '@/lib/auth'
+
+export async function GET() {
+  const result = await guardAuth()
+  if (!result.hasSession) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  return NextResponse.json({ user: result.user })
+}
+```
+
+### Server Components
+
+```tsx
+// app/protected/page.tsx
+import { isAdmin } from '@/lib/auth'
+
+export default async function ProtectedPage() {
+  const isAdminUser = await isAdmin()
+
+  if (!isAdminUser) {
+    return <div>Access denied</div>
+  }
+
+  return <div>Admin content</div>
+}
+```
+
+## Best Practices 📚
+
+1. Create a single auth layer instance and export it
+2. Use guards for route protection
+3. Use checkers for conditional rendering
+4. Handle errors appropriately
+5. Cache authentication state when possible
+
+## React providers
+
+For custom Next.js apps (outside the Payload admin) the plugin also exports React providers that wrap the Better Auth client:
+
+- `BetterAuthProvider` from `@b3nab/payload-better-auth/client` for use in client components.
+- `BetterAuthServerWrapper` from `@b3nab/payload-better-auth/rsc` for use in server components or layouts.
+- `useBetterAuthClient()` from `@b3nab/payload-better-auth/client` to access the wrapped client (`betterAuthClient`) inside the provider tree.
+
+Inside the Payload admin both providers are injected automatically (`config.admin.components.providers`), so you only need them if you are rendering Better Auth-aware UI outside the admin.
+
+## Next Steps 🚀
+
+- [Plugin Configuration](../configuration/plugin-options)
+- [Two-Factor Authentication](./two-factor)
+- [Social Login](./social-login)

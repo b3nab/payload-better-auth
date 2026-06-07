@@ -1,0 +1,157 @@
+---
+title: Permissions & Roles
+description: How the access-control schema works and how to add your own roles
+---
+
+# Permissions & Roles
+
+The plugin pre-wires Better Auth's `admin()` plugin with a small custom access-control schema. Two roles ship out of the box (`user`, `admin`) and entry to the Payload admin is gated by a single permission (`payloadcms: ['access']`).
+
+## What ships by default
+
+| Role | `payloadcms` | `byRole` | Can enter `/admin`? |
+| --- | --- | --- | --- |
+| `user`  | `[]` | `['user']` | No |
+| `admin` | `['access']` | `['user', 'admin']` | Yes |
+
+How the gate works: on every login, `loginHandler` calls
+
+```ts
+auth.api.userHasPermission({
+  body: { permissions: { payloadcms: ['access'] } },
+})
+```
+
+and rejects the login if the check fails. So "can this user enter the admin?" reduces to "does any of their roles grant `payloadcms: ['access']`?".
+
+`isRole` / `isAdmin` / `guardRole` etc. compare `session.user.role` directly (single role per user). The `userHasPermission` API supports richer checks if you need them.
+
+## Adding a new role
+
+You don't fork the plugin's permissions. You pass your own `admin()` instance with extended roles via `betterAuth.plugins`, and reuse the exported `ac` so your roles speak the same access-control vocabulary as the built-in ones.
+
+### Example: add an `editor` role that can enter the admin
+
+```ts
+// payload-better-auth.config.ts
+import { betterAuthPlugin, ac, roles } from '@b3nab/payload-better-auth'
+import { admin } from 'better-auth/plugins/admin'
+
+// New role that inherits everything `user` has, plus admin-panel access.
+const editor = ac.newRole({
+  payloadcms: ['access'],
+  byRole: ['user'],
+})
+
+export const payloadBetterAuthConfig = {
+  betterAuth: {
+    plugins: [
+      admin({
+        ac,                                  // reuse the plugin's access-control instance
+        roles: { ...roles, editor },          // keep defaults, add yours
+      }),
+    ],
+  },
+} as const
+```
+
+Why this works:
+
+- `ac` is the `createAccessControl(defaultStatements)` instance the plugin uses internally. Reusing it means your role's permissions land in the same statement schema as `user` and `admin`.
+- Granting `payloadcms: ['access']` is what makes the login handler accept the role.
+
+Once registered, `editor` is type-safe everywhere:
+
+```ts
+await isRole({ role: 'editor' })          // autocompletes
+await guardRole({ role: 'editor' }, '/login')
+```
+
+### Example: lock a role out of the admin
+
+Define a role that omits `payloadcms`:
+
+```ts
+const viewer = ac.newRole({
+  payloadcms: [],
+  byRole: ['user'],
+})
+```
+
+`viewer` users can sign in via Better Auth, hit your API, etc., but the Payload admin rejects them at the login handler.
+
+## Adding a brand-new permission resource
+
+If `payloadcms` and `byRole` aren't enough, extend the statement schema before constructing your roles. Use `defaultStatements` so you keep the existing resources:
+
+```ts
+import {
+  defaultStatements,
+  ac as defaultAc,
+  roles as defaultRoles,
+} from '@b3nab/payload-better-auth'
+import { createAccessControl } from 'better-auth/plugins/access'
+import { admin } from 'better-auth/plugins/admin'
+
+const statements = {
+  ...defaultStatements,
+  billing: ['read', 'write'],
+} as const
+
+const ac = createAccessControl(statements)
+
+const accountant = ac.newRole({
+  payloadcms: ['access'],
+  byRole: ['user'],
+  billing: ['read', 'write'],
+})
+
+betterAuthPlugin({
+  betterAuth: {
+    plugins: [
+      admin({
+        ac,
+        roles: {
+          ...defaultRoles,        // keep user + admin
+          accountant,
+        },
+      }),
+    ],
+  },
+})
+```
+
+Now you can call `auth.api.userHasPermission({ body: { permissions: { billing: ['write'] } } })` anywhere and the check honors the new resource.
+
+## Checking permissions at runtime
+
+Two patterns:
+
+1. **Role check (cheap, single-role users)** - `isRole({ role })`, `isAdmin()`, `guardRole({ role }, redirectUrl?)`. Compares `session.user.role` directly. See [checkers](../auth-layer/checkers) and [guards](../auth-layer/guards).
+2. **Permission check (flexible, resource-based)** - call Better Auth directly:
+
+   ```ts
+   const result = await auth.api.userHasPermission({
+     headers: await headers(),
+     body: { permissions: { billing: ['write'] } },
+   })
+   if (!result.success) {
+     // not allowed
+   }
+   ```
+
+Reach for the permission API when a single role string is too coarse: multi-resource grants, partial access, derived checks the role taxonomy doesn't cover cleanly.
+
+## Exports
+
+```ts
+import {
+  defaultStatements,  // the schema (payloadcms + byRole + better-auth admin defaults)
+  ac,                 // createAccessControl(defaultStatements) instance
+  userAc,             // default `user` role
+  adminAc,            // default `admin` role
+  roles,              // { user: userAc, admin: adminAc }
+} from '@b3nab/payload-better-auth'
+```
+
+Compose with these so your custom roles stay compatible with the login gate.

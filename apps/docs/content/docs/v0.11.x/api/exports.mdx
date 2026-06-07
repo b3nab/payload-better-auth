@@ -1,0 +1,72 @@
+---
+title: Package Exports
+description: Subpath exports map for @b3nab/payload-better-auth
+---
+
+# Package Exports
+
+`@b3nab/payload-better-auth` ships three entry points. Pick the right one for the environment you are importing from (server, client, or RSC).
+
+## `@b3nab/payload-better-auth` (default)
+
+Server-safe core. Import from your `payload.config.ts`, server actions, route handlers, etc.
+
+```ts
+import {
+  // Plugin
+  betterAuthPlugin,
+  // Types
+  type BetterAuthPluginOptions,
+  type CollectionConfigExtend,
+  // Auth layer factory
+  createAuthLayer,
+  // Permissions / access control building blocks
+  defaultStatements,
+  ac,
+  userAc,
+  adminAc,
+  roles,
+} from '@b3nab/payload-better-auth'
+```
+
+## `@b3nab/payload-better-auth/client`
+
+Client components and hooks (must run in the browser). Use these from `'use client'` files.
+
+```ts
+import {
+  // React provider + hook for the Better Auth client
+  BetterAuthProvider,
+  useBetterAuthClient,
+  // 2FA forms
+  FormSetupTwoFactor,
+  FormVerifyTwoFactor,
+  // Account-level 2FA control
+  TwoFactorAccountButton,
+  // Social login UI
+  SocialLoginButtons,
+} from '@b3nab/payload-better-auth/client'
+```
+
+## `@b3nab/payload-better-auth/rsc`
+
+Server wrappers used from React Server Components. The plugin itself wires these into the Payload admin automatically; import them only if you need to mount them in your own RSC tree.
+
+```ts
+import {
+  // Wrap your tree so the Better Auth client/provider is available
+  BetterAuthServerWrapper,
+  // 2FA admin views
+  SetupTwoFactorServer,
+  VerifyTwoFactorServer,
+  // Dashboard prompt
+  TwoFactorSetupPromptServer,
+  // Social login server wrapper
+  SocialLoginButtonsServer,
+} from '@b3nab/payload-better-auth/rsc'
+```
+
+## Notes
+
+- Do not import the `/client` entry from server code or the `/rsc` entry from client code; you'll get bundler errors due to the `"use client"` / RSC boundaries.
+- Permissions exports (`ac`, `roles`, etc.) are stable: pass them to your own `admin()` plugin instance under `betterAuth.plugins` if you want to extend the access control while keeping the plugin defaults compatible.

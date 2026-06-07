@@ -1,0 +1,48 @@
+---
+title: Two-Factor Authentication
+description: TOTP 2FA wired into the Payload admin panel
+---
+
+# Two-Factor Authentication
+
+The plugin ships Better Auth's `twoFactor` plugin enabled by default and wires the corresponding admin UI into the Payload admin panel automatically. No extra configuration is needed to get a working TOTP flow.
+
+## What you get out of the box
+
+When the `twoFactor` plugin is active (which is the default), the plugin:
+
+- Adds two custom admin views:
+  - `/admin/two-factor-setup` - TOTP enrollment screen (`SetupTwoFactorServer`).
+  - `/admin/two-factor-verify` - TOTP verification screen (`VerifyTwoFactorServer`).
+- Injects `TwoFactorSetupPromptServer` into `beforeDashboard`, prompting users without 2FA to set it up.
+- Exposes `TwoFactorAccountButton` for an account-level "Manage 2FA" control you can drop into custom screens.
+- Handles the login flow: when a user with 2FA enabled signs in, the login endpoint returns a placeholder user with `_twoFactorPending: true` and the client redirects to `/admin/two-factor-verify` to complete TOTP before the real session is issued.
+
+## Login flow
+
+1. User submits email + password to `POST /api/user/login`.
+2. Better Auth validates credentials. If the user has 2FA enabled, the response carries the placeholder user with `_twoFactorPending: true` (no real session is created yet).
+3. The Payload admin client detects this state and routes to `/admin/two-factor-verify`.
+4. User enters the TOTP code; on success the real session is issued and the dashboard loads.
+
+## HTTP endpoints
+
+All TOTP endpoints are mounted under `/api/auth/*` by Better Auth's `twoFactor` plugin. Common ones:
+
+- `POST /api/auth/two-factor/enable`
+- `POST /api/auth/two-factor/verify-totp`
+- `POST /api/auth/two-factor/disable`
+
+See the [Better Auth two-factor docs](https://www.better-auth.com/docs/plugins/2fa) for the full contract. Call them via `auth.api.*` server-side; in the browser, inside the Payload admin, the `useBetterAuthClient()` hook exposes `betterAuthClient.twoFactor.*` (outside the admin, create your own client with the `twoFactorClient()` plugin).
+
+## Components
+
+Exported from `@b3nab/payload-better-auth/client`:
+
+- `FormSetupTwoFactor`, `FormVerifyTwoFactor` - the raw forms used in the views.
+- `TwoFactorAccountButton` - drop-in account control to enable/disable 2FA.
+
+Exported from `@b3nab/payload-better-auth/rsc`:
+
+- `SetupTwoFactorServer`, `VerifyTwoFactorServer` - server wrappers used by the admin views.
+- `TwoFactorSetupPromptServer` - the dashboard prompt.

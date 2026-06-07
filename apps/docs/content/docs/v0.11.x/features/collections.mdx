@@ -1,0 +1,68 @@
+---
+title: Collections
+description: How the plugin generates and lets you extend Better Auth collections
+---
+
+# Collections
+
+The plugin generates Payload collections from your active Better Auth options at startup. The exact set depends on which Better Auth plugins are enabled.
+
+## Default Collections
+
+All slugs are singular.
+
+### `user`
+- Stores user accounts and profile data.
+- Authentication fields (password hash, email verification) are owned by Better Auth.
+- Extend via `extendsCollections.user`.
+
+### `session`
+- Active session records, managed by Better Auth.
+- Expiration is handled by Better Auth's session config.
+
+### `account`
+- Linked credential records (email/password account, OAuth provider accounts).
+
+### `verification`
+- Short-lived tokens for email verification, password reset, and similar flows.
+
+### `twoFactor` (when the `twoFactor` plugin is enabled, which is the default)
+- TOTP secrets and backup codes per user.
+
+Additional collections appear automatically when you enable plugins such as `passkey`, `apiKey`, etc.
+
+## Extending Collections
+
+Each value in `extendsCollections` is a standard Payload `CollectionConfig` (minus the `slug` field, since the plugin owns it). The exported type is `CollectionConfigExtend<T extends CollectionSlug> = Omit<CollectionConfig<T>, 'slug'>`. Everything Payload supports - `fields`, `hooks`, `access`, `admin`, `versions`, custom components - works as it does in any regular collection.
+
+```ts
+betterAuthPlugin({
+  extendsCollections: {
+    user: {
+      fields: [
+        { name: 'nickname', type: 'text' },
+      ],
+    },
+  },
+})
+```
+
+See [Collections](../configuration/collections) for the recommended pattern (extract each collection into its own file, type it with `CollectionConfigExtend<'user'>`, import it).
+
+## Adding fields via Better Auth
+
+Custom fields can also be declared as Better Auth `additionalFields`. The plugin reads them from `getAuthTables(auth.options)` and includes them in the generated Payload collection, so the result is functionally equivalent to declaring the field in `extendsCollections`:
+
+```ts
+betterAuthPlugin({
+  betterAuth: {
+    user: {
+      additionalFields: {
+        nickname: { type: 'string', required: false },
+      },
+    },
+  },
+})
+```
+
+Same field, different doorway: through `additionalFields` it's also part of the Better Auth schema (typed on `session.user`, available via `auth.api.*`); through `extendsCollections` it's added at the Payload layer (better for relationships, custom admin UI, hooks). Whichever you pick, the final Payload collection ends up the same - pick by what else you want the field to do.
