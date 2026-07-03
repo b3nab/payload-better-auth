@@ -15,10 +15,14 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 // exports
+// NOTE: this entry is imported by consumers' payload.config, which Next
+// bundles into every route (app-page AND app-route). It must stay free of
+// next/navigation: the client navigation module breaks Turbopack app-route
+// bundles (vendored contexts are app-page only). createAuthLayer and the
+// guards live behind the './nextjs' subpath for this reason.
 export * from './types.js'
 export * from './plugin.js'
 export * from './singleton.better-auth.js'
-export { createAuthLayer } from './nextjs/index.js'
 
 export {
   defaultStatements,

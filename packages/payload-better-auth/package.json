@@ -35,6 +35,11 @@
       "types": "./src/index.ts",
       "default": "./src/index.ts"
     },
+    "./nextjs": {
+      "import": "./src/nextjs/index.ts",
+      "types": "./src/nextjs/index.ts",
+      "default": "./src/nextjs/index.ts"
+    },
     "./client": {
       "import": "./src/exports/client.ts",
       "types": "./src/exports/client.ts",
@@ -168,6 +173,11 @@
         "import": "./dist/index.js",
         "types": "./dist/index.d.ts",
         "default": "./dist/index.js"
+      },
+      "./nextjs": {
+        "import": "./dist/nextjs/index.js",
+        "types": "./dist/nextjs/index.d.ts",
+        "default": "./dist/nextjs/index.js"
       },
       "./client": {
         "import": "./dist/exports/client.js",
