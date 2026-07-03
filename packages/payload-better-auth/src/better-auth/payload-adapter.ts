@@ -117,7 +117,6 @@ export const payloadAdapter = (config: PayloadAdapterConfig = {}) => {
             const { totalDocs } = await payload.count({
               collection: getCollectionName(model),
               where: where ? buildWhereClause(where, model, getPayloadFieldName(model)) : {},
-              depth: 0
             })
 
             return totalDocs || 0
