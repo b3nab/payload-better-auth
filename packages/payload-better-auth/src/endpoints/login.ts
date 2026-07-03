@@ -7,7 +7,6 @@ import { getRequestCollection } from '../payload-utilities/getRequestEntity.js'
 import { isNumber } from '../payload-utilities/isNumber.js'
 import { getBetterAuthSafeInternal } from '../singleton.better-auth.js'
 import invariant from 'tiny-invariant'
-import { redirect } from 'next/navigation.js'
 import { getLogger } from '../singleton.logger.js'
 // import { loginOperation } from '../payload-operations/login'
 
