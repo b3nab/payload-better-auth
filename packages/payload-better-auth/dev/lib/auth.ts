@@ -1,6 +1,6 @@
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { createAuthLayer } from '../../src'
+import { createAuthLayer } from '@b3nab/payload-better-auth/nextjs'
 import configPromise from '@payload-config'
 import { betterAuthPluginConfig } from '../payload-better-auth.config'
 import { InferSession, InferUser } from 'better-auth'
