@@ -1,6 +1,6 @@
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
-import { createAuthLayer } from '@b3nab/payload-better-auth'
+import { createAuthLayer } from '@b3nab/payload-better-auth/nextjs'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 // biome-ignore lint/style/useImportType: <explanation>
@@ -25,41 +25,44 @@ if (bool) {
       //      ^?
       headers: await headers(),
     }),
-    auth.api.listDeviceSessions({
-      //      ^?
-      headers: await headers(),
-    }),
-    auth.api.getFullOrganization({
-      //      ^?
-      headers: await headers(),
-    }),
-    auth.api.oneTapCallback({
-      //      ^?
-      body: { idToken: '' },
-    }),
-    auth.api.listPasskeys({
-      //      ^?
-      headers: await headers(),
-    }),
-    auth.api.stripeWebhook({
-      //      ^?
-      headers: await headers(),
-    }),
-    auth.api.cancelSubscription({
-      //      ^?
-      body: { returnUrl: '' },
-    }),
-    auth.api.listActiveSubscriptions({
-      //      ^?
-      headers: await headers(),
-    }),
-    auth.api.polarCheckout({
-      //      ^?
-      query: {
-        productId: '1',
-        quantity: 1,
-      },
-    }),
+    // These APIs require plugins not enabled in the current demo config
+    // (multiSession, organization, oneTap, passkey, stripe, polar).
+    // Kept commented for type-inference checks when re-enabling them.
+    // auth.api.listDeviceSessions({
+    //   //      ^?
+    //   headers: await headers(),
+    // }),
+    // auth.api.getFullOrganization({
+    //   //      ^?
+    //   headers: await headers(),
+    // }),
+    // auth.api.oneTapCallback({
+    //   //      ^?
+    //   body: { idToken: '' },
+    // }),
+    // auth.api.listPasskeys({
+    //   //      ^?
+    //   headers: await headers(),
+    // }),
+    // auth.api.stripeWebhook({
+    //   //      ^?
+    //   headers: await headers(),
+    // }),
+    // auth.api.cancelSubscription({
+    //   //      ^?
+    //   body: { returnUrl: '' },
+    // }),
+    // auth.api.listActiveSubscriptions({
+    //   //      ^?
+    //   headers: await headers(),
+    // }),
+    // auth.api.polarCheckout({
+    //   //      ^?
+    //   query: {
+    //     productId: '1',
+    //     quantity: 1,
+    //   },
+    // }),
     auth.api.verifyTOTP({
       //      ^?
       body: { code: '' },
