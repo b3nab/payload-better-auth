@@ -17,6 +17,7 @@ import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
 import { testEmailAdapter } from './helpers/testEmailAdapter'
+import { Magazines } from './collections/Magazines'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -72,6 +73,7 @@ export default buildConfig({
     Posts,
     Media,
     Categories,
+    Magazines,
     // Users
   ],
   cors: [getServerSideURL()].filter(Boolean),
