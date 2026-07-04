@@ -27,8 +27,9 @@ import { TwoFactorSetupPromptServer as TwoFactorSetupPromptServer_501c5fdba6c9a6
 import { BetterAuthServerWrapper as BetterAuthServerWrapper_501c5fdba6c9a607d65ee1a19fe5a153 } from '@b3nab/payload-better-auth/rsc'
 import { SetupTwoFactorServer as SetupTwoFactorServer_501c5fdba6c9a607d65ee1a19fe5a153 } from '@b3nab/payload-better-auth/rsc'
 import { VerifyTwoFactorServer as VerifyTwoFactorServer_501c5fdba6c9a607d65ee1a19fe5a153 } from '@b3nab/payload-better-auth/rsc'
-import { CollectionCards as CollectionCards_ab83ff7e88da8d3530831f296ec4756a } from '@payloadcms/ui/rsc'
+import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
+/** @type import('payload').ImportMap */
 export const importMap = {
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,
@@ -59,5 +60,5 @@ export const importMap = {
   "@b3nab/payload-better-auth/rsc#BetterAuthServerWrapper": BetterAuthServerWrapper_501c5fdba6c9a607d65ee1a19fe5a153,
   "@b3nab/payload-better-auth/rsc#SetupTwoFactorServer": SetupTwoFactorServer_501c5fdba6c9a607d65ee1a19fe5a153,
   "@b3nab/payload-better-auth/rsc#VerifyTwoFactorServer": VerifyTwoFactorServer_501c5fdba6c9a607d65ee1a19fe5a153,
-  "@payloadcms/ui/rsc#CollectionCards": CollectionCards_ab83ff7e88da8d3530831f296ec4756a
+  "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

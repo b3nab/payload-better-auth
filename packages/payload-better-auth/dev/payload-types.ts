@@ -73,6 +73,7 @@ export interface Config {
     session: Session;
     account: Account;
     verification: Verification;
+    jwks: Jwk;
     twoFactor: TwoFactor;
     oauthApplication: OauthApplication;
     oauthAccessToken: OauthAccessToken;
@@ -94,6 +95,7 @@ export interface Config {
     session: SessionSelect<false> | SessionSelect<true>;
     account: AccountSelect<false> | AccountSelect<true>;
     verification: VerificationSelect<false> | VerificationSelect<true>;
+    jwks: JwksSelect<false> | JwksSelect<true>;
     twoFactor: TwoFactorSelect<false> | TwoFactorSelect<true>;
     oauthApplication: OauthApplicationSelect<false> | OauthApplicationSelect<true>;
     oauthAccessToken: OauthAccessTokenSelect<false> | OauthAccessTokenSelect<true>;
@@ -114,9 +116,10 @@ export interface Config {
   globals: {};
   globalsSelect: {};
   locale: null;
-  user: User & {
-    collection: 'user';
+  widgets: {
+    collections: CollectionsWidget;
   };
+  user: User;
   jobs: {
     tasks: unknown;
     workflows: unknown;
@@ -217,6 +220,7 @@ export interface User {
         expiresAt: string;
       }[]
     | null;
+  collection: 'user';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -262,6 +266,18 @@ export interface Verification {
   identifier: string;
   value: string;
   expiresAt: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "jwks".
+ */
+export interface Jwk {
+  id: string;
+  publicKey: string;
+  privateKey: string;
+  expiresAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -433,6 +449,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'verification';
         value: string | Verification;
+      } | null)
+    | ({
+        relationTo: 'jwks';
+        value: string | Jwk;
       } | null)
     | ({
         relationTo: 'twoFactor';
@@ -615,6 +635,17 @@ export interface VerificationSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "jwks_select".
+ */
+export interface JwksSelect<T extends boolean = true> {
+  publicKey?: T;
+  privateKey?: T;
+  expiresAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "twoFactor_select".
  */
 export interface TwoFactorSelect<T extends boolean = true> {
@@ -765,6 +796,16 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "collections_widget".
+ */
+export interface CollectionsWidget {
+  data?: {
+    [k: string]: unknown;
+  };
+  width: 'full';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
