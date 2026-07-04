@@ -71,19 +71,17 @@ export interface Config {
     posts: Post;
     media: Media;
     categories: Category;
+    magazines: Magazine;
     user: User;
     session: Session;
     account: Account;
     verification: Verification;
-    organization: Organization;
-    member: Member;
-    invitation: Invitation;
     twoFactor: TwoFactor;
-    passkey: Passkey;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
     search: Search;
+    'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -95,19 +93,17 @@ export interface Config {
     posts: PostsSelect<false> | PostsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
+    magazines: MagazinesSelect<false> | MagazinesSelect<true>;
     user: UserSelect<false> | UserSelect<true>;
     session: SessionSelect<false> | SessionSelect<true>;
     account: AccountSelect<false> | AccountSelect<true>;
     verification: VerificationSelect<false> | VerificationSelect<true>;
-    organization: OrganizationSelect<false> | OrganizationSelect<true>;
-    member: MemberSelect<false> | MemberSelect<true>;
-    invitation: InvitationSelect<false> | InvitationSelect<true>;
     twoFactor: TwoFactorSelect<false> | TwoFactorSelect<true>;
-    passkey: PasskeySelect<false> | PasskeySelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
     search: SearchSelect<false> | SearchSelect<true>;
+    'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -116,6 +112,7 @@ export interface Config {
   db: {
     defaultIDType: string;
   };
+  fallbackLocale: null;
   globals: {
     header: Header;
     footer: Footer;
@@ -125,9 +122,10 @@ export interface Config {
     footer: FooterSelect<false> | FooterSelect<true>;
   };
   locale: null;
-  user: User & {
-    collection: 'user';
+  widgets: {
+    collections: CollectionsWidget;
   };
+  user: User;
   jobs: {
     tasks: {
       schedulePublish: TaskSchedulePublish;
@@ -170,7 +168,7 @@ export interface Page {
       root: {
         type: string;
         children: {
-          type: string;
+          type: any;
           version: number;
           [k: string]: unknown;
         }[];
@@ -235,7 +233,7 @@ export interface Post {
     root: {
       type: string;
       children: {
-        type: string;
+        type: any;
         version: number;
         [k: string]: unknown;
       }[];
@@ -281,7 +279,7 @@ export interface Media {
     root: {
       type: string;
       children: {
-        type: string;
+        type: any;
         version: number;
         [k: string]: unknown;
       }[];
@@ -399,6 +397,7 @@ export interface User {
   banExpires?: string | null;
   nickname?: string | null;
   posts?: (string | Post)[] | null;
+  password?: string | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -408,7 +407,14 @@ export interface User {
   hash?: string | null;
   loginAttempts?: number | null;
   lockUntil?: string | null;
-  password?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
+  collection: 'user';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -419,7 +425,7 @@ export interface CallToActionBlock {
     root: {
       type: string;
       children: {
-        type: string;
+        type: any;
         version: number;
         [k: string]: unknown;
       }[];
@@ -470,7 +476,7 @@ export interface ContentBlock {
           root: {
             type: string;
             children: {
-              type: string;
+              type: any;
               version: number;
               [k: string]: unknown;
             }[];
@@ -527,7 +533,7 @@ export interface ArchiveBlock {
     root: {
       type: string;
       children: {
-        type: string;
+        type: any;
         version: number;
         [k: string]: unknown;
       }[];
@@ -563,7 +569,7 @@ export interface FormBlock {
     root: {
       type: string;
       children: {
-        type: string;
+        type: any;
         version: number;
         [k: string]: unknown;
       }[];
@@ -620,7 +626,7 @@ export interface Form {
               root: {
                 type: string;
                 children: {
-                  type: string;
+                  type: any;
                   version: number;
                   [k: string]: unknown;
                 }[];
@@ -703,7 +709,7 @@ export interface Form {
     root: {
       type: string;
       children: {
-        type: string;
+        type: any;
         version: number;
         [k: string]: unknown;
       }[];
@@ -735,7 +741,7 @@ export interface Form {
           root: {
             type: string;
             children: {
-              type: string;
+              type: any;
               version: number;
               [k: string]: unknown;
             }[];
@@ -754,6 +760,24 @@ export interface Form {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "magazines".
+ */
+export interface Magazine {
+  id: string;
+  active?: boolean | null;
+  name: string;
+  description?: string | null;
+  /**
+   * The root URL of the magazine website
+   */
+  rootURL: string;
+  isFirstCrawl: boolean;
+  logo?: (string | null) | Media;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "session".
  */
 export interface Session {
@@ -763,7 +787,6 @@ export interface Session {
   ipAddress?: string | null;
   userAgent?: string | null;
   userId: string | User;
-  activeOrganizationId?: string | null;
   impersonatedBy?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -774,7 +797,7 @@ export interface Session {
  */
 export interface Account {
   id: string;
-  accountId: string | Account;
+  accountId: string;
   providerId: string;
   userId: string | User;
   accessToken?: string | null;
@@ -801,45 +824,6 @@ export interface Verification {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "organization".
- */
-export interface Organization {
-  id: string;
-  name: string;
-  slug?: string | null;
-  logo?: string | null;
-  metadata?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "member".
- */
-export interface Member {
-  id: string;
-  organizationId: string | Organization;
-  userId: string | User;
-  role: string;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "invitation".
- */
-export interface Invitation {
-  id: string;
-  organizationId: string | Organization;
-  role?: string | null;
-  status: string;
-  expiresAt: string;
-  inviterId: string;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "twoFactor".
  */
 export interface TwoFactor {
@@ -847,23 +831,6 @@ export interface TwoFactor {
   secret: string;
   backupCodes: string;
   userId: string | User;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "passkey".
- */
-export interface Passkey {
-  id: string;
-  name?: string | null;
-  publicKey: string;
-  userId: string | User;
-  credentialID: string;
-  counter: number;
-  deviceType: string;
-  backedUp: boolean;
-  transports?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -939,6 +906,23 @@ export interface Search {
     | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-kv".
+ */
+export interface PayloadKv {
+  id: string;
+  key: string;
+  data:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1056,6 +1040,10 @@ export interface PayloadLockedDocument {
         value: string | Category;
       } | null)
     | ({
+        relationTo: 'magazines';
+        value: string | Magazine;
+      } | null)
+    | ({
         relationTo: 'user';
         value: string | User;
       } | null)
@@ -1072,24 +1060,8 @@ export interface PayloadLockedDocument {
         value: string | Verification;
       } | null)
     | ({
-        relationTo: 'organization';
-        value: string | Organization;
-      } | null)
-    | ({
-        relationTo: 'member';
-        value: string | Member;
-      } | null)
-    | ({
-        relationTo: 'invitation';
-        value: string | Invitation;
-      } | null)
-    | ({
         relationTo: 'twoFactor';
         value: string | TwoFactor;
-      } | null)
-    | ({
-        relationTo: 'passkey';
-        value: string | Passkey;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1106,10 +1078,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'search';
         value: string | Search;
-      } | null)
-    | ({
-        relationTo: 'payload-jobs';
-        value: string | PayloadJob;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1434,6 +1402,20 @@ export interface CategoriesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "magazines_select".
+ */
+export interface MagazinesSelect<T extends boolean = true> {
+  active?: T;
+  name?: T;
+  description?: T;
+  rootURL?: T;
+  isFirstCrawl?: T;
+  logo?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "user_select".
  */
 export interface UserSelect<T extends boolean = true> {
@@ -1447,6 +1429,7 @@ export interface UserSelect<T extends boolean = true> {
   banExpires?: T;
   nickname?: T;
   posts?: T;
+  password?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -1456,6 +1439,13 @@ export interface UserSelect<T extends boolean = true> {
   hash?: T;
   loginAttempts?: T;
   lockUntil?: T;
+  sessions?:
+    | T
+    | {
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1467,7 +1457,6 @@ export interface SessionSelect<T extends boolean = true> {
   ipAddress?: T;
   userAgent?: T;
   userId?: T;
-  activeOrganizationId?: T;
   impersonatedBy?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1503,64 +1492,12 @@ export interface VerificationSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "organization_select".
- */
-export interface OrganizationSelect<T extends boolean = true> {
-  name?: T;
-  slug?: T;
-  logo?: T;
-  metadata?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "member_select".
- */
-export interface MemberSelect<T extends boolean = true> {
-  organizationId?: T;
-  userId?: T;
-  role?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "invitation_select".
- */
-export interface InvitationSelect<T extends boolean = true> {
-  organizationId?: T;
-  role?: T;
-  status?: T;
-  expiresAt?: T;
-  inviterId?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "twoFactor_select".
  */
 export interface TwoFactorSelect<T extends boolean = true> {
   secret?: T;
   backupCodes?: T;
   userId?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "passkey_select".
- */
-export interface PasskeySelect<T extends boolean = true> {
-  name?: T;
-  publicKey?: T;
-  userId?: T;
-  credentialID?: T;
-  counter?: T;
-  deviceType?: T;
-  backedUp?: T;
-  transports?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1757,6 +1694,14 @@ export interface SearchSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-kv_select".
+ */
+export interface PayloadKvSelect<T extends boolean = true> {
+  key?: T;
+  data?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-jobs_select".
  */
 export interface PayloadJobsSelect<T extends boolean = true> {
@@ -1924,6 +1869,16 @@ export interface FooterSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "collections_widget".
+ */
+export interface CollectionsWidget {
+  data?: {
+    [k: string]: unknown;
+  };
+  width: 'full';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "TaskSchedulePublish".
  */
 export interface TaskSchedulePublish {
@@ -1954,7 +1909,7 @@ export interface BannerBlock {
     root: {
       type: string;
       children: {
-        type: string;
+        type: any;
         version: number;
         [k: string]: unknown;
       }[];
