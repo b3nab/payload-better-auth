@@ -37,6 +37,7 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+next-env.d.ts
 
 .env
 
@@ -48,3 +49,4 @@ node_modules/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+release.tgz
