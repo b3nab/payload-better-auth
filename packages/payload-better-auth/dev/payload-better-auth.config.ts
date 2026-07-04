@@ -2,7 +2,7 @@ import {
   betterAuthPlugin,
   type CollectionConfigExtend,
   type BetterAuthPluginOptions,
-} from '../src'
+} from '@b3nab/payload-better-auth'
 import { reactInvitationEmail } from './lib/email/invitation'
 import { reactResetPasswordEmail } from './lib/email/reset-password'
 import { resend } from './lib/email/resend'
@@ -11,6 +11,7 @@ import {
   admin,
   bearer,
   customSession,
+  jwt,
   multiSession,
   oAuthProxy,
   oidcProvider,
@@ -121,6 +122,7 @@ export const betterAuthPluginConfig = {
     },
     plugins: [
       admin({ ac, roles }),
+      jwt(),
       twoFactor({
         otpOptions: {
           async sendOTP({ user, otp }) {

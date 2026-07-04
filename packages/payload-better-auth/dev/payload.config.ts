@@ -9,7 +9,7 @@ import { devUser } from './helpers/credentials'
 import { testEmailAdapter } from './helpers/testEmailAdapter'
 // import { seed } from './seed'
 import { betterAuthPluginConfig } from './payload-better-auth.config'
-import { betterAuthPlugin } from '../src'
+import { betterAuthPlugin } from '@b3nab/payload-better-auth'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
