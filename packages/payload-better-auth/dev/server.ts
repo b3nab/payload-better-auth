@@ -12,10 +12,14 @@ const DEV_PORT = 7125
 
 console.log(`DEV_PORT is ${DEV_PORT}`)
 
-const opts: NextServerOptions = {
+const opts: NextServerOptions & { webpack?: boolean } = {
   dev: true,
   dir: dirname,
   port: DEV_PORT,
+  // Next 16 defaults to Turbopack, which cannot resolve the NodeNext-style
+  // relative `.js` imports in our TS source (vercel/next.js#82945). Webpack
+  // handles them via resolve.extensionAlias in next.config.mjs.
+  webpack: true,
 }
 
 const app = next(opts)

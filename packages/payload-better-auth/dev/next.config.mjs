@@ -6,7 +6,7 @@ const dirname = path.dirname(fileURLToPath(import.meta.url))
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    allowedDevOrigins: ['authdemo.local', '*.authdemo.local'],
+  allowedDevOrigins: ['authdemo.local', '*.authdemo.local'],
   webpack: (webpackConfig) => {
     webpackConfig.resolve.extensionAlias = {
       '.cjs': ['.cts', '.cjs'],
