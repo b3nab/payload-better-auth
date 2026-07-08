@@ -16,6 +16,7 @@
  */
 // imports
 import type { Config } from 'payload'
+import type { AuthContext } from 'better-auth'
 import { getEndpoints } from 'better-auth/api'
 import { getAuthTables } from 'better-auth/db'
 
@@ -24,7 +25,7 @@ import {
   generatePayloadEndpoints,
 } from './core/index.js'
 import { createBetterAuthInstance } from './better-auth/instance.js'
-import { payloadSingleton } from './singleton.payload.js'
+import { pluginsToLoad } from './better-auth/plugins.server.js'
 import { initLogger } from './singleton.logger.js'
 import type { BetterAuthPluginOptions } from './types.js'
 
@@ -44,18 +45,28 @@ export const betterAuthPlugin =
     logger.debug(`PLUGIN: payload-better-auth - initializing`)
 
     ///////////////////////////////////
-    // Better Auth - INSTANCE
+    // Better Auth - OPTIONS (config time: no instance is created here)
     ///////////////////////////////////
 
-    const auth = createBetterAuthInstance({ pluginOptions })
-    const authEndpoints = getEndpoints(auth.$context, auth.options)
-    const betterAuthEndpoints = generatePayloadEndpoints(
-      auth,
-      authEndpoints.api,
-    )
-    const authTables = getAuthTables(auth.options)
+    // schema and endpoint enumeration only need the options; the instance is
+    // created in onInit, bound to the payload instance (payload.betterAuth)
+    const authOptions = {
+      ...(pluginOptions.betterAuth ?? {}),
+      plugins: pluginsToLoad(pluginOptions),
+    }
+
+    // getEndpoints builds the endpoint map synchronously from the options and
+    // awaits the context only inside its handlers, which are never invoked:
+    // the payload endpoint handlers delegate to req.payload.betterAuth.handler
+    // at request time. Enumeration (path/method) is all we consume here, so
+    // this context promise is intentionally never resolved.
+    const enumerationOnlyContext = new Promise<AuthContext>(() => {})
+
+    const authEndpoints = getEndpoints(enumerationOnlyContext, authOptions)
+    const betterAuthEndpoints = generatePayloadEndpoints(authEndpoints.api)
+    const authTables = getAuthTables(authOptions)
     const betterAuthCollections = generatePayloadCollections(
-      auth.options,
+      authOptions,
       authTables,
       pluginOptions.extendsCollections,
     )
@@ -68,20 +79,24 @@ export const betterAuthPlugin =
 
     // logger.trace({ authTables: Object.keys(authTables) }, 'authTables')
     logger.debug(
-      Object.keys(authTables).map((key) => ({[authTables[key].modelName]: Object.keys(authTables[key].fields).join(', ')})),
-      "authTables with fields:"
+      Object.keys(authTables).map((key) => ({
+        [authTables[key].modelName]: Object.keys(authTables[key].fields).join(
+          ', ',
+        ),
+      })),
+      'authTables with fields:',
     )
 
     ///////////////////////////////////////////
     // Add Better Auth - Admin Customization
     ///////////////////////////////////////////
 
-    const twoFactorPluginEnabled = auth.options.plugins?.some(
+    const twoFactorPluginEnabled = authOptions.plugins.some(
       (plugin) => plugin.id === 'two-factor',
     )
 
     // Check if social providers are configured
-    const socialProviders = Object.keys(auth.options.socialProviders || {})
+    const socialProviders = Object.keys(authOptions.socialProviders || {})
 
     config.admin = {
       ...(config.admin ?? {}),
@@ -144,15 +159,31 @@ export const betterAuthPlugin =
 
     config.onInit = async (payload) => {
       logger.trace(`PLUGIN: payload-better-auth - onInit`)
-      // Ensure we are executing any existing onInit functions before running our own.
+
+      // create the better-auth instance bound to this payload instance and
+      // expose it as payload.betterAuth: one instance per payload instance,
+      // same lifetime, no module-level state
+      payload.betterAuth = createBetterAuthInstance({ pluginOptions, payload })
+
+      // run any existing onInit after ours, so consumers can already use
+      // payload.betterAuth inside their own onInit
       if (incomingOnInit) {
         await incomingOnInit(payload)
       }
-
-      // attach payload instance to better-auth's payload adapter
-      payloadSingleton(payload)
     }
 
     logger.trace(`PLUGIN: payload-better-auth - return`)
     return config
   }
+
+/**
+ * Identity helper: captures the host's plugin options with a `const` type
+ * parameter, so array literals (betterAuth.plugins above all) keep their
+ * tuple types and flow into the instance typing (payload.betterAuth,
+ * createAuthLayer). Zero runtime cost.
+ */
+export const defineBetterAuthPluginOptions = <
+  const O extends BetterAuthPluginOptions,
+>(
+  pluginOptions: O,
+): O => pluginOptions
