@@ -13,6 +13,7 @@ import deepmerge from '@fastify/deepmerge'
 import type { BetterAuthPluginOptions } from '../types.js'
 import { getLogger } from '../singleton.logger.js'
 import { isAdmin, isUser } from './access.js'
+import { buildCascadeBeforeDelete } from './cascade-delete.js'
 import { createBetterAuthStrategy } from '../strategy/better-auth.strategy.js'
 import type { BetterAuthOptions } from 'better-auth/minimal'
 import { payloadBetterAuthEndpoints } from '../endpoints/endpoints.payload-better-auth.js'
@@ -40,7 +41,7 @@ export const generatePayloadCollections = (
       //   readVersions: isAdmin,
       // },
       slug: modelName,
-      fields: convertToPayloadFields(modelName, value.fields),
+      fields: convertToPayloadFields(modelName, value.fields, authTables),
     }
     if (key === 'user') {
       newCollection.auth = true
@@ -71,6 +72,20 @@ export const generatePayloadCollections = (
     }
     if (extendsCollections?.[modelName]) {
       newCollection = deepmerge()(newCollection, extendsCollections[modelName])
+    }
+    // payload hardcodes ON DELETE SET NULL on relationship columns: the
+    // schema's references.onDelete semantics live in this hook instead.
+    // Attached after the extendsCollections merge, preserving every hook the
+    // consumer declared: theirs run first, the cascade runs last
+    const cascadeBeforeDelete = buildCascadeBeforeDelete(authTables, key)
+    if (cascadeBeforeDelete) {
+      newCollection.hooks = {
+        ...newCollection.hooks,
+        beforeDelete: [
+          ...(newCollection.hooks?.beforeDelete ?? []),
+          cascadeBeforeDelete,
+        ],
+      }
     }
     if (newCollection.auth) {
       newCollection.auth = {
@@ -107,6 +122,7 @@ export const generatePayloadCollections = (
 const convertToPayloadFields = (
   modelName: string,
   fields: Record<string, DBFieldAttribute<DBFieldType>>,
+  authTables: BetterAuthDBSchema,
 ): PayloadField[] => {
   return Object.entries(fields)
     .filter(
@@ -129,7 +145,7 @@ const convertToPayloadFields = (
           // TODO: better-auth DBFieldAttributeConfig . sortable has the same "reason to exists" as the payload FieldBase . index ??
           index: fieldValue.sortable,
           // type: convertToPayloadType(fieldValue.type),
-          ...convertToPayloadType(modelName, fieldValue, fieldKey),
+          ...convertToPayloadType(modelName, fieldValue, fieldKey, authTables),
         }) as PayloadField,
     )
 }
@@ -142,19 +158,8 @@ function convertToPayloadType(
   modelName: string,
   { type: fieldType, references }: DBFieldAttribute<DBFieldType>,
   fieldKey: string,
+  authTables: BetterAuthDBSchema,
 ): Partial<PayloadField> {
-  // Dynamic map better-auth DBFieldAttributeConfig . references
-  if (references) {
-    // getLogger().trace(
-    //   references,
-    //   `[convertToPayloadType] references for ${fieldKey} on ${modelName}`,
-    // )
-    return {
-      type: 'relationship',
-      relationTo: references.model,
-    }
-  }
-
   const defaultType: Partial<PayloadField> = {
     type: 'text',
   }
@@ -179,6 +184,44 @@ function convertToPayloadType(
     date: {
       type: 'date',
     },
+    json: {
+      type: 'json',
+    },
   }
+
+  // Dynamic map better-auth DBFieldAttributeConfig . references
+  if (references) {
+    // getLogger().trace(
+    //   references,
+    //   `[convertToPayloadType] references for ${fieldKey} on ${modelName}`,
+    // )
+    // id references are payload's native relationship: the stored value IS
+    // the target document id. references.model can be the default key OR
+    // the renamed modelName (core reads options, plugin schemas hardcode
+    // the default): the collection slug is always the target's modelName
+    if (references.field === 'id') {
+      const referencedTable = authTables[references.model]
+      const relationTo =
+        referencedTable?.modelName ??
+        Object.values(authTables).find(
+          (table) => table.modelName === references.model,
+        )?.modelName ??
+        references.model
+      return {
+        type: 'relationship',
+        relationTo: relationTo as CollectionSlug,
+      }
+    }
+    // references to any other field are a logical FK on a non-PK column,
+    // which payload relationships cannot represent (id-only by
+    // construction): the column stays a scalar of the field's own type —
+    // the contract writes and reads the raw value — indexed because
+    // references exist to be looked up. The declared onDelete semantics
+    // run in the cascade-delete hook, the joins in the adapter
+    return fieldType === 'number'
+      ? { type: 'number', index: true }
+      : { type: 'text', index: true }
+  }
+
   return internalFieldMap[String(fieldType)] || defaultType
 }
