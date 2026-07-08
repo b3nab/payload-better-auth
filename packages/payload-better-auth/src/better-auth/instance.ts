@@ -1,102 +1,21 @@
+import type { Payload } from 'payload'
+import type { BetterAuthOptions } from 'better-auth'
+import { betterAuth } from 'better-auth/minimal'
 import type { BetterAuthPluginOptions } from '../types.js'
 import { type PluginsToLoad, pluginsToLoad } from './plugins.server.js'
-import type { Payload } from 'payload'
-import type { BetterAuthOptions, BetterAuthPlugin } from 'better-auth'
-import type { DBAdapter } from '@better-auth/core/db/adapter'
-import { betterAuth } from 'better-auth/minimal'
 import { payloadAdapter } from './payload-adapter.js'
-import { getPayload } from '../singleton.payload.js'
-import { betterAuthSingleton } from '../singleton.better-auth.js'
 import { getLogger } from '../singleton.logger.js'
 
-// The type for the Better Auth instance with proper plugin inference
-export type InferBetterAuthInstance<O extends BetterAuthPluginOptions> =
-  // & ImprovedAuth<O>
-  // ReturnType<typeof betterAuth<ReturnType<typeof buildBetterAuthOptions<O>>>> & {
-  ReturnType<typeof betterAuth<BuildOptions<O>>>
-// @ts-ignore
-// ReturnType<typeof betterAuth<BuildBetterAuthOptionsReturnType<O>>>
-// & {
-//   // Add a type assertion to help TypeScript understand that the api object can contain any plugin's API methods
-//   // HACK: this is a hack to make the api object contain any plugin's API methods and allow the code to compile.
-//   // But for some issues on some plugins, those api endpoints are not correctly inferred.
-//   // The issues are only on some plugins, not all.
-//   // Like the stripe plugin: the `stripeWebhook`method is correctly inferred, but the `cancelSubscription` and all other methods are not.
-//   // And the admin plugin: the `banUser` method is not correctly inferred (banUser is an example, all the other methods are not correctly inferred as well).
-//   api: Record<string, any>
-// }
+// The whole better-auth typing is DERIVED from the value returned by
+// buildBetterAuthOptions: no hand-written option or instance types.
+// better-auth 1.6 infers plugin api endpoints and schema fields reliably
+// as long as `plugins` is a tuple (see plugins.server.ts).
 
-const defaultOptions = {} as const
-export type InferInternalBetterAuthInstance = ReturnType<
-  typeof betterAuth<BuildBetterAuthOptionsReturnType<typeof defaultOptions>>
->
-
-export type InferPlugins<O extends BetterAuthPluginOptions> =
-  InferBetterAuthInstance<O>['options']['plugins'][number]
-
-// The following error is due to the fact that the types of better-auth are not well designed.
-// The types should be improved to allow for a more type-safe usage of the library.
-// DO NOT TYPE THE RETURN TYPE OF THIS FUNCTION BECAUSE IT WILL BREAK THE TYPE INFERENCE OF THE PLUGIN.
-export const createBetterAuthInstance = <
-  const O extends BetterAuthPluginOptions,
->({
-  pluginOptions,
-  payload,
-}: {
-  pluginOptions: O
-  payload?: Payload
-}): InferBetterAuthInstance<O> => {
-  const betterAuthOptions = buildBetterAuthOptions(pluginOptions, payload)
-
-  // Create Better Auth instance
-  const instance = betterAuth(betterAuthOptions)
-
-  // Store instance in singleton
-  betterAuthSingleton(instance)
-
-  return instance
-}
-
-type SafePlugins<T extends any[]> = T extends BetterAuthPlugin ? T[] : never
-
-// Type to ensure all plugins in an array are BetterAuthPlugin instances
-type EnsureBetterAuthPlugins<T extends any[]> = T extends (infer U)[]
-  ? U extends BetterAuthPlugin
-    ? T
-    : never
-  : never
-
-// export type BuildOptions<O extends BetterAuthPluginOptions> = ReturnType<typeof buildBetterAuthOptions<O>>
-export type BuildOptions<O extends BetterAuthPluginOptions> =
-  BuildBetterAuthOptionsReturnType<O>
-
-export type BuildBetterAuthOptionsReturnType<
-  O extends BetterAuthPluginOptions,
-> = O['betterAuth'] & {
-  database: (options: BetterAuthOptions) => DBAdapter
-  emailAndPassword: {
-    enabled: boolean
-  }
-  // plugins: BetterAuthPlugin[]
-  plugins: PluginsToLoad<O>
-  // plugins: EnsureBetterAuthPlugins<PluginsToLoad<O>>
-  // plugins: SafePlugins<PluginsToLoad<O>>
-  // plugins: any
-  // EnsureBetterAuthPlugins<EnabledPluginsArray<O>>
-  trustedOrigins: BetterAuthOptions['trustedOrigins']
-}
-
-// export type BuildBetterAuthOptionsReturnType<
-//   O extends BetterAuthPluginOptions,
-// > = ReturnType<typeof buildBetterAuthOptions<O>>
-
-const buildBetterAuthOptions = <const O extends BetterAuthPluginOptions>(
+export const buildBetterAuthOptions = <const O extends BetterAuthPluginOptions>(
   pluginOptions: O,
-  payload?: Payload,
-): BuildBetterAuthOptionsReturnType<O> => {
+  payload: Payload,
+) => {
   const logger = getLogger()
-  // Load plugins based on configuration
-  // const plugins = pluginsToLoad(pluginOptions)
 
   // Handle trusted origins
   // leave this way.. typescript types are shit..
@@ -114,20 +33,19 @@ const buildBetterAuthOptions = <const O extends BetterAuthPluginOptions>(
   }
   // end cry on typescript types
 
-  const { plugins, ...userOptionsWithoutPlugins } =
+  const { plugins: _userPlugins, ...userOptionsWithoutPlugins } =
     pluginOptions.betterAuth ?? {}
 
-  // Create Better Auth options
   return {
     // options from user config
     ////////////////////////////
-    ...(userOptionsWithoutPlugins || {}),
+    ...userOptionsWithoutPlugins,
 
     // overloads
     //////////////////////////////
     database: payloadAdapter({
-      payload: payload ?? getPayload(),
-      debugLogs: !!pluginOptions.logs
+      payload,
+      debugLogs: !!pluginOptions.logs,
     }),
     emailVerification: {
       sendOnSignUp: true,
@@ -135,15 +53,15 @@ const buildBetterAuthOptions = <const O extends BetterAuthPluginOptions>(
       autoSignInAfterVerification: true,
       sendVerificationEmail: async ({ user, url, token }, request) => {
         try {
-        await payload?.sendEmail({
-          to: user.email,
+          await payload.sendEmail({
+            to: user.email,
             subject: 'Verify your email address',
             text: `Click the link to verify your email: ${url}`,
           })
         } catch (error) {
           logger.error(error, 'Error sending verification email')
-          console.error("email verification url", url)
-          console.error("email verification token", token)
+          console.error('email verification url', url)
+          console.error('email verification token', token)
         }
       },
       ...(userOptionsWithoutPlugins.emailVerification ?? {}),
@@ -151,15 +69,15 @@ const buildBetterAuthOptions = <const O extends BetterAuthPluginOptions>(
     emailAndPassword: {
       sendResetPassword: async ({ user, url, token }, request) => {
         try {
-        await payload?.sendEmail({
-          to: user.email,
-          subject: 'Reset your password',
-          text: `Click the link to reset your password: ${url}`,
-        })
+          await payload.sendEmail({
+            to: user.email,
+            subject: 'Reset your password',
+            text: `Click the link to reset your password: ${url}`,
+          })
         } catch (error) {
           logger.error(error, 'Error sending reset password email')
-          console.error("reset password url", url)
-          console.error("reset password token", token)
+          console.error('reset password url', url)
+          console.error('reset password token', token)
         }
       },
       ...(userOptionsWithoutPlugins.emailAndPassword ?? {}),
@@ -168,20 +86,20 @@ const buildBetterAuthOptions = <const O extends BetterAuthPluginOptions>(
     user: {
       changeEmail: {
         enabled: true,
-        sendChangeEmailVerification: async (
+        sendChangeEmailConfirmation: async (
           { user, newEmail, url, token },
           request,
         ) => {
           try {
-          await payload?.sendEmail({
-            to: user.email, // verification email must be sent to the current user email to approve the change
-            subject: 'Approve email change',
-            text: `Click the link to approve the change: ${url}`,
-          })
+            await payload.sendEmail({
+              to: user.email, // verification email must be sent to the current user email to approve the change
+              subject: 'Approve email change',
+              text: `Click the link to approve the change: ${url}`,
+            })
           } catch (error) {
             logger.error(error, 'Error sending change email verification email')
-            console.error("change email verification url", url)
-            console.error("change email verification token", token)
+            console.error('change email verification url', url)
+            console.error('change email verification token', token)
           }
         },
         ...(userOptionsWithoutPlugins.user?.changeEmail ?? {}),
@@ -194,5 +112,46 @@ const buildBetterAuthOptions = <const O extends BetterAuthPluginOptions>(
     // merge options (nested ones)
     //////////////////////////////////
     trustedOrigins,
-  } as BuildBetterAuthOptionsReturnType<O>
+    // compiler-checked (not a cast): validates the object against
+    // BetterAuthOptions and gives the callbacks their contextual types,
+    // while the narrow inferred type stays untouched
+  } satisfies BetterAuthOptions
+}
+
+// everything is derived from the buildBetterAuthOptions value, except
+// `plugins`: its inferred type is the runtime-widened array, replaced here
+// by the hand-written PluginsToLoad tuple (the shape better-auth needs to
+// infer plugin schema fields and api endpoints)
+export type BuildOptions<O extends BetterAuthPluginOptions> = Omit<
+  ReturnType<typeof buildBetterAuthOptions<O>>,
+  'plugins'
+> & {
+  plugins: PluginsToLoad<O>
+}
+
+export type InferBetterAuthInstance<O extends BetterAuthPluginOptions> =
+  ReturnType<typeof betterAuth<BuildOptions<O>>>
+
+// base instance: default plugins only, no consumer options
+export type InferInternalBetterAuthInstance =
+  InferBetterAuthInstance<BetterAuthPluginOptions>
+
+export type InferPlugins<O extends BetterAuthPluginOptions> =
+  InferBetterAuthInstance<O>['options']['plugins'][number]
+
+export const createBetterAuthInstance = <
+  const O extends BetterAuthPluginOptions,
+>({
+  pluginOptions,
+  payload,
+}: {
+  pluginOptions: O
+  payload: Payload
+}): InferBetterAuthInstance<O> => {
+  const betterAuthOptions = buildBetterAuthOptions(pluginOptions, payload)
+  // the single declared frontier of the plugin typing: the runtime merge in
+  // pluginsToLoad (defaults filtered by consumer same-id override) cannot be
+  // statically verified against the PluginsToLoad tuple. The mirror is kept
+  // honest by the inference probes in dev/ and apps/demo (lib/auth.ts).
+  return betterAuth(betterAuthOptions as BuildOptions<O>)
 }
