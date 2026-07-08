@@ -1,4 +1,4 @@
-import type { BetterAuthPlugin } from "better-auth"
+import type { BetterAuthPlugin } from 'better-auth'
 import {
   // // core authentication
   twoFactor,
@@ -7,89 +7,58 @@ import {
   openAPI,
 } from 'better-auth/plugins'
 import { nextCookies } from 'better-auth/next-js'
-// biome-ignore lint/style/useImportType: <explanation>
 import type { BetterAuthPluginOptions } from '../types.js'
 import { ac, roles } from './permissions.js'
 
+// rest-parameter capture: the compiler-checked way to build a tuple type
+const tuple = <T extends BetterAuthPlugin[]>(...plugins: T) => plugins
 
-export type PluginsToLoad<O extends BetterAuthPluginOptions> = Array<
-  // | ReturnType<typeof pluginsToLoad<O>>[number]
-  //
-  | DefaultPlugins<O>
-  //
-  | (O['betterAuth'] extends { plugins: infer BAPlugins }
-      ? BAPlugins extends BetterAuthPlugin[]
-        ? BAPlugins[number]
-        : never
-      : never)
-  //
-  // | (O['betterAuth'] extends { plugins: infer BAPlugins }
-  //     ? BAPlugins extends never[]
-  //       ? DefaultPlugins<O>
-  //       : BAPlugins
-  //     : DefaultPlugins<O>)
->
-
-
-// type UserPlugins<O extends BetterAuthPluginOptions> = ReturnType<
-//   typeof userPlugins<O['betterAuthPlugins']>
-// >[number]
-type DefaultPlugins<O extends BetterAuthPluginOptions> = ReturnType<
-  typeof defaultPluginsNew<O['betterAuth']>
->[number]
-
-export const defaultPluginsNew = <
-  BAP extends BetterAuthPluginOptions['betterAuth'],
->(
-  inputConfig: NonNullable<BAP>['plugins'],
-) => {
-  const ids = {
-    admin: {
-      key: 'admin',
-      plugin: admin({ ac, roles }),
-    },
-    'next-cookies': {
-      key: 'nextCookies',
-      plugin: nextCookies(),
-    },
-    'open-api': {
-      key: 'openAPI',
-      plugin: openAPI({
-        disableDefaultReference: process.env.NODE_ENV === "production"
-      }),
-    },
-    'two-factor': {
-      key: 'twoFactor',
-      plugin: twoFactor({
-        // otpOptions: {
-        //   sendOTP(data, request) {
-        //       // TODO: implement send email for OTP
-        //   },
-        // }
-      }),
-    },
-  }
-
-  const pluginsDefault = Object.values(ids).map((id) => id.plugin)
-
-  const configuredPluginKeys = Object.values(inputConfig ?? {}).map((p) => p.id)
-
-  // console.log('configuredPluginKeys: ', configuredPluginKeys)
-
-  const filteredPlugins = pluginsDefault.filter(
-    (p) => !configuredPluginKeys.includes(p.id),
+// better-auth infers plugin schema fields (e.g. the admin plugin's user.role)
+// only from tuple types: InferDBFieldsFromPlugins iterates
+// [infer P, ...infer Rest] and a plain Array<union> resolves to {}.
+const buildDefaultPlugins = () =>
+  tuple(
+    admin({ ac, roles }),
+    nextCookies(),
+    openAPI({
+      disableDefaultReference: process.env.NODE_ENV === 'production',
+    }),
+    twoFactor({
+      // otpOptions: {
+      //   sendOTP(data, request) {
+      //       // TODO: implement send email for OTP
+      //   },
+      // }
+    }),
   )
 
-  // console.log('filteredPlugins: ', filteredPlugins)
+export type DefaultPlugins = ReturnType<typeof buildDefaultPlugins>
 
-  return !inputConfig ? pluginsDefault : filteredPlugins
-}
+// resolved at instantiation: the host tuple when present, [] when absent,
+// an open array when the host type is widened (graceful head-only inference)
+export type UserPlugins<O extends BetterAuthPluginOptions> = NonNullable<
+  O['betterAuth']
+>['plugins'] extends infer PP
+  ? PP extends readonly [...infer P extends BetterAuthPlugin[]]
+    ? P
+    : []
+  : []
 
+export type PluginsToLoad<O extends BetterAuthPluginOptions> = [
+  ...DefaultPlugins,
+  ...UserPlugins<O>,
+]
+
+// runtime mirror of PluginsToLoad: a consumer plugin with the same id
+// replaces the default at runtime; the declared tuple keeps both, and
+// their inferred fields are identical anyway
 export const pluginsToLoad = <O extends BetterAuthPluginOptions>(
   pluginOptions: O,
-) => [
-  // default plugins
-  ...defaultPluginsNew(pluginOptions.betterAuth?.plugins ?? []),
-  // user plugins
-  ...(pluginOptions.betterAuth?.plugins ?? []),
-]
+) => {
+  const userPlugins = pluginOptions.betterAuth?.plugins ?? []
+  const userPluginIds = userPlugins.map((plugin) => plugin.id)
+  const defaultPlugins = buildDefaultPlugins().filter(
+    (plugin) => !userPluginIds.includes(plugin.id),
+  )
+  return [...defaultPlugins, ...userPlugins]
+}
