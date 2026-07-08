@@ -9,16 +9,23 @@ import { createAuthClient } from 'better-auth/react'
 import { adminClient, twoFactorClient } from 'better-auth/client/plugins'
 import type { BetterAuthPluginOptions } from '../../types.js'
 
-function generateBetterAuthClient(pluginOptions: BetterAuthPluginOptions) {
-  const clientPlugins = []
-  clientPlugins.push(adminClient())
-  clientPlugins.push(twoFactorClient())
-  return createAuthClient<{
-    plugins: typeof clientPlugins,
-    fetchOptions: {
-      credentials: 'include', // Required to send cookies (like better-auth.two_factor)
-    },
-  }>({ plugins: clientPlugins, fetchOptions: { credentials: 'include' } })
+const buildClientPlugins = () => [adminClient(), twoFactorClient()]
+type ClientOptions = {
+  plugins: ReturnType<typeof buildClientPlugins>
+  fetchOptions: {
+    credentials: 'include' // Required to send cookies (like better-auth.two_factor)
+  }
+}
+// explicit annotation: the inferred client type exceeds tsc's serialization limit
+type BetterAuthUIClient = ReturnType<typeof createAuthClient<ClientOptions>>
+
+function generateBetterAuthClient(
+  pluginOptions: BetterAuthPluginOptions,
+): BetterAuthUIClient {
+  return createAuthClient<ClientOptions>({
+    plugins: buildClientPlugins(),
+    fetchOptions: { credentials: 'include' },
+  })
 }
 
 interface BetterAuthClientContextType {
