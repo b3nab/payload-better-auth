@@ -22,7 +22,6 @@
 // guards live behind the './nextjs' subpath for this reason.
 export * from './types.js'
 export * from './plugin.js'
-export * from './singleton.better-auth.js'
 
 export {
   defaultStatements,
