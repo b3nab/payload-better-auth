@@ -1,6 +1,4 @@
 import type { AuthStrategyFunction } from 'payload'
-import { payloadSingleton } from '../singleton.payload.js'
-import { getBetterAuth } from '../singleton.better-auth.js'
 import { cookies as nextCookies } from 'next/headers.js'
 import { formatAdminURL } from '@payloadcms/ui/shared'
 import { getLogger } from '../singleton.logger.js'
@@ -26,7 +24,6 @@ export const strategyHandler: AuthStrategyFunction = async ({
   isGraphQL,
   strategyName,
 }) => {
-  payloadSingleton(payload)
   const logger = getLogger()
 
   const twoFactorPlaceholderUserId = '00000000-0000-0000-0000-000000000000'
@@ -34,7 +31,7 @@ export const strategyHandler: AuthStrategyFunction = async ({
   // Prefer a real session over any pending 2FA cookie.
   // Otherwise, after successful 2FA verification (or if the cookie lingers),
   // we'd keep returning a placeholder user.
-  const betterAuth = getBetterAuth()
+  const betterAuth = payload.betterAuth
   if (!betterAuth) {
     logger.warn('[strategy] [better-auth] BetterAuth not initialized')
     return { user: null }
