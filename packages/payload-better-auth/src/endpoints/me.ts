@@ -4,7 +4,6 @@ import { status as httpStatus } from 'http-status'
 import type { PayloadHandler } from 'payload'
 import { headersWithCors, extractJWT } from 'payload'
 import { getRequestCollection } from '../payload-utilities/getRequestEntity.js'
-import { getBetterAuth } from '../singleton.better-auth.js'
 import invariant from 'tiny-invariant'
 // import { headers as nextHeaders } from 'next/headers.js'
 // import { headersWithCors } from '../payload-utilities/headersWithCors'
@@ -32,7 +31,7 @@ export const meHandler: PayloadHandler = async (req) => {
   //   req,
   // })
 
-  const betterAuth = getBetterAuth()
+  const betterAuth = req.payload.betterAuth
   invariant(betterAuth, 'BetterAuth not initialized')
 
   const result = await betterAuth.api.getSession({

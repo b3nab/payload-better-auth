@@ -10,7 +10,6 @@ import {
 } from 'payload'
 
 import { getRequestCollection } from '../payload-utilities/getRequestEntity.js'
-import { getBetterAuth } from '../singleton.better-auth.js'
 import invariant from 'tiny-invariant'
 import { getLogger } from '../singleton.logger.js'
 // import { logoutOperation } from '../payload-operations/logout'
@@ -21,7 +20,7 @@ export const logoutHandler: PayloadHandler = async (req) => {
   const collection = getRequestCollection(req)
   const { t } = req
 
-  const betterAuth = getBetterAuth()
+  const betterAuth = req.payload.betterAuth
   invariant(betterAuth, 'BetterAuth is not initialized')
 
   let response: Response | undefined

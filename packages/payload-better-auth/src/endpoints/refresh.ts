@@ -9,14 +9,13 @@ import {
 import invariant from 'tiny-invariant'
 
 import { getRequestCollection } from '../payload-utilities/getRequestEntity.js'
-import { getBetterAuth } from '../singleton.better-auth.js'
 // import { refreshOperation } from '../operations/refresh'
 
 export const refreshHandler: PayloadHandler = async (req) => {
   const collection = getRequestCollection(req)
   const { t } = req
 
-  const betterAuth = getBetterAuth()
+  const betterAuth = req.payload.betterAuth
   invariant(betterAuth, 'BetterAuth not initialized')
 
   const response = await betterAuth.api.getSession({

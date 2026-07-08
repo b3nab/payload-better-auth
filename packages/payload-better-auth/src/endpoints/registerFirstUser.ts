@@ -5,7 +5,6 @@ import {
 } from 'payload'
 import { status as httpStatus } from 'http-status'
 import { getRequestCollection } from '../payload-utilities/getRequestEntity.js'
-import { getBetterAuth, getBetterAuthSafe } from '../singleton.better-auth.js'
 import invariant from 'tiny-invariant'
 import { getLogger } from '../singleton.logger.js'
 
@@ -82,7 +81,7 @@ export const registerFirstUserHandler: PayloadHandler = async (req) => {
   //   req,
   // })
 
-  const betterAuth = getBetterAuthSafe()
+  const betterAuth = req.payload.betterAuth
 
   const response = await betterAuth.api.signUpEmail({
     body: {

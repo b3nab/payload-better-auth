@@ -5,7 +5,6 @@ import { formatAdminURL } from '@payloadcms/ui/shared'
 
 import { getRequestCollection } from '../payload-utilities/getRequestEntity.js'
 import { isNumber } from '../payload-utilities/isNumber.js'
-import { getBetterAuthSafeInternal } from '../singleton.better-auth.js'
 import invariant from 'tiny-invariant'
 import { getLogger } from '../singleton.logger.js'
 // import { loginOperation } from '../payload-operations/login'
@@ -37,7 +36,7 @@ export const loginHandler: PayloadHandler = async (req) => {
   //   req,
   // })
 
-  const betterAuth = getBetterAuthSafeInternal()
+  const betterAuth = req.payload.betterAuth
   invariant(betterAuth, 'BetterAuth not initialized')
 
   const response = await betterAuth.api.signInEmail({
@@ -92,7 +91,7 @@ export const loginHandler: PayloadHandler = async (req) => {
   const canEnterCMS = await betterAuth.api.userHasPermission({
     body: {
       userId: result.user.id,
-      permission: {
+      permissions: {
         payloadcms: ['access'],
       },
     },
