@@ -1,62 +1,31 @@
-import type {
-  BetterAuthDBSchema,
-  DBFieldAttribute,
-  DBFieldType,
-} from 'better-auth/db'
-import type {
-  CollectionConfig,
-  CollectionSlug,
-  Endpoint,
-  Field as PayloadField,
-  FieldTypes as PayloadFieldTypes,
-  PayloadHandler,
-} from 'payload'
-import type { AuthContext, betterAuth } from 'better-auth'
-import { getEndpoints } from 'better-auth/api'
-import deepmerge from '@fastify/deepmerge'
-import type { BetterAuthPluginOptions } from '../types.js'
-import { getLogger } from '../singleton.logger.js'
-import { payloadSingleton } from '../singleton.payload.js'
-import { isAdmin, isUser } from './access.js'
-import type {
-  BuildBetterAuthOptionsReturnType,
-  InferBetterAuthInstance,
-} from '../better-auth/instance.js'
+import type { Endpoint, PayloadHandler } from 'payload'
 
-type AuthEndpointsApi<O extends BetterAuthPluginOptions> = ReturnType<
-  typeof getEndpoints<BuildBetterAuthOptionsReturnType<O>>
->['api']
+// only the enumeration surface is needed: path + method of each endpoint.
+// The handlers delegate to req.payload.betterAuth at request time.
+type AuthEndpointsApi = Record<
+  string,
+  | { path?: string; options: { method?: string | string[] } }
+  | undefined
+>
 
-export const generatePayloadEndpoints = <O extends BetterAuthPluginOptions>(
-  betterAuthInstance: InferBetterAuthInstance<O>,
-  betterAuthPaths: AuthEndpointsApi<O> | undefined,
+export const generatePayloadEndpoints = (
+  betterAuthPaths: AuthEndpointsApi | undefined,
 ): Endpoint[] => {
   if (!betterAuthPaths) return []
 
-  return Object.entries(betterAuthPaths)
-    .filter((authPath) => {
-      const [key, value] = authPath
-      // console.log('KEY: ', key, '\tVALUE: ', value, '\nPATH: ', value?.path)
-      if (value?.path) return true
-      return false
-    })
-    .reduce((acc: Endpoint[], [authPath, authEndpoint]) => {
-      // console.log('PATH: ', authEndpoint.path)
-      const endpointHandler: PayloadHandler = async (req) => {
-        payloadSingleton(req.payload)
-        console.info('ENDPOINT HANDLER FOR: ', authPath)
-        return betterAuthInstance.handler(req as Request)
-      }
+  return Object.entries(betterAuthPaths).reduce(
+    (acc: Endpoint[], [authPath, authEndpoint]) => {
+      const path = authEndpoint?.path
+      if (!path) return acc
 
-      // console.log(
-      //   authEndpoint.options.method,
-      //   'method typeof ',
-      //   typeof authEndpoint.options.method,
-      // )
+      const endpointHandler: PayloadHandler = async (req) => {
+        console.info('ENDPOINT HANDLER FOR: ', authPath)
+        return req.payload.betterAuth.handler(req as Request)
+      }
 
       if (typeof authEndpoint.options.method === 'string') {
         acc.push({
-          path: `/auth${authEndpoint.path}`,
+          path: `/auth${path}`,
           method: authEndpoint.options.method.toLowerCase(),
           handler: endpointHandler,
         } as Endpoint)
@@ -65,7 +34,7 @@ export const generatePayloadEndpoints = <O extends BetterAuthPluginOptions>(
       if (Array.isArray(authEndpoint.options.method)) {
         for (const method of authEndpoint.options.method) {
           acc.push({
-            path: `/auth${authEndpoint.path}`,
+            path: `/auth${path}`,
             method: method.toLowerCase(),
             handler: endpointHandler,
           } as Endpoint)
@@ -73,5 +42,7 @@ export const generatePayloadEndpoints = <O extends BetterAuthPluginOptions>(
       }
 
       return acc
-    }, [])
+    },
+    [],
+  )
 }
