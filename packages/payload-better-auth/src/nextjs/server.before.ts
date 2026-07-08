@@ -1,31 +1,13 @@
-import { getPayload, type Payload, type SanitizedConfig } from 'payload'
-import { headers } from 'next/headers.js'
+import { getPayload, type SanitizedConfig } from 'payload'
 import invariant from 'tiny-invariant'
-import {
-  getBetterAuthSafe,
-  getBetterAuthSafeInternal,
-} from '../singleton.better-auth.js'
-import { getPayload as getPayloadSingleton } from '../singleton.payload.js'
-import type { BetterAuthPluginOptions } from '../types.js'
 
 export const serverBefore = async (configPromise: Promise<SanitizedConfig>) => {
-  let payload: Payload | undefined = undefined
-  if (configPromise) {
-    payload = await getPayload({
-      config: configPromise,
-    })
-  } else {
-    const payloadSingleton = getPayloadSingleton()
-    if (payloadSingleton) {
-      payload = payloadSingleton
-    }
-  }
-
+  // getPayload caches per process; payload.betterAuth is attached by the
+  // plugin's onInit, so both instances share the same lifetime
+  const payload = await getPayload({ config: configPromise })
   invariant(payload, 'Payload instance NOT FOUND.')
 
-  // const betterAuth = getBetterAuthSafe<O>(payload)
-  const betterAuth = getBetterAuthSafeInternal(payload)
-
+  const betterAuth = payload.betterAuth
   invariant(betterAuth, 'betterAuth server instance NOT FOUND.')
 
   return {
