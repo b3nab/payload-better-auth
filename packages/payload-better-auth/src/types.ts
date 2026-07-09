@@ -2,7 +2,10 @@ import type { CollectionConfig, CollectionSlug } from 'payload'
 import type { BetterAuthOptions } from 'better-auth/minimal'
 import type { BetterAuthPlugin } from 'better-auth'
 import type { LoggerConfig } from './singleton.logger.js'
-import type { InferInternalBetterAuthInstance } from './better-auth/instance.js'
+import type {
+  InferBetterAuthInstance,
+  InferInternalBetterAuthInstance,
+} from './better-auth/instance.js'
 
 export type CollectionConfigExtend<T extends CollectionSlug> = Omit<
   CollectionConfig<T>,
@@ -36,16 +39,56 @@ export type BetterAuthPluginOptions = Readonly<{
   logs?: false | LoggerConfig['level'] // 'debug' | 'info' | 'warn' | 'error'
 }>
 
+/**
+ * Type registry, same pattern payload uses for its generated types
+ * (GeneratedTypes): an empty interface the host project fills once via
+ * declaration merging, next to its plugin config:
+ *
+ * ```ts
+ * declare module '@b3nab/payload-better-auth' {
+ *   interface PayloadBetterAuthRegister {
+ *     pluginOptions: typeof betterAuthPluginConfig
+ *   }
+ * }
+ * ```
+ *
+ * With that in place `payload.betterAuth` is host-typed everywhere (host
+ * plugins included). Without it, every access errors with
+ * {@link BetterAuthNotRegistered}, which spells out the registration to add.
+ */
+
+// biome-ignore lint/suspicious/noEmptyInterface: registry interface, filled by the host via declaration merging
+export interface PayloadBetterAuthRegister {}
+
+/**
+ * Compile-time error for hosts that did not fill the registry: every access
+ * on `payload.betterAuth` surfaces the message below instead of silently
+ * degrading to the internal base type, so the missing registration is
+ * discovered immediately.
+ */
+export type BetterAuthNotRegistered = {
+  'ERROR: payload.betterAuth is untyped because PayloadBetterAuthRegister is empty. Add next to your plugin options: declare module "@b3nab/payload-better-auth" { interface PayloadBetterAuthRegister { pluginOptions: typeof betterAuthPluginConfig } }': never
+}
+
+export type ResolvedBetterAuthInstance = PayloadBetterAuthRegister extends {
+  pluginOptions: infer O extends BetterAuthPluginOptions
+}
+  ? InferBetterAuthInstance<O>
+  : PayloadBetterAuthRegister extends { internal: true }
+    ? // package-internal programs only (see register.internal.d.ts): our own
+      // code types against the plugin's standard surface
+      InferInternalBetterAuthInstance
+    : BetterAuthNotRegistered
+
 declare module 'payload' {
   export interface BasePayload {
     /**
      * The better-auth instance bound to this Payload instance, created by
      * the plugin's onInit: one instance per payload instance, same lifetime.
      *
-     * Typed with the default plugins only: module augmentation cannot be
-     * generic over the host's plugin options, so the host-specific view
-     * (host plugins included) lives behind createAuthLayer.
+     * Host-typed when the project fills the {@link PayloadBetterAuthRegister}
+     * interface; a compile-time error otherwise.
      */
-    betterAuth: InferInternalBetterAuthInstance
+    betterAuth: ResolvedBetterAuthInstance
   }
 }
