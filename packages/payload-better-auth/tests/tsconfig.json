@@ -1,0 +1,14 @@
+{
+  "extends": "../tsconfig.json",
+  "exclude": [],
+  "include": ["**/*.ts", "**/*.tsx"],
+  "compilerOptions": {
+    "baseUrl": "./",
+    "rootDir": "../",
+    "moduleResolution": "bundler",
+    "module": "Preserve",
+    "noEmit": true,
+    "emitDeclarationOnly": false,
+    "incremental": true
+  }
+}
