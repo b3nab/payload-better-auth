@@ -27,7 +27,10 @@ import {
 import { createBetterAuthInstance } from './better-auth/instance.js'
 import { pluginsToLoad } from './better-auth/plugins.server.js'
 import { initLogger } from './singleton.logger.js'
-import type { BetterAuthPluginOptions } from './types.js'
+import type {
+  BetterAuthPluginOptions,
+  ResolvedBetterAuthInstance,
+} from './types.js'
 
 // import { getBetterAuthSafe } from './singleton.better-auth'
 
@@ -162,8 +165,14 @@ export const betterAuthPlugin =
 
       // create the better-auth instance bound to this payload instance and
       // expose it as payload.betterAuth: one instance per payload instance,
-      // same lifetime, no module-level state
-      payload.betterAuth = createBetterAuthInstance({ pluginOptions, payload })
+      // same lifetime, no module-level state.
+      // The cast is the write-side frontier of PayloadBetterAuthRegister: the
+      // plugin cannot know the host registration statically, and both sides
+      // derive from the same pluginOptions value, which keeps it honest
+      payload.betterAuth = createBetterAuthInstance({
+        pluginOptions,
+        payload,
+      }) as unknown as ResolvedBetterAuthInstance
 
       // run any existing onInit after ours, so consumers can already use
       // payload.betterAuth inside their own onInit
