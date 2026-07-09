@@ -1,11 +1,8 @@
-import type { SanitizedConfig } from 'payload'
-import type { BetterAuthPluginOptions } from '../types.js'
-import { getBetterAuthSafe } from '../singleton.better-auth.js'
-import {
-  createBetterAuthInstance,
-  type InferBetterAuthInstance,
-  type InferPlugins,
-} from '../better-auth/instance.js'
+import { getPayload, type SanitizedConfig } from 'payload'
+import type {
+  BetterAuthPluginOptions,
+  ResolvedBetterAuthInstance,
+} from '../types.js'
 import {
   isAuth,
   isGuest,
@@ -29,7 +26,7 @@ type Checker<Args = void> = Args extends void
   : (args: Args) => Promise<boolean>
 
 type AuthLayer<O extends BetterAuthPluginOptions> = {
-  auth: InferBetterAuthInstance<O>
+  getAuth: () => Promise<ResolvedBetterAuthInstance>
   isAuth: Checker
   isGuest: Checker
   isUser: Checker
@@ -42,14 +39,17 @@ type AuthLayer<O extends BetterAuthPluginOptions> = {
   guardRole: Guard<IsRoleArgs<O>>
 }
 
-export function createAuthLayer<O extends BetterAuthPluginOptions>(
+export function createAuthLayer<const O extends BetterAuthPluginOptions>(
   configPromise: Promise<SanitizedConfig>,
   pluginOptions: O,
 ): AuthLayer<O> {
-  createBetterAuthInstance({ pluginOptions })
   return {
-    // better auth instance
-    auth: getBetterAuthSafe<O>(),
+    // the real payload.betterAuth: the instance is born in the plugin's
+    // onInit, bound to payload, so the access is a function (getPayload
+    // caches per process). Host typing comes from PayloadBetterAuthRegister
+    // (see types.ts): no cast, no imitation
+    getAuth: async () =>
+      (await getPayload({ config: configPromise })).betterAuth,
 
     // checkers
     isAuth: isAuth(configPromise, pluginOptions),
