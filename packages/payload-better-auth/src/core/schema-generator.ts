@@ -138,12 +138,15 @@ const convertToPayloadFields = (
           //   read: ({ req: { user }, id }) => user?.id === id,
           //   update: ({ req: { user }, id }) => user?.id === id,
           // },
-          hidden: fieldValue.returned ?? false,
+          // returned defaults to true: only an explicit false (secrets like
+          // twoFactor.secret) must leave payload responses and the admin UI
+          hidden: fieldValue.returned === false,
           // TODO: how to map better-auth DBFieldAttributeConfig . input ??
           defaultValue: fieldValue.defaultValue,
           unique: fieldValue.unique,
-          // TODO: better-auth DBFieldAttributeConfig . sortable has the same "reason to exists" as the payload FieldBase . index ??
-          index: fieldValue.sortable,
+          // sortable is a storage hint (varchar vs text) payload does not
+          // need; the index attribute is the real one since better-auth 1.6
+          index: fieldValue.index,
           // type: convertToPayloadType(fieldValue.type),
           ...convertToPayloadType(modelName, fieldValue, fieldKey, authTables),
         }) as PayloadField,
