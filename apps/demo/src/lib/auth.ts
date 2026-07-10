@@ -3,10 +3,9 @@ import configPromise from '@payload-config'
 import { createAuthLayer } from '@b3nab/payload-better-auth/nextjs'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-// biome-ignore lint/style/useImportType: <explanation>
 import { betterAuthPluginConfig } from '@/plugins/payload.better-auth'
 
-export const { auth, isRole, guardRole } = createAuthLayer(
+export const { getAuth, isRole, guardRole } = createAuthLayer(
   configPromise,
   betterAuthPluginConfig,
 )
@@ -14,6 +13,11 @@ export const { auth, isRole, guardRole } = createAuthLayer(
 // Check if the type inference is working correctly for the better-auth instance
 const bool = false
 if (bool) {
+  const payload = await getPayload({ config: configPromise })
+  const auth = payload.betterAuth
+  //    ^?
+  // const auth = await getAuth()
+  //    ^?
   const { api } = auth
   //      ^?
   await Promise.all([
@@ -80,7 +84,7 @@ if (bool) {
       headers: await headers(),
       body: {
         role: 'admin',
-        permission: {
+        permissions: {
           //  ^?
           byRole: ['admin'],
         },
