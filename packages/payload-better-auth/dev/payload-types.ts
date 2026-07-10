@@ -290,6 +290,9 @@ export interface TwoFactor {
   secret: string;
   backupCodes: string;
   userId: string | User;
+  verified?: boolean | null;
+  failedVerificationCount?: number | null;
+  lockedUntil?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -321,7 +324,7 @@ export interface OauthAccessToken {
   refreshToken?: string | null;
   accessTokenExpiresAt?: string | null;
   refreshTokenExpiresAt?: string | null;
-  clientId?: (string | null) | OauthApplication;
+  clientId?: string | null;
   userId?: (string | null) | User;
   scopes?: string | null;
   updatedAt: string;
@@ -333,7 +336,7 @@ export interface OauthAccessToken {
  */
 export interface OauthConsent {
   id: string;
-  clientId?: (string | null) | OauthApplication;
+  clientId?: string | null;
   userId?: (string | null) | User;
   scopes?: string | null;
   consentGiven?: boolean | null;
@@ -399,6 +402,8 @@ export interface Subscription {
   canceledAt?: string | null;
   endedAt?: string | null;
   seats?: number | null;
+  billingInterval?: string | null;
+  stripeScheduleId?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -652,6 +657,9 @@ export interface TwoFactorSelect<T extends boolean = true> {
   secret?: T;
   backupCodes?: T;
   userId?: T;
+  verified?: T;
+  failedVerificationCount?: T;
+  lockedUntil?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -754,6 +762,8 @@ export interface SubscriptionSelect<T extends boolean = true> {
   canceledAt?: T;
   endedAt?: T;
   seats?: T;
+  billingInterval?: T;
+  stripeScheduleId?: T;
   updatedAt?: T;
   createdAt?: T;
 }
