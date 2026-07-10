@@ -19,7 +19,6 @@ const tuple = <T extends BetterAuthPlugin[]>(...plugins: T) => plugins
 const buildDefaultPlugins = () =>
   tuple(
     admin({ ac, roles }),
-    nextCookies(),
     openAPI({
       disableDefaultReference: process.env.NODE_ENV === 'production',
     }),
@@ -32,7 +31,13 @@ const buildDefaultPlugins = () =>
     }),
   )
 
+// nextCookies must be the LAST plugin of the array (better-auth docs): its
+// response hook turns set-cookie headers into Next cookies and has to run
+// after every other plugin, the host ones included
+const buildTailPlugins = () => tuple(nextCookies())
+
 export type DefaultPlugins = ReturnType<typeof buildDefaultPlugins>
+export type TailPlugins = ReturnType<typeof buildTailPlugins>
 
 // resolved at instantiation: the host tuple when present, [] when absent,
 // an open array when the host type is widened (graceful head-only inference)
@@ -47,6 +52,7 @@ export type UserPlugins<O extends BetterAuthPluginOptions> = NonNullable<
 export type PluginsToLoad<O extends BetterAuthPluginOptions> = [
   ...DefaultPlugins,
   ...UserPlugins<O>,
+  ...TailPlugins,
 ]
 
 // runtime mirror of PluginsToLoad: a consumer plugin with the same id
@@ -60,5 +66,8 @@ export const pluginsToLoad = <O extends BetterAuthPluginOptions>(
   const defaultPlugins = buildDefaultPlugins().filter(
     (plugin) => !userPluginIds.includes(plugin.id),
   )
-  return [...defaultPlugins, ...userPlugins]
+  const tailPlugins = buildTailPlugins().filter(
+    (plugin) => !userPluginIds.includes(plugin.id),
+  )
+  return [...defaultPlugins, ...userPlugins, ...tailPlugins]
 }
