@@ -831,6 +831,9 @@ export interface TwoFactor {
   secret: string;
   backupCodes: string;
   userId: string | User;
+  verified?: boolean | null;
+  failedVerificationCount?: number | null;
+  lockedUntil?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1498,6 +1501,9 @@ export interface TwoFactorSelect<T extends boolean = true> {
   secret?: T;
   backupCodes?: T;
   userId?: T;
+  verified?: T;
+  failedVerificationCount?: T;
+  lockedUntil?: T;
   updatedAt?: T;
   createdAt?: T;
 }
