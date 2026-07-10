@@ -66,7 +66,10 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
   }
 
   // every payload call joins transactionReq when present: payload manages
-  // the transaction natively through the req (initTransaction & co.)
+  // the transaction natively through the req (initTransaction & co.).
+  // Document reads pass showHiddenFields: the adapter is better-auth's
+  // storage layer and must see hidden columns too (returned: false fields,
+  // e.g. account.password, are generated as hidden in the collections)
   type AdapterBuilder = Parameters<typeof createAdapterFactory>[0]['adapter']
   const buildAdapter =
     (transactionReq?: PayloadRequest): AdapterBuilder =>
@@ -226,6 +229,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
               collection: getCollectionName(joinModel),
               where: { [toField]: { in: keys } } as PayloadWhere,
               pagination: false as const,
+              showHiddenFields: true,
               req: transactionReq,
               depth: 0,
             },
@@ -283,6 +287,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
                 collection: getCollectionName(model),
                 where: compiled.where,
                 pagination: false,
+                showHiddenFields: true,
                 req: transactionReq,
                 depth: 0,
               })
@@ -325,6 +330,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
             const result = await payload.create({
               collection: getCollectionName(model),
               data,
+              showHiddenFields: true,
               req: transactionReq,
               depth: 0,
             })
@@ -361,6 +367,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
                     limit: 1,
                     select: transformSelectToPayload(model, select),
                   }),
+              showHiddenFields: true,
               req: transactionReq,
               depth: 0,
             })
@@ -424,6 +431,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
                 where: compiled.where,
                 pagination: false,
                 sort,
+                showHiddenFields: true,
                 req: transactionReq,
                 depth: 0,
               })
@@ -468,6 +476,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
               pagination: false,
               sort,
               select: transformSelectToPayload(model, select),
+              showHiddenFields: true,
               req: transactionReq,
               depth: 0,
             })
@@ -512,6 +521,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
                 collection: getCollectionName(model),
                 where: compiled.where,
                 pagination: false,
+                showHiddenFields: true,
                 req: transactionReq,
                 depth: 0,
               })
@@ -526,6 +536,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
                 collection: getCollectionName(model),
                 id: doc.id,
                 data: update as any,
+                showHiddenFields: true,
                 req: transactionReq,
                 depth: 0,
               })
@@ -550,6 +561,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
               collection: getCollectionName(model),
               where: compiled.where,
               data: update as any,
+              showHiddenFields: true,
               req: transactionReq,
               depth: 0,
             })
@@ -591,6 +603,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
               collection: getCollectionName(model),
               where: compiled.where,
               pagination: false,
+              showHiddenFields: true,
               req: transactionReq,
               depth: 0,
             })
@@ -633,6 +646,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
                 collection: getCollectionName(model),
                 where: compiled.where,
                 pagination: false,
+                showHiddenFields: true,
                 req: transactionReq,
                 depth: 0,
               })
@@ -702,6 +716,7 @@ export const payloadAdapter = (config: PayloadAdapterConfig) => {
               collection: getCollectionName(model),
               where: compiled.where,
               pagination: false,
+              showHiddenFields: true,
               req: transactionReq,
               depth: 0,
             })
