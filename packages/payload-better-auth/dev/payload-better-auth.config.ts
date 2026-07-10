@@ -1,7 +1,7 @@
 import {
   betterAuthPlugin,
+  defineBetterAuthPluginOptions,
   type CollectionConfigExtend,
-  type BetterAuthPluginOptions,
 } from '@b3nab/payload-better-auth'
 import { reactInvitationEmail } from './lib/email/invitation'
 import { reactResetPasswordEmail } from './lib/email/reset-password'
@@ -49,11 +49,11 @@ const STARTER_PRICE_ID = {
   annual: 'price_1QxWYqLUjnrYIrmlonqPThVF',
 }
 
-export const betterAuthPluginConfig = {
+export const betterAuthPluginConfig = defineBetterAuthPluginOptions({
   extendsCollections: {
     user: UserExtend,
   },
-  // logs: 'trace',
+  logs: 'trace',
   betterAuth: {
     appName: 'Better Auth Demo',
     baseURL: 'http://authdemo.local:7125',
@@ -204,4 +204,12 @@ export const betterAuthPluginConfig = {
       }),
     ],
   },
-} satisfies BetterAuthPluginOptions
+})
+
+// registers this host's plugin options in the package type registry:
+// payload.betterAuth becomes host-typed everywhere
+declare module '@b3nab/payload-better-auth' {
+  interface PayloadBetterAuthRegister {
+    pluginOptions: typeof betterAuthPluginConfig
+  }
+}
