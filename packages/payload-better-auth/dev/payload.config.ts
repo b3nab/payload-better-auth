@@ -18,7 +18,8 @@ if (!process.env.ROOT_DIR) {
   process.env.ROOT_DIR = dirname
 }
 
-export default buildConfig({
+export const buildDevConfig = (overrides?: { idType?: 'serial' | 'uuid' }) =>
+  buildConfig({
   cors: [process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://authdemo.local:7125'],
   admin: {
     // autoLogin: devUser,
@@ -54,7 +55,9 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URI,
     },
-    idType: 'uuid',
+    // serial vs uuid decide the id shape of every collection; the adapter
+    // tests boot one payload per shape
+    idType: overrides?.idType ?? 'uuid',
     // blocksAsJSON: true,
   }),
   // db: mongooseAdapter({
@@ -70,6 +73,11 @@ export default buildConfig({
   serverURL: process.env.NEXT_PUBLIC_SERVER_URL,
   // sharp,
   typescript: {
+    // init()/reload() spawn a `payload generate:types` child that hangs forever
+    // in findConfig (payloadcms/payload#15553); dev:sync generates types explicitly
+    autoGenerate: false,
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
 })
+
+export default buildDevConfig()
