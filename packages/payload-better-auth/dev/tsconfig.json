@@ -1,6 +1,6 @@
 {
   "extends": "../tsconfig.json",
-  "exclude": [],
+  "exclude": ["../src/register.internal.d.ts"],
   "include": [
     "**/*.js",
     "**/*.jsx",
@@ -20,21 +20,12 @@
     "module": "Preserve",
     "composite": true,
     "paths": {
-      "@payload-config": [
-        "./payload.config.ts"
-      ],
-      "@b3nab/payload-better-auth": [
-        "../src/index.ts"
-      ],
-      "@b3nab/payload-better-auth/client": [
-        "../src/exports/client.ts"
-      ],
-      "@b3nab/payload-better-auth/rsc": [
-        "../src/exports/rsc.ts"
-      ],
-      "@/*": [
-        "./*"
-      ],
+      "@payload-config": ["./payload.config.ts"],
+      "@b3nab/payload-better-auth": ["../src/index.ts"],
+      "@b3nab/payload-better-auth/client": ["../src/exports/client.ts"],
+      "@b3nab/payload-better-auth/rsc": ["../src/exports/rsc.ts"],
+      "@b3nab/payload-better-auth/nextjs": ["../src/exports/nextjs.ts"],
+      "@/*": ["./*"]
     },
     "noEmit": true,
     "emitDeclarationOnly": false,
