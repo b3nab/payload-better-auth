@@ -5,9 +5,9 @@
  * Yet they still can test the Local API and custom endpoints using NextRESTClient helper.
  */
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
-import { beforeAllFixtures } from '../fixtures/beforeAll.fixtures'
-import { afterAllFixtures } from '../fixtures/afterAll.fixtures'
-import { getSuite } from '../fixtures/suite.ctx'
+import { beforeAllFixtures } from '../fixtures/beforeAll.fixtures.js'
+import { afterAllFixtures } from '../fixtures/afterAll.fixtures.js'
+import { getSuite } from '../fixtures/suite.ctx.js'
 
 describe('Better Auth API', () => {
   beforeAll(beforeAllFixtures(), 1000*60)
@@ -23,7 +23,7 @@ describe('Better Auth API', () => {
     }))
 
     const betterAuthEndpoints = Object.values(
-      getSuite().betterAuthEndpoints.api || {},
+      getSuite().betterAuthEndpoints?.api || {},
     ).reduce((acc: any[], endpoint) => {
       if ("method" in endpoint && typeof endpoint.method === 'string') {
         acc.push({
