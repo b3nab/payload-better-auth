@@ -134,19 +134,19 @@ const editor = ac.newRole({
   byRole: ['user'],
 })
 
-export const acBV = ac
-export const rolesBV = { ...roles, editor }
+export { ac }
+export const appRoles = { ...roles, editor }
 ```
 
 ```ts title="@/lib/payload-better-auth.config.ts (updated)"
 import { admin } from 'better-auth/plugins/admin'
-import { acBV, rolesBV } from '@/lib/permissions'
+import { ac, appRoles } from '@/lib/permissions'
 
 export const payloadBetterAuthConfig = {
   // ...
   betterAuth: {
     plugins: [
-      admin({ ac: acBV, roles: rolesBV }),
+      admin({ ac, roles: appRoles }),
     ],
     // ...
   },
