@@ -1,5 +1,4 @@
 import { defineDocs, defineConfig } from 'fumadocs-mdx/config'
-import { remarkInstall } from 'fumadocs-docgen'
 
 export const docs = defineDocs({
   dir: 'content/docs',
@@ -7,15 +6,14 @@ export const docs = defineDocs({
 
 export default defineConfig({
   mdxOptions: {
-    remarkPlugins: [
-      [
-        remarkInstall,
-        {
-          persist: {
-            id: 'persist-install',
-          },
-        },
-      ],
-    ],
+    // fumadocs-mdx applies remarkNpm (fumadocs-core) to ```package-install
+    // blocks before any custom remark plugin runs: persistence of the chosen
+    // package manager must be configured HERE, not via fumadocs-docgen's
+    // remarkInstall, which by then finds no code block left to transform.
+    remarkNpmOptions: {
+      persist: {
+        id: 'persist-install',
+      },
+    },
   },
 })
