@@ -1,0 +1,104 @@
+---
+title: Introduction
+description: A powerful authentication plugin for Payload CMS that enhances and extends the default auth system with modern security features.
+icon: Album
+---
+
+<span className='hidden dark:block' media="(prefers-color-scheme: dark)">
+![payload-better-auth-banner](/banner-dark.png)
+</span>
+<span className='dark:hidden' media="(prefers-color-scheme: light)">
+![payload-better-auth-banner](/banner.png)
+</span>
+
+# Better Auth for Payload CMS
+
+You are one plugin away from revolutionizing your Payload CMS authentication system. This plugin seamlessly integrates [Better Auth](https://www.better-auth.com) with [Payload CMS v3](https://payloadcms.com), providing enhanced authentication capabilities.
+
+## Why this plugin?
+
+While Payload CMS comes with a solid and extensible authentication system out of the box, it primarily focuses on basic email/password authentication and API keys. Modern applications often require more sophisticated authentication methods and features.
+
+This plugin bridges that gap: Better Auth becomes the authentication engine, Payload stays your database and admin UI, and everything in between - collections, endpoints, admin screens - is generated for you.
+
+## Key features
+
+<Tabs items={['Authentication', 'Admin UI', 'Developer Experience']}>
+  <Tab value="authentication">
+    <ul>
+      <li>Unified Better Auth strategy: email + password, TOTP 2FA, social/OAuth</li>
+      <li>Default email verification and password reset flows (overridable)</li>
+      <li>Session management handled by Better Auth</li>
+      <li>Role-based access control via the Better Auth admin plugin</li>
+    </ul>
+    <Link href="features/two-factor">Two-factor authentication</Link>
+  </Tab>
+  <Tab value="admin-ui">
+    <ul>
+      <li>Auto-injected social login buttons in the Payload admin login screen</li>
+      <li>2FA setup prompt before the dashboard, plus setup/verify views</li>
+      <li>Account-level controls (TwoFactorAccountButton)</li>
+    </ul>
+    <Link href="features/social-login">Social login</Link>
+  </Tab>
+  <Tab value="developer-experience">
+    <ul>
+      <li>Collections auto-generated from your Better Auth options</li>
+      <li>Payload endpoints bridged to Better Auth (`/login`, `/logout`, `/me`, ...)</li>
+      <li>Per-collection overrides via `extendsCollections`</li>
+      <li>`payload.betterAuth` instance, fully typed with your own plugin options</li>
+      <li>Auth layer helpers for Next.js (checkers, guards, server actions)</li>
+    </ul>
+    <Link href="api/exports">API Reference</Link>
+  </Tab>
+</Tabs>
+
+## Quick start
+
+<Steps>
+  <Step title="Install the Plugin">
+    <p>Add the plugin and its peer dependencies to your Payload project.</p>
+    <Link href="installation">Installation Guide</Link>
+  </Step>
+  <Step title="Follow the Walkthrough">
+    <p>From install to a protected Next.js route, with the most common knobs in one place.</p>
+    <Link href="quick-setup">Quick Setup Walkthrough</Link>
+  </Step>
+  <Step title="Configure Authentication">
+    <p>Set up authentication strategies and other settings.</p>
+    <Link href="configuration/plugin-options">Configuration Guide</Link>
+  </Step>
+</Steps>
+
+## Next.js integration
+
+Better Auth provides a powerful integration with Next.js through the Auth Layer:
+
+<Accordions type="single">
+  <Accordion title="Checkers" id="checkers">
+    <p>Verify authentication state in your components and routes.</p>
+    <Link href="auth-layer/checkers">Learn about checkers</Link>
+  </Accordion>
+  <Accordion title="Guards" id="guards">
+    <p>Protect your routes and components from unauthorized access.</p>
+    <Link href="auth-layer/guards">Learn about guards</Link>
+  </Accordion>
+  <Accordion title="Configuration" id="configuration">
+    <p>Customize authentication behavior to match your needs.</p>
+    <Link href="configuration/plugin-options">Configuration options</Link>
+  </Accordion>
+</Accordions>
+
+## Community and support
+
+<Cards>
+  <Card
+    title="Report Issues"
+    href="https://github.com/b3nab/payload-better-auth/issues"
+    description="Found a bug? Let us know!"
+  />
+</Cards>
+
+## Credits
+
+Created by [Benedetto Abbenanti](https://ben.abbenanti.com)

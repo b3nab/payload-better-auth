@@ -1,0 +1,61 @@
+---
+title: Plugin Options
+description: How to compose betterAuth options and the defaults the plugin applies for you
+icon: Settings
+---
+
+# Plugin options
+
+The plugin takes a single options object. Everything Better Auth knows about (plugins, social providers, email flows, sessions, ...) goes inside the nested `betterAuth` key.
+
+```ts
+betterAuthPlugin({
+  betterAuth: {
+    appName: 'My App',
+    plugins: [
+      // your additional Better Auth plugins
+    ],
+    socialProviders: {
+      // github, google, ...
+    },
+    // any other BetterAuthOptions
+  },
+  extendsCollections: {
+    // per-collection overrides
+  },
+  logs: 'info',
+})
+```
+
+For the full type, see the [Types Reference](../api/plugin-options).
+
+## Better Auth options
+
+The `betterAuth` object accepts the native [Better Auth options](https://www.better-auth.com/docs/reference/options). One exception: the `database` field is omitted because the plugin wires the Payload adapter automatically.
+
+## Default Better Auth plugins
+
+The plugin pre-registers a handful of Better Auth plugins so that the admin UI works out of the box (source: `src/better-auth/plugins.server.ts`):
+
+| ID | Default config |
+| --- | --- |
+| `admin` | `admin({ ac, roles })` using the plugin's default access control |
+| `two-factor` | `twoFactor()` (TOTP) |
+| `open-api` | `openAPI({ disableDefaultReference: NODE_ENV === 'production' })` |
+| `next-cookies` | `nextCookies()` - always kept last, after every plugin of yours, as better-auth requires |
+
+Passing a plugin with the same id under `betterAuth.plugins` replaces the default: e.g. your own `admin({ ac, roles })` with custom roles supersedes the built-in one.
+
+## Collection extensions
+
+`extendsCollections` lets you patch the auto-generated Better Auth collections (user, session, account, verification, plus any plugin-added ones). See [Collections](./collections) for the full reference.
+
+## Logging
+
+```ts
+betterAuthPlugin({
+  logs: 'debug', // false | 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace'
+})
+```
+
+Defaults to `'info'`. Pass `false` to silence the plugin entirely.

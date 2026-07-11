@@ -1,0 +1,140 @@
+---
+title: Collections
+description: The Payload collections the plugin generates and how to extend them
+icon: Blocks
+---
+
+# Collections
+
+The plugin builds Payload collections from your Better Auth options at startup. The exact set depends on which Better Auth plugins are active, but the base set is always present.
+
+## Auto-generated collections
+
+| Slug (singular) | Source |
+| --- | --- |
+| `user` | Better Auth core |
+| `session` | Better Auth core |
+| `account` | Better Auth core |
+| `verification` | Better Auth core |
+| `twoFactor` | `twoFactor` plugin (default) |
+| `jwks` | `jwt` plugin (opt-in) |
+
+Slugs are singular. Any other Better Auth plugin you enable adds its own collection(s) automatically - the plugin reads them from the resolved schema, no configuration needed.
+
+### `user`
+- Stores user accounts and profile data.
+- Authentication fields (password hash, email verification) are owned by Better Auth.
+- Extend via `extendsCollections.user`.
+
+### `session`
+- Active session records, managed by Better Auth. Expiration follows Better Auth's session config.
+
+### `account`
+- Linked credential records (email/password account, OAuth provider accounts).
+
+### `verification`
+- Short-lived tokens for email verification, password reset, and similar flows.
+
+## How fields are generated
+
+Each Better Auth schema field becomes the closest Payload field, so the generated collections behave like ones you would write by hand:
+
+| In the Better Auth schema | What you get in Payload |
+| --- | --- |
+| `string`, `number`, `boolean`, `date`, `json` | `text`, `number`, `checkbox`, `date`, `json` |
+| a list of allowed values (e.g. `['light', 'dark']`) | a `select` with those options - the admin shows a dropdown, invalid values are rejected everywhere |
+| a reference to another model | a `relationship` to that collection (or an indexed plain field when the reference is not on `id`) |
+| `returned: false` | a hidden field - secrets like TOTP keys never appear in API responses or the admin UI |
+| `input: false` | a read-only field - system-owned values (e.g. Stripe ids) can't be edited from the admin or the API, only by the auth flows themselves |
+| `index: true` | an indexed field |
+
+## What happens on delete
+
+Deleting a record cleans up its dependents according to the Better Auth schema. In practice: deleting a `user` also deletes its `session`, `account`, and `twoFactor` records, transitively.
+
+The exact behavior per relation is whatever the schema declares (`onDelete`):
+
+- **`cascade`** (the default): dependents are deleted with the parent.
+- **`set null`** / **`set default`**: the referencing field is nulled or reset.
+- **`restrict`** / **`no action`**: the delete fails with a 400 while dependents exist.
+
+This runs as a `beforeDelete` hook on each collection. Hooks you add via `extendsCollections` run first, the cleanup runs last, and everything shares the same request - on databases with transaction support, the whole delete is atomic.
+
+## Extending a collection
+
+Each value in `extendsCollections` is a standard Payload [`CollectionConfig`](https://payloadcms.com/docs/configuration/collections) - the same shape you would pass to `buildConfig({ collections: [...] })` - with the `slug` field omitted (since the plugin owns the slug). The exact type is exported:
+
+```ts
+import type { CollectionSlug, CollectionConfig } from 'payload'
+
+export type CollectionConfigExtend<T extends CollectionSlug> = Omit<
+  CollectionConfig<T>,
+  'slug'
+>
+```
+
+So anything Payload supports - `fields`, `hooks`, `access`, `admin`, `versions`, custom components, etc. - works exactly as it does in a normal collection. Inline form:
+
+```ts
+import { betterAuthPlugin } from '@b3nab/payload-better-auth'
+
+betterAuthPlugin({
+  extendsCollections: {
+    user: {
+      admin: { useAsTitle: 'email' },
+      fields: [
+        { name: 'nickname', type: 'text' },
+        {
+          name: 'posts',
+          type: 'relationship',
+          relationTo: 'posts',
+          hasMany: true,
+        },
+      ],
+      hooks: {
+        afterChange: [
+          ({ doc }) => {
+            // your hook
+          },
+        ],
+      },
+    },
+    session: {
+      admin: { hidden: true },
+    },
+  },
+})
+```
+
+For real projects, prefer extracting each collection into its own file just like you would for a regular Payload collection, typed with `CollectionConfigExtend<'user'>`:
+
+```ts
+// collections/User.ts
+import type { CollectionConfigExtend } from '@b3nab/payload-better-auth'
+
+export const User: CollectionConfigExtend<'user'> = {
+  admin: { group: 'My App', useAsTitle: 'email' },
+  fields: [
+    { name: 'nickname', type: 'text' },
+    // ...all the Payload fields you need
+  ],
+}
+```
+
+```ts
+// payload-better-auth.config.ts
+import { User } from '@/collections/User'
+
+export const payloadBetterAuthConfig = defineBetterAuthPluginOptions({
+  extendsCollections: { user: User },
+  // ...
+})
+```
+
+Notes:
+
+- Extensions are deep-merged onto the generated config. Fields you add are appended to the Better Auth fields, not replacements.
+- You can equivalently add custom fields through Better Auth's `additionalFields` on `betterAuth.user` (or `betterAuth.session`). Both paths feed into the same final Payload collection. Pick whichever fits the field's purpose:
+  - Through `betterAuth.user.additionalFields`: the field is part of the Better Auth schema, so it's typed on `session.user`, accessible via `auth.api.*`, and persisted through Better Auth's own pipeline.
+  - Through `extendsCollections.user.fields`: the field is Payload-native. Useful for Payload-only concerns like relationships to other Payload collections, custom admin UI components, or complex field types.
+- Authentication-related fields are owned by Better Auth (e.g. `password`, `emailVerified`, TOTP secrets). Don't redeclare them in `extendsCollections`.

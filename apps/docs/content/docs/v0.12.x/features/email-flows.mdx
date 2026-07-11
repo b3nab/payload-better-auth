@@ -1,0 +1,73 @@
+---
+title: Email Flows
+description: Default email verification, password reset, and change-email flows
+---
+
+# Email Flows
+
+The plugin ships default implementations for the three transactional email flows Better Auth supports. They use `payload.sendEmail(...)`, so they pick up whatever Payload email adapter you configured (Resend, SMTP, etc.). Every default is shallow-merged with your own options, so anything you pass wins.
+
+<Callout type="warn" title="Requires a Payload email adapter">
+  The default handlers send through `payload.sendEmail(...)`: configure a [Payload email adapter](https://payloadcms.com/docs/email/overview) (Resend, Nodemailer/SMTP, ...) or they will throw when a flow fires. During local development the verification URL/token is also logged to the console so you are never locked out.
+</Callout>
+
+## What is enabled by default
+
+| Flow | Default behavior |
+| --- | --- |
+| Email verification on sign-up | `sendOnSignUp: true`, `autoSignInAfterVerification: true` |
+| Email verification on sign-in | `sendOnSignIn: true` (when the user is not yet verified) |
+| Password reset | `emailAndPassword.sendResetPassword` wired to `payload.sendEmail` |
+| Change-email | `user.changeEmail.enabled: true`, `sendChangeEmailConfirmation` wired to `payload.sendEmail` (sent to the **current** email for approval) |
+
+`emailAndPassword.enabled` is also set to `true` by default.
+
+## Overriding a flow
+
+Pass your own implementation through `betterAuth.emailVerification`, `betterAuth.emailAndPassword`, or `betterAuth.user.changeEmail`. Your value replaces the default for that field.
+
+```ts
+import { betterAuthPlugin } from '@b3nab/payload-better-auth'
+
+betterAuthPlugin({
+  betterAuth: {
+    emailVerification: {
+      sendOnSignUp: true,
+      autoSignInAfterVerification: false,
+      sendVerificationEmail: async ({ user, url }) => {
+        await myMailer.send({
+          to: user.email,
+          subject: 'Confirm your email',
+          html: renderTemplate('verify', { url }),
+        })
+      },
+    },
+    emailAndPassword: {
+      sendResetPassword: async ({ user, url }) => {
+        await myMailer.send({
+          to: user.email,
+          subject: 'Reset your password',
+          html: renderTemplate('reset', { url }),
+        })
+      },
+    },
+    user: {
+      changeEmail: {
+        sendChangeEmailConfirmation: async ({ user, newEmail, url }) => {
+          await myMailer.send({
+            to: user.email,
+            subject: `Approve change to ${newEmail}`,
+            html: renderTemplate('change-email', { url, newEmail }),
+          })
+        },
+      },
+    },
+  },
+})
+```
+
+## Notes
+
+- better-auth 1.6 renamed `sendChangeEmailVerification` to `sendChangeEmailConfirmation`. If you are migrating an override from 0.11.x, rename the key.
+- The default handlers swallow errors via the plugin logger. In production you should provide your own implementations that surface errors properly.
+- See the [Better Auth email verification docs](https://www.better-auth.com/docs/concepts/email) for the full option surface (template tokens, expiry, etc.).

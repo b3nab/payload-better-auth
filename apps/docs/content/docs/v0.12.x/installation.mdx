@@ -1,0 +1,79 @@
+---
+title: Installation
+description: Learn how to install and configure Better Auth in your Payload CMS project
+icon: Download
+---
+
+# Installation
+
+This guide covers installing the plugin and its requirements. For the full journey - config file, custom collections, roles, protected routes - follow the [Quick Setup Walkthrough](./quick-setup).
+
+## Prerequisites
+
+- Node.js 20.9 or later (the floor required by Next.js 16)
+- Payload CMS 3.x
+- A running database (the plugin talks to it through Payload's Local API; the test suite covers PostgreSQL with both `serial` and `uuid` id shapes)
+
+<Callout type="info" title="Better Auth Version Compatibility">
+  `@b3nab/payload-better-auth@0.12.x` requires `better-auth@1.6.x` (peer range `>=1.6.22 <1.7.0`). Install `better-auth` in your project alongside the plugin: your own code imports from it directly (Better Auth plugins, `createAuthClient`), and app and plugin must share the same copy.
+  If you have strange type errors, double-check that only one `better-auth` version is in your tree.
+</Callout>
+
+## Installation
+
+#### 1. Install the package using your preferred package manager:
+
+```package-install
+@b3nab/payload-better-auth
+```
+
+#### 2. Install the required peer dependencies:
+
+```package-install
+better-auth better-auth-harmony
+```
+
+The plugin declares everything it needs as peer dependencies. `better-auth` and `better-auth-harmony` are the ones you add yourself; the others ship with every Payload 3 app - just keep them within the supported ranges:
+
+| Peer | Supported range |
+| --- | --- |
+| `better-auth` | `>=1.6.22 <1.7.0` |
+| `better-auth-harmony` | `>=1.3.2 <2.0.0` |
+| `payload` | `>=3.0.0 <4.0.0` |
+| `@payloadcms/next`, `@payloadcms/ui` | `>=3.0.0 <4.0.0` |
+| `next` | `>=16.2.2 <17.0.0` |
+| `react`, `react-dom` | `>=19.0.0 <20.0.0` |
+
+## Environment variables
+
+Create or update your `.env` file:
+
+```
+BETTER_AUTH_SECRET=your_generated_secret
+```
+
+You can generate a secure secret using:
+```bash
+openssl rand -base64 32
+```
+
+## What you get by default
+
+Even with an empty plugin config you have out-of-the-box:
+
+- Payload admin with email and password authentication
+- Payload admin with Two Factor Authentication (TOTP) wired into the admin UI
+- Default email verification and password reset flows (overridable)
+- Auto-injected social login buttons when `betterAuth.socialProviders` is configured
+- OpenAPI auto documentation at `/api/auth/reference` (development only; disabled in production)
+- `admin` and `user` Roles and default RBAC (from better-auth's admin plugin)
+
+## Next step
+
+<Cards>
+  <Card
+    title="Quick Setup Walkthrough"
+    href="./quick-setup"
+    description="Create the plugin config, wire it into Payload, and protect your first route"
+  />
+</Cards>

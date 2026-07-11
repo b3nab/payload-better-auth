@@ -1,0 +1,266 @@
+---
+title: Quick Setup Walkthrough
+description: End-to-end setup, from install to a protected Next.js route, with the most common config knobs in one place
+icon: Rocket
+---
+
+# Quick Setup Walkthrough
+
+A pragmatic, top-to-bottom walkthrough that wires the plugin into a Payload + Next.js app, sets up the most common knobs (email flows, social providers, custom roles, a custom user collection), and ends with a protected route. Each section links to the deeper reference page.
+
+## Prerequisites
+
+- Node.js 20.9+ (the floor required by Next.js 16)
+- Next.js 16.2.2 or newer
+- Payload v3 on any supported database
+- React 19 (App Router)
+
+## 1. Install
+
+```package-install
+@b3nab/payload-better-auth better-auth better-auth-harmony
+```
+
+`better-auth` and `better-auth-harmony` are peer dependencies: install them alongside the plugin. The remaining peers (payload, next, react, `@payloadcms/next`, `@payloadcms/ui`) are already part of every Payload app - see [Installation](./installation) for the supported ranges.
+
+## 2. Create the plugin config in its own file
+
+Keeping the config separate from `payload.config.ts` keeps things readable and gives you good type inference. Wrap the object in `defineBetterAuthPluginOptions` so TypeScript validates the shape while keeping full type inference for your plugins, and add the `declare module` registration so `payload.betterAuth` is typed with your options everywhere. How the two pieces work is explained in [Auth Instance](./auth-layer/auth-instance).
+
+```ts title="@/lib/payload-better-auth.config.ts"
+import { defineBetterAuthPluginOptions } from '@b3nab/payload-better-auth'
+
+export const payloadBetterAuthConfig = defineBetterAuthPluginOptions({
+  logs: 'info',
+  betterAuth: {
+    appName: 'My App',
+    baseURL: process.env.NEXT_PUBLIC_SERVER_URL,
+    trustedOrigins: [process.env.NEXT_PUBLIC_SERVER_URL!],
+  },
+})
+
+// makes payload.betterAuth fully typed with YOUR options, everywhere
+declare module '@b3nab/payload-better-auth' {
+  interface PayloadBetterAuthRegister {
+    pluginOptions: typeof payloadBetterAuthConfig
+  }
+}
+```
+
+Even an empty `{}` works - the plugin ships sensible defaults (admin, two-factor, openAPI in dev, next-cookies, default email flows). Add only what you want to change.
+
+## 3. Wire it into Payload
+
+```ts title="@/payload.config.ts"
+import { buildConfig } from 'payload'
+import { betterAuthPlugin } from '@b3nab/payload-better-auth'
+import { payloadBetterAuthConfig } from '@/lib/payload-better-auth.config'
+
+export default buildConfig({
+  // ...your existing config
+  plugins: [betterAuthPlugin(payloadBetterAuthConfig)],
+})
+```
+
+## 4. Environment variables
+
+```bash title=".env"
+BETTER_AUTH_SECRET=  # openssl rand -base64 32
+NEXT_PUBLIC_SERVER_URL=http://localhost:3000
+```
+
+## 5. Customize the user collection
+
+Treat the user collection like any Payload collection: define it in its own file, type it with `CollectionConfigExtend<'user'>`, then plug it in.
+
+```ts title="@/collections/User.ts"
+import type { CollectionConfigExtend } from '@b3nab/payload-better-auth'
+
+export const User: CollectionConfigExtend<'user'> = {
+  admin: { useAsTitle: 'email', group: 'My App' },
+  fields: [
+    { name: 'nickname', type: 'text' },
+    {
+      name: 'posts',
+      type: 'relationship',
+      relationTo: 'posts',
+      hasMany: true,
+    },
+  ],
+  hooks: {
+    afterChange: [
+      ({ doc }) => {
+        // anything Payload supports
+      },
+    ],
+  },
+}
+```
+
+```ts title="@/lib/payload-better-auth.config.ts (updated)"
+import { User } from '@/collections/User'
+
+export const payloadBetterAuthConfig = defineBetterAuthPluginOptions({
+  extendsCollections: { user: User },
+  betterAuth: { /* ... */ },
+})
+```
+
+Need a field that should also be visible to Better Auth's typed APIs (e.g. on `session.user`)? Add it through `betterAuth.user.additionalFields` instead - both paths land in the same Payload collection. See [Collections](./configuration/collections).
+
+## 6. Add social providers
+
+Configure providers under `betterAuth.socialProviders`. The plugin auto-injects social login buttons into the Payload admin login screen.
+
+```ts
+betterAuth: {
+  socialProviders: {
+    github: {
+      clientId: process.env.GITHUB_CLIENT_ID!,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+    },
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    },
+  },
+}
+```
+
+See [Social Login](./features/social-login).
+
+## 7. Add custom roles
+
+Pass your own `admin()` instance with extended roles via `betterAuth.plugins`. Reuse the exported `ac` so your roles speak the same access-control vocabulary as the built-ins.
+
+```ts title="@/lib/permissions.ts"
+import { ac, roles } from '@b3nab/payload-better-auth'
+
+const editor = ac.newRole({
+  payloadcms: ['access'],   // can enter the admin
+  byRole: ['user'],
+})
+
+export { ac }
+export const appRoles = { ...roles, editor }
+```
+
+```ts title="@/lib/payload-better-auth.config.ts (updated)"
+import { admin } from 'better-auth/plugins/admin'
+import { ac, appRoles } from '@/lib/permissions'
+
+export const payloadBetterAuthConfig = defineBetterAuthPluginOptions({
+  // ...
+  betterAuth: {
+    plugins: [
+      admin({ ac, roles: appRoles }),
+    ],
+    // ...
+  },
+})
+```
+
+See [Permissions](./features/permissions).
+
+## 8. Customize email flows
+
+Defaults are already wired to `payload.sendEmail(...)`. Override any handler when you want full control:
+
+```ts
+betterAuth: {
+  emailVerification: {
+    sendOnSignUp: true,
+    autoSignInAfterVerification: true,
+    sendVerificationEmail: async ({ user, url }) => {
+      await myMailer.send({
+        to: user.email,
+        subject: 'Verify your email',
+        html: renderTemplate('verify', { url }),
+      })
+    },
+  },
+  emailAndPassword: {
+    enabled: true,
+    sendResetPassword: async ({ user, url }) => {
+      await myMailer.send({
+        to: user.email,
+        subject: 'Reset your password',
+        html: renderTemplate('reset', { url }),
+      })
+    },
+  },
+}
+```
+
+See [Email Flows](./features/email-flows).
+
+## 9. Create the auth layer for Next.js
+
+```ts title="@/lib/auth.ts"
+import { createAuthLayer } from '@b3nab/payload-better-auth/nextjs'
+import config from '@/payload.config'
+import { payloadBetterAuthConfig } from '@/lib/payload-better-auth.config'
+
+export const {
+  getAuth,
+  // checkers
+  isAuth, isGuest, isUser, isAdmin, isRole,
+  // guards
+  guardAuth, guardGuest, guardUser, guardAdmin, guardRole,
+} = createAuthLayer(config, payloadBetterAuthConfig)
+```
+
+Note the `/nextjs` subpath: since 0.12 the auth layer has its own entry point ([why](./migration-to-0.12)). `getAuth()` returns the Better Auth instance the plugin manages for you (`payload.betterAuth`). Thanks to the registration from step 2, any plugin you add under `betterAuth.plugins` (custom roles, 2FA, social providers, etc.) is reflected in the `auth.api.*` typings out of the box.
+
+```ts
+const auth = await getAuth()
+const session = await auth.api.getSession({ headers: await headers() })
+```
+
+Inside Payload hooks, endpoints, or anywhere a `payload` instance is already in scope, skip the layer and use `payload.betterAuth` directly.
+
+## 10. Protect a route
+
+```tsx title="@/app/admin-area/page.tsx"
+import { guardAdmin } from '@/lib/auth'
+
+export default async function AdminAreaPage() {
+  const { user } = await guardAdmin('/login') // bounces if not admin
+  return <div>Hello {user.email}</div>
+}
+```
+
+```tsx title="@/app/dashboard/page.tsx"
+import { guardRole } from '@/lib/auth'
+
+export default async function DashboardPage() {
+  const { user } = await guardRole({ role: 'editor' }, '/login')
+  return <div>Welcome, {user.nickname ?? user.email}</div>
+}
+```
+
+See [Guards](./auth-layer/guards) and [Checkers](./auth-layer/checkers).
+
+## 11. Run
+
+```bash
+npm run dev  # or pnpm dev / yarn dev / bun dev
+```
+
+Open the admin at `http://localhost:3000/admin`, register the first user (becomes admin), and verify:
+
+- Sign-up/login work and the verification email lands.
+- Social login buttons render on `/admin/login` if you configured providers.
+- Visiting `/admin/two-factor-setup` lets you enrol TOTP.
+- Your protected Next.js routes redirect when unauthenticated and render when authorized.
+
+## Where to go next
+
+- [Plugin Options](./configuration/plugin-options) - full list of knobs and their defaults
+- [Collections](./configuration/collections) - extending auto-generated collections
+- [Permissions](./features/permissions) - roles, statements, runtime checks
+- [Two-Factor](./features/two-factor) - TOTP flow + admin UI
+- [Social Login](./features/social-login) - provider setup and auto-injection
+- [Email Flows](./features/email-flows) - verification, password reset, change-email
+- [Exports](./api/exports) - package entry points (`.`, `/nextjs`, `/client`, `/rsc`)
+- [Migrating to 0.12](./migration-to-0.12) - coming from 0.11.x

@@ -1,0 +1,117 @@
+---
+title: Better Auth Instance
+description: Where the Better Auth instance lives, how to access it, and how to get it fully typed
+# icon: Fingerprint
+# icon: LandPlot
+icon: ScanFace
+---
+
+# Auth Instance
+
+The auth instance is a core concept in Better Auth that provides all the authentication functionality: `auth.api.getSession(...)`, `auth.api.signInEmail(...)`, and everything else Better Auth and its plugins expose.
+
+You never create this instance yourself. The plugin creates it when Payload boots and attaches it to the Payload instance: **`payload.betterAuth`**. One Payload instance, one Better Auth instance, same lifetime - and it is already available inside your own `onInit`.
+
+## Accessing the instance
+
+### Inside Payload code
+
+Hooks, custom endpoints, access functions, scripts - if you have `payload` (or `req.payload`), the instance is one property away:
+
+```ts
+// a Payload hook
+afterChange: [
+  async ({ req }) => {
+    const session = await req.payload.betterAuth.api.getSession({
+      headers: req.headers,
+    })
+  },
+]
+```
+
+### From Next.js code
+
+Use `getAuth` from the [auth layer](./create-auth-layer):
+
+```typescript title="@/lib/auth.ts"
+import { createAuthLayer } from '@b3nab/payload-better-auth/nextjs'
+import config from '@/payload.config'
+import { payloadBetterAuthConfig } from '@/payload-better-auth.config'
+
+export const {
+  getAuth,
+  // ...checkers
+  // ...guards
+} = createAuthLayer(config, payloadBetterAuthConfig)
+```
+
+```typescript
+import { headers } from 'next/headers'
+import { getAuth } from '@/lib/auth'
+
+const auth = await getAuth()
+const session = await auth.api.getSession({
+  headers: await headers(),
+})
+// session?.user is the current user (or undefined when unauthenticated)
+```
+
+Both paths hand you the same instance. Prefer `payload.betterAuth` inside Payload code (hooks, endpoints, access functions); reserve `getAuth()` for Next.js code outside Payload.
+
+## Getting it fully typed
+
+Register your plugin options once, next to your config, and `payload.betterAuth` is typed with **your** options - custom plugins, roles, and schema fields included - everywhere in the project:
+
+```ts title="@/lib/payload-better-auth.config.ts"
+import { defineBetterAuthPluginOptions } from '@b3nab/payload-better-auth'
+
+export const payloadBetterAuthConfig = defineBetterAuthPluginOptions({
+  betterAuth: {
+    // your options, plugins included
+  },
+})
+
+declare module '@b3nab/payload-better-auth' {
+  interface PayloadBetterAuthRegister {
+    pluginOptions: typeof payloadBetterAuthConfig
+  }
+}
+```
+
+That's the whole setup. From here on you get:
+
+- Autocomplete on `auth.api.*` for every plugin you registered (e.g. `auth.api.banUser` from `admin`, `auth.api.verifyTOTP` from `twoFactor`)
+- Your custom roles autocompleted in `isRole` / `guardRole`
+- Type checking for method parameters and inferred return values
+
+Two rules keep the typing intact:
+
+1. Always wrap the config in `defineBetterAuthPluginOptions({...})` - it validates the shape while preserving the exact types of what you wrote (a plain `satisfies` widens your `plugins` array and loses the plugin-specific typings).
+2. Keep the `declare module` block next to the config - it is what connects your options to `payload.betterAuth`.
+
+<Callout type="warn" title="Registration is enforced">
+Without the `declare module` registration, any access to `payload.betterAuth` fails to compile - the error message contains the exact snippet to add. You can't silently end up with an untyped instance.
+</Callout>
+
+## Deriving session and user types
+
+Derive the types from the instance (better-auth 1.6 removed the old `InferSession` / `InferUser` helpers):
+
+```ts
+type Auth = Awaited<ReturnType<typeof getAuth>>
+
+type SessionData = Auth['$Infer']['Session']
+type Session = SessionData['session']
+type User = SessionData['user']
+```
+
+## Integration with the auth layer
+
+The auth instance works seamlessly with other auth layer features. Learn more about:
+
+- [Auth Checkers](./checkers) - Functions to check authentication state
+- [Auth Guards](./guards) - Functions to protect routes and actions
+
+## Configuration
+
+The auth instance is configured through your Better Auth options. Learn more about configuration in the [Configuration section](../configuration/plugin-options).

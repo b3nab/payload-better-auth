@@ -1,0 +1,34 @@
+---
+title: Social Login
+description: OAuth providers wired into the Payload admin login screen
+---
+
+# Social Login
+
+When you configure one or more `socialProviders` on Better Auth, the plugin automatically adds a `SocialLoginButtons` panel to the Payload admin login screen. No manual UI work is required.
+
+## Setup
+
+```ts
+import { betterAuthPlugin } from '@b3nab/payload-better-auth'
+
+betterAuthPlugin({
+  betterAuth: {
+    socialProviders: {
+      github: {
+        clientId: process.env.GITHUB_CLIENT_ID!,
+        clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+      },
+      google: {
+        clientId: process.env.GOOGLE_CLIENT_ID!,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      },
+    },
+  },
+})
+```
+
+That's it - no component to mount, no extra wiring. The plugin detects the configured providers and renders a social login panel below the admin login form; clicking a button starts the provider's OAuth flow and redirects back to the admin on success.
+
+For each provider's credential setup (OAuth app, callback URL), see the [Better Auth social providers docs](https://www.better-auth.com/docs/authentication/github).
+

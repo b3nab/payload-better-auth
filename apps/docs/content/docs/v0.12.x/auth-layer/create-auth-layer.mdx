@@ -1,0 +1,78 @@
+---
+title: createAuthLayer
+description: Learn how to use the createAuthLayer function to set up authentication in your Next.js application
+icon: LandPlot
+# icon: Layers
+---
+
+# createAuthLayer
+
+The `createAuthLayer` function is the core of Better Auth's Next.js integration. It provides a set of pre-built helpers that make it easy to implement authentication checks and guards in your Next.js actions, routes and components.
+
+## Setup
+
+First, create an auth layer in your Next.js project:
+
+```typescript title="@/lib/auth.ts"
+import { createAuthLayer } from '@b3nab/payload-better-auth/nextjs'
+import config from '@/payload.config'
+import { payloadBetterAuthConfig } from '@/payload-better-auth.config'
+
+export const {
+  // accessor for the betterAuth instance (payload.betterAuth)
+  getAuth,
+  // checkers
+  isAuth,
+  isGuest,
+  isUser,
+  isAdmin,
+  isRole,
+  // guards
+  guardAuth,
+  // guardGuest,
+  // guardUser,
+  // guardAdmin,
+  // guardRole,
+} = createAuthLayer(config, payloadBetterAuthConfig)
+```
+
+<Callout type="warn" title="Import from the /nextjs subpath">
+`createAuthLayer` is exported from `@b3nab/payload-better-auth/nextjs`, not from the package root. Importing it from the root was removed in 0.12 - see [Migrating to 0.12](../migration-to-0.12) for the background.
+</Callout>
+
+<Callout type="info" title="Better Auth Integration">
+This setup is similar to Better Auth's `lib/auth.ts` file, but with a key difference: you don't need to create a Better Auth instance manually using `betterAuth({...})`. The @b3nab/payload-better-auth plugin creates the instance when Payload boots and manages it for you as `payload.betterAuth`; `getAuth()` returns exactly that instance.
+</Callout>
+
+<Callout type="info" title="Type inference">
+Once your project registers its plugin options (see [Auth Instance](./auth-instance)), any Better Auth plugin you add under `betterAuth.plugins` (e.g. `twoFactor`, `passkey`, `admin`) is reflected in the `auth.api.*` typings out of the box: full autocomplete, no manual casting.
+</Callout>
+
+## Available helpers
+
+The `createAuthLayer` function returns several helpers:
+
+## Better Auth instance
+- `getAuth`: async accessor for the Better Auth instance (`payload.betterAuth`)
+
+[Learn more on auth instance](../auth-layer/auth-instance)
+
+### Checkers
+- `isAuth`: Check if user is authenticated
+- `isGuest`: Check if user is a guest (not authenticated)
+- `isUser`: Check if user has the `user` role (shortcut for `isRole({ role: 'user' })`)
+- `isAdmin`: Check if user is an admin
+- `isRole`: Check if user has specific role
+
+[Learn more on checkers](../auth-layer/checkers)
+
+### Guards
+- `guardAuth`: Protect and redirect if user is not authenticated
+- `guardGuest`: Protect and redirect if user is a guest (not authenticated)
+- `guardUser`: Protect and redirect if user is logged in
+- `guardAdmin`: Protect and redirect if user is an admin
+- `guardRole`: Protect and redirect if user has specific role
+
+[Learn more on guards](../auth-layer/guards)
+
+Create the auth layer once, in a single file, and import its helpers from there across the app.

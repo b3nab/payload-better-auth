@@ -1,0 +1,103 @@
+---
+title: Migrating to 0.12
+description: Breaking changes and upgrade steps from 0.11.x to 0.12.x
+icon: ArrowBigUpDash
+---
+
+# Migrating to 0.12
+
+v0.12 upgrades the plugin to `better-auth` 1.6, removes every module-level singleton in favor of a `payload.betterAuth` instance property, and moves the Next.js auth layer behind a dedicated `./nextjs` subpath. Most apps migrate with three mechanical edits.
+
+## TL;DR checklist
+
+1. Import `createAuthLayer` from `@b3nab/payload-better-auth/nextjs` (not the package root).
+2. Destructure `getAuth` instead of `auth` from `createAuthLayer(...)` and call `await getAuth()` where you used `auth`.
+3. Wrap your plugin options in `defineBetterAuthPluginOptions({...})` and register them in the `PayloadBetterAuthRegister` interface.
+4. Install `better-auth@1.6.23` and `better-auth-harmony` in your app (they are now peer dependencies), or bump `better-auth` into the peer range `>=1.6.22 <1.7.0` if you already have it.
+
+## 1. `createAuthLayer` moved to the `/nextjs` subpath
+
+`createAuthLayer` and the guards depend on `next/navigation`, which must not end up in the same bundle as your `payload.config.ts` (Next.js bundles the config into every route, and Turbopack rejects the combination). They now live behind `@b3nab/payload-better-auth/nextjs`.
+
+```diff title="@/lib/auth.ts"
+- import { createAuthLayer } from '@b3nab/payload-better-auth'
++ import { createAuthLayer } from '@b3nab/payload-better-auth/nextjs'
+```
+
+Everything else exported from the root (`betterAuthPlugin`, types, `ac`/`roles` permission building blocks) stays where it was.
+
+## 2. `auth` is now `getAuth()`
+
+In 0.11 `createAuthLayer` eagerly created a Better Auth instance and returned it as `auth`. In 0.12 the one true instance is created by the plugin's `onInit` and lives on the Payload instance as `payload.betterAuth` - the auth layer only hands you an accessor:
+
+```diff title="@/lib/auth.ts"
+  export const {
+-   auth,
++   getAuth,
+    isAuth, isGuest, isUser, isAdmin, isRole,
+    guardAuth, guardGuest, guardUser, guardAdmin, guardRole,
+  } = createAuthLayer(config, payloadBetterAuthConfig)
+```
+
+```diff title="usage"
+- const session = await auth.api.getSession({ headers: await headers() })
++ const auth = await getAuth()
++ const session = await auth.api.getSession({ headers: await headers() })
+```
+
+`getAuth()` resolves the process-cached Payload instance (`getPayload`) and returns its `payload.betterAuth` - same lifetime as Payload, no duplicate instances, no module-level state. Anywhere you already have a `payload` or `req.payload` in hand (hooks, endpoints, server functions), you can skip the layer entirely and use `payload.betterAuth` directly.
+
+## 3. Register your plugin options for full typing
+
+In 0.12 `payload.betterAuth` can be typed with your own plugin options - custom plugins, roles, and schema fields included. Two small changes to your config file activate it: wrap the options in `defineBetterAuthPluginOptions` (in place of `satisfies BetterAuthPluginOptions` / `as const`) and add the registration block next to the config:
+
+```ts title="@/lib/payload-better-auth.config.ts"
+import { defineBetterAuthPluginOptions } from '@b3nab/payload-better-auth'
+
+export const payloadBetterAuthConfig = defineBetterAuthPluginOptions({
+  betterAuth: {
+    appName: 'My App',
+    // ...
+  },
+})
+
+// makes payload.betterAuth fully typed with YOUR options, everywhere
+declare module '@b3nab/payload-better-auth' {
+  interface PayloadBetterAuthRegister {
+    pluginOptions: typeof payloadBetterAuthConfig
+  }
+}
+```
+
+Without the registration, every access to `payload.betterAuth` fails to compile with a message that spells out exactly this snippet - you cannot silently end up with an untyped instance. See [Auth Instance](./auth-layer/auth-instance) for the details.
+
+<Callout type="info" title="satisfies still works at runtime">
+  `satisfies BetterAuthPluginOptions` / `as const` configs from 0.11 still run, but they lose the plugin-specific typings. Switch to `defineBetterAuthPluginOptions` + the `declare module` block to get a fully typed `payload.betterAuth` and `auth.api.*` for your custom plugins.
+</Callout>
+
+## 4. better-auth 1.6
+
+The peer range moves from `>=1.4.0 <1.5.0` to `>=1.6.22 <1.7.0`, and `better-auth` is now a peer dependency you install yourself (up to 0.11 the plugin also shipped its own copy): add `better-auth@1.6.23` to your app if it isn't there already. Notable upstream changes that surface through the plugin:
+
+- `user.changeEmail.sendChangeEmailVerification` was renamed to **`sendChangeEmailConfirmation`**. If you overrode it, rename the key. See [Email Flows](./features/email-flows).
+- `auth.api.userHasPermission` takes `permissions` (plural) in its body; the singular `permission` is gone.
+- `InferSession` / `InferUser` type helpers were dropped upstream. Derive types from the instance instead: `Awaited<ReturnType<typeof getAuth>>['$Infer']['Session']`.
+- The 2FA plugin gained brute-force lockout fields (`failedVerificationCount`, `lockedUntil`, `verified`) - the generated `twoFactor` collection includes them automatically.
+
+## 5. Removed APIs
+
+| Removed | Replacement |
+| --- | --- |
+| `getBetterAuth()` / `getBetterAuthSafe()` singleton getters | `payload.betterAuth` (or `getAuth()` from the auth layer) |
+| `auth` property returned by `createAuthLayer` | `getAuth()` |
+| `createAuthLayer` export from the package root | same export, from `@b3nab/payload-better-auth/nextjs` |
+
+The plugin no longer keeps any module-level payload or better-auth state: one Payload instance, one Better Auth instance, bound together in `onInit`.
+
+## 6. New in 0.12 (non-breaking)
+
+- **Atomic operations**: multi-step auth flows run inside a database transaction on databases that support them (on the others they behave as before).
+- **Automatic cleanup on delete**: deleting a user also deletes its sessions, accounts, and other dependents, following the `onDelete` rules declared by the schema (`cascade`, `set null`, `restrict`, ...). See [Collections](./configuration/collections).
+- **Better generated collections**: `json` fields, dropdowns for fields with a fixed set of values, secrets hidden from responses and admin, system-owned fields read-only, indexes honored. See [Collections](./configuration/collections).
+- **Serial and UUID ids**: numeric (`serial`) and `uuid`/`uuidv7` id shapes both work - the plugin follows whatever `idType` your Payload database adapter is configured with.
+- New peer dependencies: `better-auth-harmony` (`>=1.3.2 <2.0.0`, install it alongside `better-auth`) plus `@payloadcms/next` and `@payloadcms/ui` (`>=3.0.0 <4.0.0`, already present in every Payload app).

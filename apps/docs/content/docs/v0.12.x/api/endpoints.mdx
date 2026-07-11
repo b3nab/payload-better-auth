@@ -1,0 +1,60 @@
+---
+title: API Endpoints
+description: HTTP endpoints exposed by the plugin
+---
+
+# API Endpoints
+
+The plugin exposes two surfaces of HTTP endpoints:
+
+1. **Payload-side endpoints** mounted under the user collection at `/api/<userSlug>/...` (default `userSlug` is `user`). These bridge the Payload admin to Better Auth and enforce the `payloadcms` access gate.
+2. **Better Auth endpoints** that the plugin mounts for you at `/api/auth/*`. Everything related to sign-up, sign-in, 2FA, social providers, sessions and so on lives here. The full reference is in the [Better Auth docs](https://www.better-auth.com/docs).
+
+## Payload-side endpoints
+
+Mounted on the user collection (singular slug `user` by default).
+
+### `POST /api/user/login`
+
+Authenticates with email + password through Better Auth, runs the `payloadcms: ['access']` permission check, and returns a Payload-shaped session.
+
+```http
+POST /api/user/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "secret"
+}
+```
+
+Successful response includes `user`, `token` (unless the collection has `removeTokenFromResponses`), and `exp`. When the account has 2FA enabled, login returns a placeholder user with `_twoFactorPending: true` and the admin client redirects to `/admin/two-factor-verify` to complete TOTP.
+
+### `POST /api/user/logout`
+
+Clears the Better Auth session and the Payload cookie.
+
+### `GET /api/user/me`
+
+Returns the current session and user, derived from Better Auth and re-shaped for Payload.
+
+### `POST /api/user/refresh-token`
+
+Refreshes the JWT cookie used by the Payload admin.
+
+### `POST /api/user/first-register`
+
+Used by the Payload "first user" bootstrap flow. Once a user exists, the endpoint rejects with 403: subsequent registrations must go through the normal Better Auth sign-up surface.
+
+## Better Auth endpoints (`/api/auth/*`)
+
+The plugin mounts these automatically as Payload endpoints delegating to Better Auth. Common paths:
+
+- `POST /api/auth/sign-up/email`
+- `POST /api/auth/sign-in/email`
+- `POST /api/auth/sign-in/social`
+- `POST /api/auth/two-factor/enable`
+- `POST /api/auth/two-factor/verify-totp`
+- `GET  /api/auth/reference` - OpenAPI reference (development only; disabled in production)
+
+The exact shape of each request/response is defined by Better Auth and any plugins you enable. Use `payload.betterAuth.api.<method>()` server-side (or `getAuth()` from the [auth layer](../auth-layer/create-auth-layer)) or a Better Auth client created with `createAuthClient` from `better-auth/react` browser-side to call them with full typings instead of crafting raw HTTP.

@@ -1,0 +1,125 @@
+---
+title: Types Reference
+description: Type reference for BetterAuthPluginOptions and the typing helpers
+---
+
+# Types Reference
+
+`betterAuthPlugin(options)` accepts a single `BetterAuthPluginOptions` object. The full type lives in `src/types.ts`:
+
+```ts
+import type { CollectionConfig, CollectionSlug } from 'payload'
+import type { BetterAuthOptions } from 'better-auth/minimal'
+import type { BetterAuthPlugin } from 'better-auth'
+
+export type CollectionConfigExtend<T extends CollectionSlug> = Omit<
+  CollectionConfig<T>,
+  'slug'
+>
+
+export type BetterAuthPluginOptions = Readonly<{
+  /**
+   * Better Auth config. Merged on top of the plugin defaults.
+   * https://www.better-auth.com/docs/reference/options
+   */
+  betterAuth?: Omit<BetterAuthOptions, 'database' | 'plugins'> & {
+    plugins?: readonly BetterAuthPlugin[]
+  }
+
+  /**
+   * Per-collection overrides applied on top of the auto-generated
+   * Better Auth collections (user, session, account, verification, ...).
+   */
+  extendsCollections?: {
+    [K in CollectionSlug]?: CollectionConfigExtend<K>
+  }
+
+  /**
+   * Plugin log level. Pass `false` to silence the plugin entirely.
+   * @default 'info'
+   */
+  logs?: false | 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace'
+}>
+```
+
+Note: the `database` field of `BetterAuthOptions` is intentionally omitted. The plugin wires the Payload adapter automatically; you cannot (and should not) pass a custom Better Auth `database`.
+
+## `defineBetterAuthPluginOptions`
+
+A zero-runtime-cost helper that validates your options while preserving their exact types, so type inference for your plugins flows into `payload.betterAuth` and `createAuthLayer`. Use it in place of `satisfies BetterAuthPluginOptions`.
+
+```ts
+import { defineBetterAuthPluginOptions } from '@b3nab/payload-better-auth'
+
+export const payloadBetterAuthConfig = defineBetterAuthPluginOptions({
+  betterAuth: {
+    // ...
+  },
+})
+```
+
+## `PayloadBetterAuthRegister`
+
+The interface that connects your plugin options to `payload.betterAuth`'s type. Fill it once, next to your plugin config:
+
+```ts
+declare module '@b3nab/payload-better-auth' {
+  interface PayloadBetterAuthRegister {
+    pluginOptions: typeof payloadBetterAuthConfig
+  }
+}
+```
+
+With the registration in place, `payload.betterAuth` resolves to the instance typed with **your** options (custom plugins included) everywhere in the project. Without it, every access to `payload.betterAuth` is a compile-time error whose message spells out the registration to add. See [Auth Instance](../auth-layer/auth-instance).
+
+## Field reference
+
+### `betterAuth`
+
+The native [Better Auth options object](https://www.better-auth.com/docs/reference/options). Anything you would pass to `betterAuth({ ... })` directly goes here, including `plugins: [...]`, `socialProviders: { ... }`, `emailAndPassword: { ... }`, `user: { ... }`, etc.
+
+The plugin merges your options on top of a set of defaults (see `src/better-auth/instance.ts` and `src/better-auth/plugins.server.ts`). Your settings always win; a plugin with the same id as a default replaces it, and `nextCookies()` is always kept last.
+
+```ts
+import { defineBetterAuthPluginOptions } from '@b3nab/payload-better-auth'
+import { twoFactor, username } from 'better-auth/plugins'
+
+export const payloadBetterAuthConfig = defineBetterAuthPluginOptions({
+  betterAuth: {
+    appName: 'My App',
+    plugins: [
+      twoFactor(),
+      username(),
+    ],
+    socialProviders: {
+      github: {
+        clientId: process.env.GITHUB_CLIENT_ID!,
+        clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+      },
+    },
+  },
+})
+```
+
+### `extendsCollections`
+
+Lets you patch any of the auto-generated collections (e.g. add Payload hooks, custom fields, or admin overrides) without re-implementing the schema.
+
+```ts
+betterAuthPlugin({
+  extendsCollections: {
+    user: {
+      admin: { useAsTitle: 'email' },
+      hooks: {
+        afterChange: [/* ... */],
+      },
+    },
+  },
+})
+```
+
+The slug keys are Payload collection slugs (singular: `user`, `session`, `account`, `verification`, plus any added by other Better Auth plugins).
+
+### `logs`
+
+Controls the plugin's Pino logger. Accepts `false` to disable or any Pino level. Defaults to `'info'`.

@@ -1,0 +1,72 @@
+---
+title: Package Exports
+description: Subpath exports map for @b3nab/payload-better-auth
+---
+
+# Package Exports
+
+`@b3nab/payload-better-auth` has three entry points for you, plus one internal. Pick by the environment you are importing from (Payload config, Next.js server code, or client).
+
+## `@b3nab/payload-better-auth` (default)
+
+Server-safe core. Import from your `payload.config.ts` and anywhere else on the server.
+
+```ts
+import {
+  // Plugin
+  betterAuthPlugin,
+  // Config helper: keeps your options fully typed
+  defineBetterAuthPluginOptions,
+  // Types
+  type BetterAuthPluginOptions,
+  type CollectionConfigExtend,
+  // Interface to register your options (types payload.betterAuth)
+  type PayloadBetterAuthRegister,
+  // Permissions / access control building blocks
+  defaultStatements,
+  ac,
+  userAc,
+  adminAc,
+  roles,
+} from '@b3nab/payload-better-auth'
+```
+
+## `@b3nab/payload-better-auth/nextjs`
+
+The Next.js auth layer. Import from server components, server actions, and route handlers - never from `payload.config.ts` or the files it imports (that's why it has its own entry point, see [Migrating to 0.12](../migration-to-0.12)).
+
+```ts
+import { createAuthLayer } from '@b3nab/payload-better-auth/nextjs'
+
+const {
+  getAuth,                                          // accessor for payload.betterAuth
+  isAuth, isGuest, isUser, isAdmin, isRole,         // checkers
+  guardAuth, guardGuest, guardUser, guardAdmin, guardRole, // guards
+} = createAuthLayer(configPromise, pluginOptions)
+```
+
+## `@b3nab/payload-better-auth/client`
+
+Client components and hooks (must run in the browser). Use these from `'use client'` files.
+
+```ts
+import {
+  // React provider + hook for the Better Auth client
+  BetterAuthProvider,
+  useBetterAuthClient,
+  // 2FA forms
+  FormsTwoFactor,
+  FormVerifyTwoFactor,
+  // Account-level 2FA control
+  TwoFactorAccountButton,
+  // Social login UI
+  SocialLoginButtons,
+} from '@b3nab/payload-better-auth/client'
+```
+
+## Notes
+
+- The package also ships a `/rsc` entry: it is internal, used by the plugin itself to wire the admin views, providers, and prompts into the Payload admin. You never import it yourself.
+- Do not import the `/client` entry from server code; you'll get bundler errors due to the `"use client"` boundary.
+- `createAuthLayer` moved from the default entry to `/nextjs` in 0.12 - see [Migrating to 0.12](../migration-to-0.12).
+- Permissions exports (`ac`, `roles`, etc.) are stable: pass them to your own `admin()` plugin instance under `betterAuth.plugins` if you want to extend the access control while keeping the plugin defaults compatible.

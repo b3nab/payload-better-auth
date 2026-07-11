@@ -1,0 +1,65 @@
+---
+title: Two-Factor Authentication
+description: TOTP 2FA wired into the Payload admin panel
+---
+
+# Two-Factor Authentication
+
+The plugin ships Better Auth's `twoFactor` plugin enabled by default and wires the corresponding admin UI into the Payload admin panel automatically. No extra configuration is needed to get a working TOTP flow.
+
+## What you get out of the box
+
+When the `twoFactor` plugin is active (which is the default), the plugin:
+
+- Adds two custom admin views:
+  - `/admin/two-factor-setup` - TOTP enrollment screen.
+  - `/admin/two-factor-verify` - TOTP verification screen.
+- Shows a setup prompt before the dashboard to users without 2FA.
+- Exposes `TwoFactorAccountButton` for an account-level "Manage 2FA" control you can drop into custom screens.
+- Handles the login flow: when a user with 2FA enabled signs in, the login endpoint returns a placeholder user with `_twoFactorPending: true` and the client redirects to `/admin/two-factor-verify` to complete TOTP before the real session is issued.
+
+## Login flow
+
+1. User submits email + password to `POST /api/user/login`.
+2. Better Auth validates credentials. If the user has 2FA enabled, the response carries the placeholder user with `_twoFactorPending: true` (no real session is created yet).
+3. The Payload admin client detects this state and routes to `/admin/two-factor-verify`.
+4. User enters the TOTP code; on success the real session is issued and the dashboard loads.
+
+## HTTP endpoints
+
+All TOTP endpoints are mounted under `/api/auth/*` by Better Auth's `twoFactor` plugin. Common ones:
+
+- `POST /api/auth/two-factor/enable`
+- `POST /api/auth/two-factor/verify-totp`
+- `POST /api/auth/two-factor/disable`
+
+See the [Better Auth two-factor docs](https://www.better-auth.com/docs/plugins/2fa) for the full contract. Call them via `(await getAuth()).api.*` server-side; in the browser, inside the Payload admin, the `useBetterAuthClient()` hook exposes `betterAuthClient.twoFactor.*` (outside the admin, create your own client with the `twoFactorClient()` plugin).
+
+Better Auth 1.6 adds brute-force protection to TOTP verification: the generated `twoFactor` collection carries the `verified`, `failedVerificationCount`, and `lockedUntil` fields, and repeated failed verifications lock the factor until the lockout window expires.
+
+## Customizing the 2FA plugin
+
+The default is a plain `twoFactor()` instance. To configure it (e.g. OTP delivery over email), pass your own under `betterAuth.plugins`: a plugin with the same id replaces the default.
+
+```ts
+import { twoFactor } from 'better-auth/plugins'
+
+betterAuth: {
+  plugins: [
+    twoFactor({
+      otpOptions: {
+        async sendOTP({ user, otp }) {
+          await myMailer.send({ to: user.email, subject: 'Your code', text: otp })
+        },
+      },
+    }),
+  ],
+}
+```
+
+## Components
+
+The admin views and the dashboard prompt are wired automatically - nothing to mount. For your own screens, `@b3nab/payload-better-auth/client` exports:
+
+- `TwoFactorAccountButton` - drop-in account control to enable/disable 2FA.
+- `FormsTwoFactor`, `FormVerifyTwoFactor` - the raw setup/verify forms, if you build a custom flow.
