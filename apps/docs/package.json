@@ -20,7 +20,6 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "fumadocs-core": "^16.8.12",
-    "fumadocs-docgen": "^2.1.0",
     "fumadocs-mdx": "^15.0.7",
     "fumadocs-ui": "^16.8.12",
     "lucide-react": "^0.477.0",
