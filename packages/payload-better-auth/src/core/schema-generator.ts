@@ -61,7 +61,8 @@ export const generatePayloadCollections = (
             type: 'ui',
             admin: {
               components: {
-                Field: '@b3nab/payload-better-auth/client#TwoFactorAccountButton',
+                Field:
+                  '@b3nab/payload-better-auth/client#TwoFactorAccountButton',
               },
               position: 'sidebar',
             },
@@ -92,17 +93,20 @@ export const generatePayloadCollections = (
         // disableLocalStrategy: true,
         strategies: [
           betterAuthStrategy,
-          ...((typeof newCollection.auth === 'object' && newCollection.auth?.strategies) ? newCollection.auth.strategies : []),
+          ...(typeof newCollection.auth === 'object' &&
+          newCollection.auth?.strategies
+            ? newCollection.auth.strategies
+            : []),
         ],
       }
       newCollection.fields = [
         ...newCollection.fields,
         {
-          name: "password",
-          type: "text",
+          name: 'password',
+          type: 'text',
           required: false,
-          hidden: true
-        }
+          hidden: true,
+        },
       ]
       newCollection.endpoints = payloadBetterAuthEndpoints
     }
@@ -141,7 +145,13 @@ const convertToPayloadFields = (
           // returned defaults to true: only an explicit false (secrets like
           // twoFactor.secret) must leave payload responses and the admin UI
           hidden: fieldValue.returned === false,
-          // TODO: how to map better-auth DBFieldAttributeConfig . input ??
+          // input defaults to true: an explicit false marks a system-owned
+          // value (never user-provided). Field access blocks every payload
+          // write surface; the adapter is immune (Local API overrideAccess).
+          // admin.readOnly would not do: it has no effect on the API
+          ...(fieldValue.input === false
+            ? { access: { create: () => false, update: () => false } }
+            : {}),
           defaultValue: fieldValue.defaultValue,
           unique: fieldValue.unique,
           // sortable is a storage hint (varchar vs text) payload does not
@@ -224,6 +234,13 @@ function convertToPayloadType(
     return fieldType === 'number'
       ? { type: 'number', index: true }
       : { type: 'text', index: true }
+  }
+
+  // a literal list types ONE allowed value (InferDBValueType resolves
+  // Array<LiteralString> to T[number]): payload's select enforces the same
+  // domain on every write surface, admin included
+  if (Array.isArray(fieldType)) {
+    return { type: 'select', options: [...fieldType] }
   }
 
   return internalFieldMap[String(fieldType)] || defaultType
