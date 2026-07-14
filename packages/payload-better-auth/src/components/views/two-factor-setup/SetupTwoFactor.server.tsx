@@ -25,7 +25,7 @@ export const SetupTwoFactorServer: React.FC<AdminViewServerProps> = async ({
   const twoFactorEnabled = user?.twoFactorEnabled || false
 
   if (!user) {
-    redirect('/admin')
+    redirect(initPageResult.req.payload.config.routes.admin)
   }
 
   return (
