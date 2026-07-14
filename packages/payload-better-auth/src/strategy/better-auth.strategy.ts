@@ -15,7 +15,7 @@ import { getLogger } from '../singleton.logger.js'
  * in admin only the 2FA plugin is handled with a custom page
  *
  * The strategy checks:
- * 1. If a 2FA verification is pending (better-auth.two_factor cookie exists)
+ * 1. If a 2FA verification is pending (the two_factor cookie exists)
  * 2. Otherwise, validates the session via Better Auth's getSession API
  */
 export const strategyHandler: AuthStrategyFunction = async ({
@@ -43,9 +43,15 @@ export const strategyHandler: AuthStrategyFunction = async ({
     })
 
     if (!session?.user) {
-      // If no session, check for pending 2FA verification
+      // If no session, check for pending 2FA verification.
+      // The runtime cookie name carries deploy-dependent prefixes (__Secure-
+      // on https, a custom cookiePrefix): resolve it from the same
+      // better-auth context that set the cookie instead of hardcoding it
       const cookies = await nextCookies()
-      const twoFactorCookie = cookies.get('better-auth.two_factor')
+      const twoFactorCookieName = (await betterAuth.$context).createAuthCookie(
+        'two_factor',
+      ).name
+      const twoFactorCookie = cookies.get(twoFactorCookieName)
 
       if (twoFactorCookie?.value) {
         logger.debug(
