@@ -53,7 +53,7 @@ export const betterAuthPluginConfig = defineBetterAuthPluginOptions({
   extendsCollections: {
     user: UserExtend,
   },
-  logs: 'trace',
+  // logs: 'trace',
   betterAuth: {
     appName: 'Better Auth Demo',
     baseURL: 'http://authdemo.local:7125',
