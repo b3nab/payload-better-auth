@@ -42,32 +42,42 @@ async function main() {
       : 'hash comparison: DIFFERENT',
   )
 
-  // Refresh the demo install so pnpm re-resolves the tarball content.
-  run('pnpm install')
-
-  run('pnpm typecheck', DEMO_DIR)
-
-  // Regenerate import map and payload types from the installed artifact.
-  // This also exercises the payload CLI loading the plugin through plain Node.
-  run('pnpm sync', DEMO_DIR)
-
-  // Consumer verification: FULL `next build` with both bundlers, exactly as a
-  // consumer runs it. The page-data collection phase must run: bundler module
-  // errors (e.g. Turbopack MODULE_UNPARSABLE) only surface when the compiled
-  // chunks are instantiated there, not during compilation. Payload needs a
-  // reachable MongoDB in that phase, so boot an ephemeral one via
-  // testcontainers (same pattern as tests/fixtures/beforeAll.fixtures.ts).
-  const memoryDB = await new MongoDBContainer('mongo:8').start()
-  const DATABASE_URI = `${memoryDB.getConnectionString()}/verify-consumer?directConnection=true`
+  // Point the demo at the packed tarball only for the duration of this run;
+  // the committed dependency stays workspace:*. pnpm add re-resolves the
+  // tarball content, and the finally below restores manifest and lockfile.
+  run(
+    `pnpm add @b3nab/payload-better-auth@file:${path.relative(DEMO_DIR, TARBALL)}`,
+    DEMO_DIR,
+  )
 
   try {
-    rmSync(path.join(DEMO_DIR, '.next'), { recursive: true, force: true })
-    run('pnpm exec next build', DEMO_DIR, { DATABASE_URI })
+    run('pnpm typecheck', DEMO_DIR)
 
-    rmSync(path.join(DEMO_DIR, '.next'), { recursive: true, force: true })
-    run('pnpm exec next build --webpack', DEMO_DIR, { DATABASE_URI })
+    // Regenerate import map and payload types from the installed artifact.
+    // This also exercises the payload CLI loading the plugin through plain Node.
+    run('pnpm sync', DEMO_DIR)
+
+    // Consumer verification: FULL `next build` with both bundlers, exactly as a
+    // consumer runs it. The page-data collection phase must run: bundler module
+    // errors (e.g. Turbopack MODULE_UNPARSABLE) only surface when the compiled
+    // chunks are instantiated there, not during compilation. Payload needs a
+    // reachable MongoDB in that phase, so boot an ephemeral one via
+    // testcontainers (same pattern as tests/fixtures/beforeAll.fixtures.ts).
+    const memoryDB = await new MongoDBContainer('mongo:8').start()
+    const DATABASE_URI = `${memoryDB.getConnectionString()}/verify-consumer?directConnection=true`
+
+    try {
+      rmSync(path.join(DEMO_DIR, '.next'), { recursive: true, force: true })
+      run('pnpm exec next build', DEMO_DIR, { DATABASE_URI })
+
+      rmSync(path.join(DEMO_DIR, '.next'), { recursive: true, force: true })
+      run('pnpm exec next build --webpack', DEMO_DIR, { DATABASE_URI })
+    } finally {
+      await memoryDB.stop()
+    }
   } finally {
-    await memoryDB.stop()
+    // Restore the committed workspace dependency and lockfile.
+    run('pnpm add @b3nab/payload-better-auth@workspace:*', DEMO_DIR)
   }
 
   console.log('\nverify:pre-release PASSED')
