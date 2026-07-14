@@ -9,7 +9,7 @@
   </h2>
 
 <p align="center">
-    You are one plugin away to revolutionize your PayloadCMS's auth.
+    You are one plugin away from revolutionizing your Payload CMS auth.
   <!-- The most comprehensive authentication library for TypeScript -->
     <br />
     <a href="https://payload-better-auth.abbenanti.com"><strong>Learn more »</strong></a>
@@ -31,9 +31,6 @@
 
 <!-- # Payload Better Auth Plugin -->
 
-> ⚠️ **ATTENTION**: If you want a preview access to the plugin, you should
-> contact the author (in private) and request access to the private registry.
-
 A plugin that integrates [Better Auth](https://www.better-auth.com) with
 [Payload CMS v3](https://payloadcms.com), providing enhanced authentication
 capabilities. This plugin is thought to be used in production, with real users,
@@ -42,8 +39,8 @@ so to be rock solid well tested and reliable. 🗿
 ## Description
 
 The `@b3nab/payload-better-auth` plugin wraps the better-auth library to
-seamleassly integrate advanced authentication features into Payload CMS v3. It
-enhanches developer productivity and user experience by offering more
+seamlessly integrate advanced authentication features into Payload CMS v3. It
+enhances developer productivity and user experience by offering more
 sophisticated authentication methods beyond Payload's built-in auth system.
 Definitely it's a better-way 🤓 to manage authentication for Payload CMS v3.
 
@@ -64,52 +61,73 @@ focus on user experience and developer productivity.
   - Integration with Better Auth
   - Automatic Collections creation
   - Automatic Better Auth API Endpoints creation
-  - Payload Adapter as Better Auth database
+  - Payload Adapter as Better Auth database, with transactions, joins, and
+    automatic cleanup of dependent records on delete
 - **Better Integration 🤓**
   - 2FA TOTP-based for Admin Panel
+  - Social login buttons auto-injected into the admin login screen
+  - Default email verification and password reset flows (overridable)
   - Easily extend Collections using Payload-like collection's config
+  - `payload.betterAuth` instance, fully typed with your own plugin options
+  - Auth layer helpers for Next.js (checkers, guards)
 
 ## Installation
 
+Install the plugin and its peer dependencies:
+
 ```bash
-pnpm add @b3nab/payload-better-auth
+pnpm add @b3nab/payload-better-auth better-auth better-auth-harmony
 ```
 
 ## Quick Start
 
-Into your `payload.config.ts` file, add the plugin:
+Create the plugin config in its own file:
+
+```ts
+// lib/payload-better-auth.config.ts
+import { defineBetterAuthPluginOptions } from "@b3nab/payload-better-auth";
+
+export const payloadBetterAuthConfig = defineBetterAuthPluginOptions({
+  // Better Auth Config. https://www.better-auth.com/docs/reference/options
+  betterAuth: {
+    // used by two factor plugin as an issuer and other things
+    appName: "My App",
+    // better-auth secret - you can omit it if your env variable is named `BETTER_AUTH_SECRET`
+    /** you can generate a good secret
+     * using the following command:
+     * @example
+     * openssl rand -base64 32
+     */
+    secret: process.env.BETTER_AUTH_SECRET,
+  },
+});
+
+// makes payload.betterAuth fully typed with YOUR options, everywhere
+declare module "@b3nab/payload-better-auth" {
+  interface PayloadBetterAuthRegister {
+    pluginOptions: typeof payloadBetterAuthConfig;
+  }
+}
+```
+
+Then add the plugin to your `payload.config.ts` file:
 
 ```ts
 import { buildConfig } from "payload";
 import { betterAuthPlugin } from "@b3nab/payload-better-auth";
+import { payloadBetterAuthConfig } from "./lib/payload-better-auth.config";
 
 export default buildConfig({
   // ... other config
 
-  plugins: [
-    betterAuthPlugin({
-      // Better Auth Config. https://www.better-auth.com/docs/reference/options
-      betterAuth: {
-        // used by two factor plugin as an issuer and other things
-        appName: "My App",
-        // better-auth secret - you can omit it if your env variable is named `BETTER_AUTH_SECRET`
-        /** you can generate a good secret
-         * using the following command:
-         * @example
-         * openssl rand -base64 32
-         */
-        secret: process.env.BETTER_AUTH_SECRET,
-      },
-    }),
-  ],
+  plugins: [betterAuthPlugin(payloadBetterAuthConfig)],
   // ... other config
 });
 ```
 
-### Roadmap (TODOs)
-
-- \[ ] Payload Auth Endpoints - Needs to replace all remaining payload default
-  auth endpoints
+See the [docs](https://payload-better-auth.abbenanti.com/docs) for the full
+setup: custom collections, roles, social providers, email flows, and protected
+Next.js routes.
 
 ## Important Notes
 
@@ -133,4 +151,4 @@ Created and maintained by [Benedetto Abbenanti](https://ben.abbenanti.com).
 This project would not be possible without the following open-source projects:
 
 - [Better Auth](https://better-auth.com)
-- [PayloadCMS](https://payloadcms.com)
+- [Payload CMS](https://payloadcms.com)
