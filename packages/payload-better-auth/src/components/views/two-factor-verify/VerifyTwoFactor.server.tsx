@@ -21,14 +21,27 @@ export const VerifyTwoFactorServer: React.FC<AdminViewServerProps> = async ({
   payload,
 }) => {
   const { cookies } = initPageResult
-  const twoFactorSession = cookies.get('better-auth.two_factor')
+  const { betterAuth, config } = initPageResult.req.payload
+  // the runtime cookie name carries deploy-dependent prefixes (__Secure- on
+  // https, a custom cookiePrefix): resolve it from the same better-auth
+  // context that set the cookie instead of hardcoding 'better-auth.two_factor'
+  const authContext = await betterAuth.$context
+  const twoFactorSession = cookies.get(
+    authContext.createAuthCookie('two_factor').name,
+  )
   console.log('twoFactorSession', twoFactorSession)
 
   // const twoFactorEnabled = user?.twoFactorEnabled || false
 
   if (!twoFactorSession) {
-    redirect('/admin')
+    redirect(config.routes.admin)
   }
+
+  // the otp flow is server-driven: offer it only when the host configured a
+  // sender on the two-factor plugin
+  const otpAvailable = Boolean(
+    authContext.getPlugin('two-factor')?.options?.otpOptions?.sendOTP,
+  )
 
   return (
     <MinimalTemplate
@@ -43,7 +56,7 @@ export const VerifyTwoFactorServer: React.FC<AdminViewServerProps> = async ({
       // visibleEntities={initPageResult.visibleEntities}
     >
       <Gutter>
-        <FormVerifyTwoFactor />
+        <FormVerifyTwoFactor otpAvailable={otpAvailable} />
         <div
           style={{
             width: '100%',
